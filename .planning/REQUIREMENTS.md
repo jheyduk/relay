@@ -40,10 +40,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Notifications
 
-- [ ] **NOTF-01**: User receives push notification when a session needs permission
-- [ ] **NOTF-02**: User receives push notification when a session completes
-- [ ] **NOTF-03**: Permission notifications use high-priority channel
-- [ ] **NOTF-04**: Completion/info notifications use normal-priority channel
+- [x] **NOTF-01**: User receives push notification when a session needs permission
+- [x] **NOTF-02**: User receives push notification when a session completes
+- [x] **NOTF-03**: Permission notifications use high-priority channel
+- [x] **NOTF-04**: Completion/info notifications use normal-priority channel
 
 ### UI
 
@@ -111,10 +111,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VOIC-01 | Phase 5 | Pending |
 | VOIC-02 | Phase 5 | Pending |
 | VOIC-03 | Phase 5 | Pending |
-| NOTF-01 | Phase 4 | Pending |
-| NOTF-02 | Phase 4 | Pending |
-| NOTF-03 | Phase 4 | Pending |
-| NOTF-04 | Phase 4 | Pending |
+| NOTF-01 | Phase 4 | Complete |
+| NOTF-02 | Phase 4 | Complete |
+| NOTF-03 | Phase 4 | Complete |
+| NOTF-04 | Phase 4 | Complete |
 | UI-01 | Phase 2 | Complete |
 | MSG-06 | Phase 4 | Complete |
 

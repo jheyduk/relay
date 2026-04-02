@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-02T20:53:18.664Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-02T20:53:29.918Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 5
@@ -61,6 +61,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03 P01 | 3min | 2 tasks | 9 files |
 | Phase 03 P02 | 2min | 3 tasks | 6 files |
 | Phase 04 P01 | 3min | 2 tasks | 8 files |
+| Phase 04-02 Pnotifications | 3min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,9 @@ Recent decisions affecting current work:
 - [Phase 03]: parametersOf pattern for Koin ViewModel injection with per-screen parameters
 - [Phase 04]: Callback format: callback:{response}:{kuerzel} sent via sendCommand (per D-01 CONTEXT)
 - [Phase 04]: Local variable extraction for cross-module nullable smart casts in Compose (Kotlin compiler limitation)
+- [Phase 04-02]: LaunchedEffect with mutableStateOf for deep-link navigation to avoid navigating before NavHost is composed
+- [Phase 04-02]: PendingIntent uses session.hashCode() as requestCode for unique per-session intents
+- [Phase 04-02]: Notification channel separation: relay_permissions (HIGH) for permission requests, relay_updates (DEFAULT) for completions
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T20:53:14.909Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-04-02T20:53:29.916Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
