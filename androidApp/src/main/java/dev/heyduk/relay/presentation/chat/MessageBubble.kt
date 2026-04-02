@@ -5,7 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,6 +31,9 @@ import java.util.Locale
 @Composable
 fun MessageBubble(
     message: ChatMessage,
+    isTtsPlaying: Boolean = false,
+    onPlayTts: (() -> Unit)? = null,
+    onStopTts: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val isOutgoing = message.isOutgoing
@@ -77,6 +86,24 @@ fun MessageBubble(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                if (!message.isOutgoing && onPlayTts != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(
+                            onClick = { if (isTtsPlaying) onStopTts?.invoke() else onPlayTts() },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (isTtsPlaying) Icons.Filled.Stop else Icons.Filled.VolumeUp,
+                                contentDescription = if (isTtsPlaying) "Stop" else "Play",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }

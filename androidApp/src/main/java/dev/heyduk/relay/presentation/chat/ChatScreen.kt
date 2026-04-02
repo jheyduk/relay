@@ -118,7 +118,14 @@ fun ChatScreen(
                         message = message,
                         onOptionSelected = { option -> viewModel.answerQuestion(message.id, option) }
                     )
-                    else -> MessageBubble(message = message)
+                    else -> MessageBubble(
+                        message = message,
+                        isTtsPlaying = uiState.ttsPlayingMessageId == message.id,
+                        onPlayTts = if (!message.isOutgoing) {
+                            { viewModel.playTts(message.id, message.content) }
+                        } else null,
+                        onStopTts = { viewModel.stopTts() }
+                    )
                 }
             }
         }
