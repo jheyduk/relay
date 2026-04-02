@@ -35,7 +35,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Voice
 
 - [x] **VOIC-01**: User can record voice and get on-device Whisper transcription
-- [ ] **VOIC-02**: Transcribed text is sent to the active session as a regular message
+- [x] **VOIC-02**: Transcribed text is sent to the active session as a regular message
 - [ ] **VOIC-03**: User can play back Claude responses via TTS
 
 ### Notifications
@@ -109,7 +109,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MSG-04 | Phase 4 | Complete |
 | MSG-05 | Phase 3 | Complete |
 | VOIC-01 | Phase 5 | Complete |
-| VOIC-02 | Phase 5 | Pending |
+| VOIC-02 | Phase 5 | Complete |
 | VOIC-03 | Phase 5 | Pending |
 | NOTF-01 | Phase 4 | Complete |
 | NOTF-02 | Phase 4 | Complete |

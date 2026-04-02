@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-04-02T22:01:32.598Z"
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-04-02T22:06:45.597Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 ## Current Position
 
 Phase: 05 (voice-pipeline) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-02
 
@@ -64,6 +64,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04-02 Pnotifications | 3min | 2 tasks | 7 files |
 | Phase 04 P03 | 1min | 2 tasks | 2 files |
 | Phase 05 P01 | 5min | 2 tasks | 6 files |
+| Phase 05 P03 | 3min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,8 @@ Recent decisions affecting current work:
 - [Phase 05]: FetchContent for ggml build from whisper.cpp source tree (official whisper.android approach)
 - [Phase 05]: arm64-v8a only ABI filter for initial native build, x86_64 emulator support deferred
 - [Phase 05]: Float array JNI interface instead of file path for whisper transcription flexibility
+- [Phase 05]: Lazy WhisperManager initialization on first recording -- avoids loading 141MB model at app start
+- [Phase 05]: TranscriptPreview replaces CommandInput when transcript available -- clean state-driven UI swap
 
 ### Pending Todos
 
@@ -118,6 +121,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T22:01:32.595Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-04-02T22:06:45.595Z
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None
