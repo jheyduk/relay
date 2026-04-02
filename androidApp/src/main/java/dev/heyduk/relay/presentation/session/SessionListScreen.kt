@@ -51,6 +51,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SessionListScreen(
     onNavigateToSetup: () -> Unit,
+    onNavigateToChat: (String) -> Unit = {},
     viewModel: SessionListViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -153,10 +154,7 @@ fun SessionListScreen(
                             onToggleExpand = { viewModel.toggleCardExpanded(session.kuerzel) },
                             onSelect = {
                                 viewModel.selectSession(session.kuerzel)
-                                // Fetch /last response if not loaded yet
-                                if (session.kuerzel !in uiState.lastResponses) {
-                                    viewModel.fetchLastResponse(session.kuerzel)
-                                }
+                                onNavigateToChat(session.kuerzel)
                             },
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
