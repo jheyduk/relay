@@ -10,25 +10,32 @@ import dev.heyduk.relay.presentation.status.StatusScreen
 
 /**
  * Navigation graph for Relay.
- * Routes to setup screen if tokens are not configured, otherwise to status screen.
+ * Routes to setup screen if tokens are not configured, otherwise to session list screen.
  */
 @Composable
 fun RelayNavGraph(navController: NavHostController, isConfigured: Boolean) {
     NavHost(
         navController = navController,
-        startDestination = if (isConfigured) "status" else "setup"
+        startDestination = if (isConfigured) "sessions" else "setup"
     ) {
         composable("setup") {
             SetupScreen(
                 onConfigured = {
-                    navController.navigate("status") {
+                    navController.navigate("sessions") {
                         popUpTo("setup") { inclusive = true }
                     }
                 }
             )
         }
-        composable("status") {
+        composable("sessions") {
             SessionListScreen(
+                onNavigateToSetup = {
+                    navController.navigate("setup")
+                }
+            )
+        }
+        composable("status") {
+            StatusScreen(
                 onNavigateToSetup = {
                     navController.navigate("setup")
                 }
