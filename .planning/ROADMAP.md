@@ -87,7 +87,7 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md -- Permission and question card composables, callback repository layer, DB schema extension
 - [x] 04-02-PLAN.md -- Notification channels, PollingService notification triggers, deep-link navigation
-- [ ] 04-03-PLAN.md -- ChatScreen wiring for interactive cards, ChatViewModel callback actions, visual verification
+- [x] 04-03-PLAN.md -- ChatScreen wiring for interactive cards, ChatViewModel callback actions, visual verification
 
 ### Phase 5: Voice Pipeline
 **Goal**: Users can speak to sessions and hear responses -- on-device Whisper transcription and Android TTS enable hands-free interaction
