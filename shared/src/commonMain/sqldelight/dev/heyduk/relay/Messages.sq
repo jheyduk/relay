@@ -23,3 +23,10 @@ SELECT * FROM messages ORDER BY timestamp DESC LIMIT 50;
 
 getLastMessageForSession:
 SELECT * FROM messages WHERE session = ? ORDER BY timestamp DESC LIMIT 1;
+
+insertOutgoing:
+INSERT INTO messages (update_id, session, type, message, status, tool_name, command, file_path, timestamp, is_from_relay)
+VALUES (?, ?, 'TEXT', ?, NULL, NULL, NULL, NULL, ?, 1);
+
+countOutgoingForSession:
+SELECT COUNT(*) FROM messages WHERE session = ? AND is_from_relay = 1;
