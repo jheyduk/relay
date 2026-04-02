@@ -13,4 +13,7 @@ interface ChatRepository {
 
     /** Send a text message to a session. Persists outgoing message to DB and sends via Telegram. */
     suspend fun sendMessage(kuerzel: String, text: String)
+
+    /** Answer a permission callback. Marks the message as answered in DB and sends the callback to Telegram. */
+    suspend fun answerCallback(messageId: Long, kuerzel: String, response: String)
 }

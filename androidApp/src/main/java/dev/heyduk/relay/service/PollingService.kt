@@ -94,7 +94,8 @@ class PollingService : Service() {
                         command = update.command,
                         file_path = update.filePath,
                         timestamp = update.timestamp,
-                        is_from_relay = if (update.isFromRelay) 1L else 0L
+                        is_from_relay = if (update.isFromRelay) 1L else 0L,
+                        callback_response = null
                     )
                 }
             }

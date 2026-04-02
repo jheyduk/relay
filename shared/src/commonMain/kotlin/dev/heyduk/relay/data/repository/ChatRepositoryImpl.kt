@@ -45,6 +45,14 @@ class ChatRepositoryImpl(
         // Delegate actual delivery to Telegram
         telegramRepository.sendCommand(kuerzel, text)
     }
+
+    override suspend fun answerCallback(messageId: Long, kuerzel: String, response: String) {
+        // Persist the decision locally so the UI reflects the answered state immediately
+        database.messagesQueries.markAnswered(response, messageId)
+
+        // Send callback to Telegram (format: callback:allow:kuerzel / callback:deny:kuerzel)
+        telegramRepository.sendCommand(kuerzel, "callback:$response:$kuerzel")
+    }
 }
 
 /**
@@ -56,5 +64,9 @@ private fun Messages.toChatMessage() = ChatMessage(
     content = message,
     timestamp = timestamp,
     isOutgoing = is_from_relay != 0L,
-    type = RelayMessageType.valueOf(type)
+    type = RelayMessageType.valueOf(type),
+    toolName = tool_name,
+    command = command,
+    filePath = file_path,
+    callbackResponse = callback_response
 )
