@@ -11,6 +11,7 @@ import dev.heyduk.relay.presentation.session.SessionListViewModel
 import dev.heyduk.relay.presentation.setup.SetupViewModel
 import dev.heyduk.relay.presentation.status.StatusViewModel
 import dev.heyduk.relay.service.NetworkMonitor
+import dev.heyduk.relay.service.NotificationHelper
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -33,6 +34,9 @@ val androidModule = module {
 
     // NetworkMonitor
     single { NetworkMonitor(androidContext()) }
+
+    // NotificationHelper
+    single { NotificationHelper(androidContext()) }
 
     // SQLDelight database driver and database
     single { AndroidSqliteDriver(RelayDatabase.Schema, androidContext(), "relay.db") }
