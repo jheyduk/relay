@@ -62,14 +62,13 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can select a session and send a text message that arrives at the correct zellij-claude session on the Mac
   2. User can view the full conversation history for any session, with messages displayed in chronological order
-  3. Conversation history persists across app restarts (stored in Room database)
-**Plans**: TBD
+  3. Conversation history persists across app restarts (stored in SQLDelight database)
+**Plans**: 2 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [ ] 03-01-PLAN.md -- ChatMessage model, Messages.sq outgoing persistence, ChatRepository with send+persist
+- [ ] 03-02-PLAN.md -- ChatScreen with message bubbles, ChatViewModel, navigation wiring, visual verification
 
 ### Phase 4: Permissions & Notifications
 **Goal**: Users never miss a permission request or session completion -- native Allow/Deny buttons replace Telegram inline keyboards, with push notifications surfacing time-critical events
@@ -114,6 +113,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Transport & Foundation | 3/3 | Complete | 2026-04-02 |
 | 2. Session Discovery & Status | 0/3 | Planning complete | - |
-| 3. Messaging & Conversations | 0/3 | Not started | - |
+| 3. Messaging & Conversations | 0/2 | Planning complete | - |
 | 4. Permissions & Notifications | 0/3 | Not started | - |
 | 5. Voice Pipeline | 0/3 | Not started | - |
