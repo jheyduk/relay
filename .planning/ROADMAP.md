@@ -53,7 +53,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md -- Session domain model, /ls parser, command router, SessionRepository (shared module)
 - [x] 02-02-PLAN.md -- RelayTheme, session cards, status chips, session list screen, command input (UI layer)
-- [ ] 02-03-PLAN.md -- Koin DI wiring, navigation update, MainActivity theming, visual verification
+- [x] 02-03-PLAN.md -- Koin DI wiring, navigation update, MainActivity theming, visual verification
 
 ### Phase 3: Messaging & Conversations
 **Goal**: Users can have text conversations with individual sessions and review history across app restarts
