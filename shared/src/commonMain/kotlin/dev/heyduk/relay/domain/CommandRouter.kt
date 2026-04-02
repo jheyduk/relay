@@ -27,8 +27,39 @@ object CommandRouter {
      * @param selectedKuerzel Currently selected session kuerzel, or null if none selected
      * @return The routed command result
      */
+    private val globalCommands = setOf("/ls", "/help")
+    private val sessionCommands = setOf("/last", "/open", "/goto", "/rename")
+
+    /**
+     * Route user input to the correct command format.
+     *
+     * @param input Raw user input text
+     * @param selectedKuerzel Currently selected session kuerzel, or null if none selected
+     * @return The routed command result
+     */
     fun route(input: String, selectedKuerzel: String?): CommandResult {
-        // Stub - will be implemented in GREEN phase
-        TODO("Not yet implemented")
+        val trimmed = input.trim()
+        val command = trimmed.split(" ").first()
+
+        // Global commands are always global, regardless of selected session
+        if (command in globalCommands) {
+            return CommandResult.Global(trimmed)
+        }
+
+        // Session-targeted commands require a selected session
+        if (sessionCommands.any { trimmed.startsWith(it) }) {
+            return if (selectedKuerzel == null) {
+                CommandResult.NoSessionSelected
+            } else {
+                CommandResult.SessionTargeted("$trimmed @$selectedKuerzel")
+            }
+        }
+
+        // Plain text requires a selected session
+        return if (selectedKuerzel == null) {
+            CommandResult.NoSessionSelected
+        } else {
+            CommandResult.Message(selectedKuerzel, trimmed)
+        }
     }
 }
