@@ -6,8 +6,11 @@ import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import dev.heyduk.relay.data.DataStoreOffsetProvider
 import dev.heyduk.relay.data.remote.OffsetProvider
 import dev.heyduk.relay.db.RelayDatabase
+import dev.heyduk.relay.presentation.setup.SetupViewModel
+import dev.heyduk.relay.presentation.status.StatusViewModel
 import dev.heyduk.relay.service.NetworkMonitor
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 // Top-level DataStore delegate (recommended single-instance pattern)
@@ -32,4 +35,8 @@ val androidModule = module {
     // SQLDelight database driver and database
     single { AndroidSqliteDriver(RelayDatabase.Schema, androidContext(), "relay.db") }
     single { RelayDatabase(get<AndroidSqliteDriver>()) }
+
+    // ViewModels
+    viewModel { SetupViewModel(get(), get()) }
+    viewModel { StatusViewModel(get(), get()) }
 }
