@@ -4,6 +4,8 @@ import dev.heyduk.relay.data.remote.RelayMessageParser
 import dev.heyduk.relay.data.remote.TelegramApi
 import dev.heyduk.relay.data.remote.TelegramApiImpl
 import dev.heyduk.relay.data.remote.TelegramPoller
+import dev.heyduk.relay.data.repository.ChatRepository
+import dev.heyduk.relay.data.repository.ChatRepositoryImpl
 import dev.heyduk.relay.data.repository.SessionRepository
 import dev.heyduk.relay.data.repository.SessionRepositoryImpl
 import dev.heyduk.relay.data.repository.TelegramRepository
@@ -85,4 +87,7 @@ val sharedModule = module {
 
     // Session repository: discovers sessions via /ls and parses update stream
     single<SessionRepository> { SessionRepositoryImpl(get()) }
+
+    // Chat repository: per-session message history and send-with-persist
+    single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
 }
