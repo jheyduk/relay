@@ -47,7 +47,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### UI
 
-- [ ] **UI-01**: App supports dark mode via Material 3 dynamic theming
+- [x] **UI-01**: App supports dark mode via Material 3 dynamic theming
 
 ## v2 Requirements
 
@@ -115,7 +115,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOTF-02 | Phase 4 | Pending |
 | NOTF-03 | Phase 4 | Pending |
 | NOTF-04 | Phase 4 | Pending |
-| UI-01 | Phase 2 | Pending |
+| UI-01 | Phase 2 | Complete |
 | MSG-06 | Phase 4 | Pending |
 
 **Coverage:**
