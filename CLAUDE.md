@@ -3,14 +3,14 @@
 
 **Relay**
 
-A native Android companion app for Claude Code sessions that replaces the current Telegram-based workflow. Relay provides a session-aware UI where each zellij-claude session gets its own visual space, with text and voice input unified in a single conversation stream. It communicates directly via the Telegram Bot API — no custom backend required.
+A mobile companion app for Claude Code sessions that replaces the current Telegram-based workflow. Relay provides a session-aware UI where each zellij-claude session gets its own visual space, with text and voice input unified in a single conversation stream. Built with Kotlin Multiplatform (KMP) for shared business logic across Android and iOS. Communicates directly via the Telegram Bot API — no custom backend required.
 
 **Core Value:** Remote session control with per-session separation — see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
 
 ### Constraints
 
 - **Transport**: Telegram Bot API only — no custom server, no WebSocket, no direct connection to the Mac
-- **Platform**: Android (Kotlin/Jetpack Compose) — native, no cross-platform framework
+- **Platform**: Kotlin Multiplatform (KMP) — shared business logic, Compose for Android UI, SwiftUI for future iOS UI
 - **Voice**: On-device Whisper model for transcription — must work offline
 - **Protocol**: Must speak the existing zellij-claude message format — the Mac-side should need zero changes
 - **Single user**: App is for the developer only, no auth/account system needed
