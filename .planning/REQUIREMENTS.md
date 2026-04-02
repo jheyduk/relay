@@ -26,7 +26,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Messaging
 
 - [x] **MSG-01**: User can send text messages to a specific session
-- [ ] **MSG-02**: User can view per-session conversation history
+- [x] **MSG-02**: User can view per-session conversation history
 - [ ] **MSG-03**: User can tap Allow or Deny on permission requests with native buttons
 - [ ] **MSG-04**: Permission requests show tool details (command, file path)
 - [x] **MSG-05**: Conversation history persists across app restarts (Room DB)
@@ -104,7 +104,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SESS-04 | Phase 2 | Complete |
 | SESS-05 | Phase 2 | Complete |
 | MSG-01 | Phase 3 | Complete |
-| MSG-02 | Phase 3 | Pending |
+| MSG-02 | Phase 3 | Complete |
 | MSG-03 | Phase 4 | Pending |
 | MSG-04 | Phase 4 | Pending |
 | MSG-05 | Phase 3 | Complete |
