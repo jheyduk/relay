@@ -30,12 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. App correctly parses incoming bot messages (distinguishes status updates, responses, and permission requests)
   4. App maintains polling connection when switching between WiFi and mobile data
   5. Foreground service keeps polling alive when the app is backgrounded or the screen is off
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md -- KMP project scaffolding, domain models, Telegram DTOs, SQLDelight schema
+- [ ] 01-02-PLAN.md -- Telegram API client, polling loop with backoff, message parser, repository
+- [ ] 01-03-PLAN.md -- Android foreground service, network monitor, setup UI, status UI, E2E verification
 
 ### Phase 2: Session Discovery & Status
 **Goal**: Users can see all active zellij-claude sessions at a glance with live status indicators and execute session management commands
@@ -112,7 +112,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Transport & Foundation | 0/3 | Not started | - |
+| 1. Transport & Foundation | 0/3 | Planning complete | - |
 | 2. Session Discovery & Status | 0/3 | Not started | - |
 | 3. Messaging & Conversations | 0/3 | Not started | - |
 | 4. Permissions & Notifications | 0/3 | Not started | - |
