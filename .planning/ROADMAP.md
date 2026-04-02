@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- KMP project scaffolding, domain models, Telegram DTOs, SQLDelight schema
-- [ ] 01-02-PLAN.md -- Telegram API client, polling loop with backoff, message parser, repository
+- [x] 01-02-PLAN.md -- Telegram API client, polling loop with backoff, message parser, repository
 - [ ] 01-03-PLAN.md -- Android foreground service, network monitor, setup UI, status UI, E2E verification
 
 ### Phase 2: Session Discovery & Status

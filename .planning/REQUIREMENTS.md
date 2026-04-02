@@ -11,7 +11,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **TRNS-01**: App connects to Telegram Bot API via long polling (getUpdates)
 - [x] **TRNS-02**: App resolves 409 conflict with existing Mac-side bot polling
-- [ ] **TRNS-03**: App sends messages in zellij-claude format (`@kuerzel message`)
+- [x] **TRNS-03**: App sends messages in zellij-claude format (`@kuerzel message`)
 - [x] **TRNS-04**: App receives and parses incoming bot messages (status, responses, permission requests)
 - [ ] **TRNS-05**: App maintains connection through network transitions (WiFi/mobile)
 
@@ -95,7 +95,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | TRNS-01 | Phase 1 | Complete |
 | TRNS-02 | Phase 1 | Complete |
-| TRNS-03 | Phase 1 | Pending |
+| TRNS-03 | Phase 1 | Complete |
 | TRNS-04 | Phase 1 | Complete |
 | TRNS-05 | Phase 1 | Pending |
 | SESS-01 | Phase 2 | Pending |

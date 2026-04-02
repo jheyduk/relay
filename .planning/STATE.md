@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-04-02T16:15:59.373Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-04-02T16:27:55.927Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 ## Current Position
 
 Phase: 01 (Transport & Foundation) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-02
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 01 P01 | 10min | 2 tasks | 14 files |
+| Phase 01 P02 | 9min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Gradle 9.4.1 for JDK 25 compat (8.14 doesn't support JDK 25)
 - [Phase 01]: android.builtInKotlin=false for AGP 9 + traditional KMP plugin compat
 - [Phase 01]: KSP 2.3.6 (new simplified versioning, replaces old 2.x.y-1.0.z format)
+- [Phase 01]: Extracted TelegramApi as interface (not class) for testability in poller and repository tests
+- [Phase 01]: Two-bot architecture via named Koin qualifiers: relayApi for reading, commandApi for writing
+- [Phase 01]: At-least-once delivery: offset persisted before processing updates
 
 ### Pending Todos
 
@@ -79,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T16:15:59.371Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-04-02T16:27:55.925Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
