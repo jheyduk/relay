@@ -16,6 +16,7 @@ import dev.heyduk.relay.data.remote.RelayMessageParser
 import dev.heyduk.relay.data.remote.TelegramApiImpl
 import dev.heyduk.relay.data.remote.TelegramPoller
 import dev.heyduk.relay.db.RelayDatabase
+import dev.heyduk.relay.domain.model.RelayMessageType
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -47,6 +48,7 @@ class PollingService : Service() {
     private val networkMonitor: NetworkMonitor by inject()
     private val httpClient: HttpClient by inject()
     private val database: RelayDatabase by inject()
+    private val notificationHelper: NotificationHelper by inject()
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -97,6 +99,13 @@ class PollingService : Service() {
                         is_from_relay = if (update.isFromRelay) 1L else 0L,
                         callback_response = null
                     )
+
+                    // Trigger notifications for permission and completion messages
+                    when (update.type) {
+                        RelayMessageType.PERMISSION -> notificationHelper.showPermissionNotification(update)
+                        RelayMessageType.COMPLETION -> notificationHelper.showCompletionNotification(update)
+                        else -> { /* no notification for other types */ }
+                    }
                 }
             }
 
