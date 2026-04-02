@@ -100,8 +100,8 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 05-01-PLAN.md -- whisper.cpp native CMake build, JNI bridge, WhisperManager with model file handling
-- [ ] 05-02-PLAN.md -- TtsManager with Android TextToSpeech, speaker icon on message bubbles, play/stop controls
+- [x] 05-01-PLAN.md -- whisper.cpp native CMake build, JNI bridge, WhisperManager with model file handling
+- [x] 05-02-PLAN.md -- TtsManager with Android TextToSpeech, speaker icon on message bubbles, play/stop controls
 - [ ] 05-03-PLAN.md -- AudioRecorder, hold-to-record button, transcript preview, voice-to-text-to-send pipeline wiring
 
 ## Progress

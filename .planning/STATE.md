@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-04-02T20:59:22.217Z"
+status: executing
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-04-02T22:01:32.598Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 14
+  completed_plans: 13
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** Remote session control with per-session separation -- see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
-**Current focus:** Phase 04 — Permissions & Notifications
+**Current focus:** Phase 05 — voice-pipeline
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 05 (voice-pipeline) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
@@ -63,6 +63,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P01 | 3min | 2 tasks | 8 files |
 | Phase 04-02 Pnotifications | 3min | 2 tasks | 7 files |
 | Phase 04 P03 | 1min | 2 tasks | 2 files |
+| Phase 05 P01 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,9 @@ Recent decisions affecting current work:
 - [Phase 04-02]: Notification channel separation: relay_permissions (HIGH) for permission requests, relay_updates (DEFAULT) for completions
 - [Phase 04]: sendingCallbackIds as Set<Long> in UiState for per-message loading indicators
 - [Phase 04]: answerQuestion sends both callback and text message for question flow
+- [Phase 05]: FetchContent for ggml build from whisper.cpp source tree (official whisper.android approach)
+- [Phase 05]: arm64-v8a only ABI filter for initial native build, x86_64 emulator support deferred
+- [Phase 05]: Float array JNI interface instead of file path for whisper transcription flexibility
 
 ### Pending Todos
 
@@ -114,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T20:56:17.014Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-04-02T22:01:32.595Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
