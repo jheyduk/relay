@@ -24,3 +24,10 @@ local.properties
 
 # OS
 Thumbs.db
+
+# whisper.cpp native source (cloned at build time, not committed)
+androidApp/src/main/cpp/whisper.cpp/
+
+# Whisper model files (large binaries, downloaded separately)
+androidApp/src/main/assets/*.bin
+androidApp/.cxx/
