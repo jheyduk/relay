@@ -16,24 +16,37 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 /**
- * Ktor-based Telegram Bot API client.
+ * Telegram Bot API client contract for reading updates and sending messages.
+ */
+interface TelegramApi {
+    suspend fun getUpdates(
+        offset: Long = 0,
+        timeout: Int = 30,
+        allowedUpdates: List<String> = listOf("message", "callback_query")
+    ): List<TelegramUpdate>
+
+    suspend fun sendMessage(text: String): TelegramMessage
+}
+
+/**
+ * Ktor-based implementation of [TelegramApi].
  * Supports getUpdates (long-polling) and sendMessage.
  */
-class TelegramApi(
+class TelegramApiImpl(
     private val httpClient: HttpClient,
     private val botToken: String,
     private val chatId: String
-) {
+) : TelegramApi {
     private val baseUrl = "https://api.telegram.org/bot$botToken"
 
     /**
      * Long-poll for updates from the Telegram Bot API.
      * Per-request timeout overrides ensure the connection stays open for long polling.
      */
-    suspend fun getUpdates(
-        offset: Long = 0,
-        timeout: Int = 30,
-        allowedUpdates: List<String> = listOf("message", "callback_query")
+    override suspend fun getUpdates(
+        offset: Long,
+        timeout: Int,
+        allowedUpdates: List<String>
     ): List<TelegramUpdate> {
         val response: TelegramResponse<List<TelegramUpdate>> = httpClient.get("$baseUrl/getUpdates") {
             parameter("offset", offset)
@@ -57,7 +70,7 @@ class TelegramApi(
     /**
      * Send a message to the configured chat via Telegram Bot API.
      */
-    suspend fun sendMessage(text: String): TelegramMessage {
+    override suspend fun sendMessage(text: String): TelegramMessage {
         val response: TelegramResponse<TelegramMessage> = httpClient.post("$baseUrl/sendMessage") {
             contentType(ContentType.Application.Json)
             setBody(SendMessageRequest(chatId = chatId, text = text))

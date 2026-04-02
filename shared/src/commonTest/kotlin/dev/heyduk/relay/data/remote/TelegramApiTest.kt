@@ -35,7 +35,7 @@ class TelegramApiTest {
     @Test
     fun getUpdatesWithEmptyResultReturnsEmptyList() = runTest {
         val client = createMockClient("""{"ok":true,"result":[]}""")
-        val api = TelegramApi(client, "test-token", "123")
+        val api = TelegramApiImpl(client, "test-token", "123")
         val result = api.getUpdates()
         assertTrue(result.isEmpty())
     }
@@ -59,7 +59,7 @@ class TelegramApiTest {
             }
         """.trimIndent()
         val client = createMockClient(responseJson)
-        val api = TelegramApi(client, "test-token", "123")
+        val api = TelegramApiImpl(client, "test-token", "123")
         val result = api.getUpdates()
         assertEquals(1, result.size)
         assertEquals(100L, result[0].updateId)
@@ -78,7 +78,7 @@ class TelegramApiTest {
                 json(Json { ignoreUnknownKeys = true; isLenient = true })
             }
         }
-        val api = TelegramApi(client, "test-token", "123")
+        val api = TelegramApiImpl(client, "test-token", "123")
         api.getUpdates(offset = 42, timeout = 30)
         assertTrue(capturedUrl.contains("offset=42"), "URL should contain offset=42, was: $capturedUrl")
         assertTrue(capturedUrl.contains("timeout=30"), "URL should contain timeout=30, was: $capturedUrl")
@@ -111,7 +111,7 @@ class TelegramApiTest {
                 json(Json { ignoreUnknownKeys = true; isLenient = true })
             }
         }
-        val api = TelegramApi(client, "test-token", "123")
+        val api = TelegramApiImpl(client, "test-token", "123")
         val result = api.sendMessage("test message")
         assertEquals(HttpMethod.Post, capturedMethod)
         assertTrue(capturedBody.contains("123")) // chat_id
@@ -122,7 +122,7 @@ class TelegramApiTest {
     @Test
     fun getUpdatesWithOkFalseThrowsTelegramApiException() = runTest {
         val client = createMockClient("""{"ok":false,"error_code":401,"description":"Unauthorized"}""")
-        val api = TelegramApi(client, "test-token", "123")
+        val api = TelegramApiImpl(client, "test-token", "123")
         val exception = assertFailsWith<TelegramApiException> {
             api.getUpdates()
         }
