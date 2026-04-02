@@ -27,7 +27,7 @@ Establish reliable bidirectional communication between the mobile app and zellij
 
 ### Message Persistence
 - DataStore Preferences for polling offset (single Long value, no DB schema needed)
-- Room DB for message storage (full conversation history)
+- SQLDelight for message storage (KMP-compatible, shared schema across platforms)
 - Message deduplication via update_id as Primary Key with IGNORE Conflict Strategy
 
 ### Foreground Service & Network
