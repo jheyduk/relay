@@ -17,11 +17,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Sessions
 
-- [ ] **SESS-01**: User can view list of all active zellij-claude sessions with status
-- [ ] **SESS-02**: User can see session status (working, waiting, ready, shell) with visual indicator
-- [ ] **SESS-03**: User can execute `/ls` to refresh session list
-- [ ] **SESS-04**: User can execute `/last @kuerzel` to see last response
-- [ ] **SESS-05**: User can execute `/open`, `/goto`, `/rename` session commands
+- [x] **SESS-01**: User can view list of all active zellij-claude sessions with status
+- [x] **SESS-02**: User can see session status (working, waiting, ready, shell) with visual indicator
+- [x] **SESS-03**: User can execute `/ls` to refresh session list
+- [x] **SESS-04**: User can execute `/last @kuerzel` to see last response
+- [x] **SESS-05**: User can execute `/open`, `/goto`, `/rename` session commands
 
 ### Messaging
 
@@ -98,11 +98,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TRNS-03 | Phase 1 | Complete |
 | TRNS-04 | Phase 1 | Complete |
 | TRNS-05 | Phase 1 | Complete |
-| SESS-01 | Phase 2 | Pending |
-| SESS-02 | Phase 2 | Pending |
-| SESS-03 | Phase 2 | Pending |
-| SESS-04 | Phase 2 | Pending |
-| SESS-05 | Phase 2 | Pending |
+| SESS-01 | Phase 2 | Complete |
+| SESS-02 | Phase 2 | Complete |
+| SESS-03 | Phase 2 | Complete |
+| SESS-04 | Phase 2 | Complete |
+| SESS-05 | Phase 2 | Complete |
 | MSG-01 | Phase 3 | Pending |
 | MSG-02 | Phase 3 | Pending |
 | MSG-03 | Phase 4 | Pending |

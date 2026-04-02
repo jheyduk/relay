@@ -47,13 +47,13 @@ Plans:
   3. User can execute `/last @kuerzel` to view the last response from a specific session
   4. User can execute `/open`, `/goto`, `/rename` commands for session management
   5. App renders in dark mode via Material 3 dynamic theming
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+- [x] 02-01-PLAN.md -- Session domain model, /ls parser, command router, SessionRepository (shared module)
+- [ ] 02-02-PLAN.md -- RelayTheme, session cards, status chips, session list screen, command input (UI layer)
+- [ ] 02-03-PLAN.md -- Koin DI wiring, navigation update, MainActivity theming, visual verification
 
 ### Phase 3: Messaging & Conversations
 **Goal**: Users can have text conversations with individual sessions and review history across app restarts
@@ -112,8 +112,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Transport & Foundation | 0/3 | Planning complete | - |
-| 2. Session Discovery & Status | 0/3 | Not started | - |
+| 1. Transport & Foundation | 3/3 | Complete | 2026-04-02 |
+| 2. Session Discovery & Status | 0/3 | Planning complete | - |
 | 3. Messaging & Conversations | 0/3 | Not started | - |
 | 4. Permissions & Notifications | 0/3 | Not started | - |
 | 5. Voice Pipeline | 0/3 | Not started | - |
