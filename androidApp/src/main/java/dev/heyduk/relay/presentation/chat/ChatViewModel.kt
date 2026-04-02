@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.heyduk.relay.data.repository.ChatRepository
 import dev.heyduk.relay.domain.model.ChatMessage
+import dev.heyduk.relay.voice.AudioRecorder
 import dev.heyduk.relay.voice.TtsManager
+import dev.heyduk.relay.voice.WhisperManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +22,8 @@ import kotlinx.coroutines.launch
 class ChatViewModel(
     private val chatRepository: ChatRepository,
     private val ttsManager: TtsManager,
+    private val whisperManager: WhisperManager,
+    private val audioRecorder: AudioRecorder,
     private val kuerzel: String
 ) : ViewModel() {
 
@@ -29,12 +33,18 @@ class ChatViewModel(
         val isSending: Boolean = false,
         val errorMessage: String? = null,
         val sendingCallbackIds: Set<Long> = emptySet(),
-        val ttsPlayingMessageId: Long? = null
+        val ttsPlayingMessageId: Long? = null,
+        val isRecording: Boolean = false,
+        val isTranscribing: Boolean = false,
+        val transcriptPreview: String? = null
     )
 
     private data class LocalState(
         val isSending: Boolean = false,
-        val errorMessage: String? = null
+        val errorMessage: String? = null,
+        val isRecording: Boolean = false,
+        val isTranscribing: Boolean = false,
+        val transcriptPreview: String? = null
     )
 
     private val _localState = MutableStateFlow(LocalState())
@@ -52,7 +62,10 @@ class ChatViewModel(
             isSending = local.isSending,
             errorMessage = local.errorMessage,
             sendingCallbackIds = sendingIds,
-            ttsPlayingMessageId = ttsId
+            ttsPlayingMessageId = ttsId,
+            isRecording = local.isRecording,
+            isTranscribing = local.isTranscribing,
+            transcriptPreview = local.transcriptPreview
         )
     }.stateIn(
         scope = viewModelScope,
@@ -117,6 +130,72 @@ class ChatViewModel(
     /** Stop TTS playback. */
     fun stopTts() {
         ttsManager.stop()
+    }
+
+    // --- Voice recording ---
+
+    /** Initialize whisper on first use. */
+    private var whisperInitialized = false
+
+    fun startRecording() {
+        viewModelScope.launch {
+            // Initialize whisper if needed (first use)
+            if (!whisperInitialized) {
+                try {
+                    whisperManager.initialize()
+                    whisperInitialized = true
+                } catch (e: Exception) {
+                    _localState.update { it.copy(errorMessage = "Whisper init failed: ${e.message}") }
+                    return@launch
+                }
+            }
+
+            _localState.update { it.copy(isRecording = true) }
+            try {
+                audioRecorder.startRecording()
+            } catch (e: Exception) {
+                _localState.update {
+                    it.copy(isRecording = false, errorMessage = "Recording failed: ${e.message}")
+                }
+            }
+        }
+    }
+
+    fun stopRecording() {
+        audioRecorder.stopRecording()
+        _localState.update { it.copy(isRecording = false, isTranscribing = true) }
+
+        viewModelScope.launch {
+            try {
+                val wavFile = audioRecorder.getOutputFile()
+                    ?: throw IllegalStateException("No recording file available")
+                val transcript = whisperManager.transcribe(wavFile)
+                if (transcript.isBlank()) {
+                    _localState.update {
+                        it.copy(isTranscribing = false, errorMessage = "Could not transcribe audio")
+                    }
+                } else {
+                    _localState.update {
+                        it.copy(isTranscribing = false, transcriptPreview = transcript)
+                    }
+                }
+                // Clean up temp file
+                wavFile.delete()
+            } catch (e: Exception) {
+                _localState.update {
+                    it.copy(isTranscribing = false, errorMessage = "Transcription failed: ${e.message}")
+                }
+            }
+        }
+    }
+
+    fun sendTranscript(text: String) {
+        _localState.update { it.copy(transcriptPreview = null) }
+        sendMessage(text)  // reuses existing send flow
+    }
+
+    fun cancelTranscript() {
+        _localState.update { it.copy(transcriptPreview = null) }
     }
 
     override fun onCleared() {

@@ -1,7 +1,12 @@
 package dev.heyduk.relay.presentation.chat
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -25,8 +31,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.heyduk.relay.domain.model.RelayMessageType
 import dev.heyduk.relay.presentation.components.CommandInput
@@ -47,6 +55,24 @@ fun ChatScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    val audioPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) viewModel.startRecording()
+    }
+
+    fun handleMicPress() {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+        if (hasPermission) {
+            viewModel.startRecording()
+        } else {
+            audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
 
     // Show error messages via snackbar
     LaunchedEffect(uiState.errorMessage) {
@@ -71,11 +97,30 @@ fun ChatScreen(
             )
         },
         bottomBar = {
-            CommandInput(
-                selectedKuerzel = kuerzel,
-                onSendCommand = viewModel::sendMessage,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column {
+                if (uiState.isTranscribing) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+
+                val transcript = uiState.transcriptPreview
+                if (transcript != null) {
+                    TranscriptPreview(
+                        transcript = transcript,
+                        onSend = viewModel::sendTranscript,
+                        onCancel = viewModel::cancelTranscript,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    CommandInput(
+                        selectedKuerzel = kuerzel,
+                        onSendCommand = viewModel::sendMessage,
+                        isRecording = uiState.isRecording,
+                        onMicPressed = { handleMicPress() },
+                        onMicReleased = { viewModel.stopRecording() },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->

@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import dev.heyduk.relay.presentation.chat.VoiceRecordButton
 
 /**
  * Persistent bottom bar command input.
@@ -29,6 +30,9 @@ import androidx.compose.ui.unit.dp
 fun CommandInput(
     selectedKuerzel: String?,
     onSendCommand: (String) -> Unit,
+    isRecording: Boolean = false,
+    onMicPressed: (() -> Unit)? = null,
+    onMicReleased: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var text by rememberSaveable { mutableStateOf("") }
@@ -70,6 +74,14 @@ fun CommandInput(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send"
+                )
+            }
+
+            if (onMicPressed != null && onMicReleased != null) {
+                VoiceRecordButton(
+                    isRecording = isRecording,
+                    onStartRecording = onMicPressed,
+                    onStopRecording = onMicReleased
                 )
             }
         }
