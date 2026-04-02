@@ -25,7 +25,8 @@ class ChatViewModel(
         val messages: List<ChatMessage> = emptyList(),
         val kuerzel: String = "",
         val isSending: Boolean = false,
-        val errorMessage: String? = null
+        val errorMessage: String? = null,
+        val sendingCallbackIds: Set<Long> = emptySet()
     )
 
     private data class LocalState(
@@ -34,16 +35,19 @@ class ChatViewModel(
     )
 
     private val _localState = MutableStateFlow(LocalState())
+    private val _sendingCallbacks = MutableStateFlow<Set<Long>>(emptySet())
 
     val uiState: StateFlow<ChatUiState> = combine(
         chatRepository.messagesForSession(kuerzel),
-        _localState
-    ) { messages, local ->
+        _localState,
+        _sendingCallbacks
+    ) { messages, local, sendingIds ->
         ChatUiState(
             messages = messages,
             kuerzel = kuerzel,
             isSending = local.isSending,
-            errorMessage = local.errorMessage
+            errorMessage = local.errorMessage,
+            sendingCallbackIds = sendingIds
         )
     }.stateIn(
         scope = viewModelScope,
@@ -62,6 +66,35 @@ class ChatViewModel(
                 _localState.update { it.copy(errorMessage = "Send failed: ${e.message}") }
             } finally {
                 _localState.update { it.copy(isSending = false) }
+            }
+        }
+    }
+
+    /** Answer a permission callback (Allow/Deny). */
+    fun answerCallback(messageId: Long, response: String) {
+        viewModelScope.launch {
+            _sendingCallbacks.update { it + messageId }
+            try {
+                chatRepository.answerCallback(messageId, kuerzel, response)
+            } catch (e: Exception) {
+                _localState.update { it.copy(errorMessage = "Callback failed: ${e.message}") }
+            } finally {
+                _sendingCallbacks.update { it - messageId }
+            }
+        }
+    }
+
+    /** Answer a question by sending the callback and the option text as a message. */
+    fun answerQuestion(messageId: Long, option: String) {
+        viewModelScope.launch {
+            _sendingCallbacks.update { it + messageId }
+            try {
+                chatRepository.answerCallback(messageId, kuerzel, option)
+                chatRepository.sendMessage(kuerzel, option)
+            } catch (e: Exception) {
+                _localState.update { it.copy(errorMessage = "Answer failed: ${e.message}") }
+            } finally {
+                _sendingCallbacks.update { it - messageId }
             }
         }
     }

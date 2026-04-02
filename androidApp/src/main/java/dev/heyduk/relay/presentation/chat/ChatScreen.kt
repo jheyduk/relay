@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.heyduk.relay.domain.model.RelayMessageType
 import dev.heyduk.relay.presentation.components.CommandInput
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -106,7 +107,19 @@ fun ChatScreen(
                 items = uiState.messages.reversed(),
                 key = { it.id }
             ) { message ->
-                MessageBubble(message = message)
+                when (message.type) {
+                    RelayMessageType.PERMISSION -> PermissionCard(
+                        message = message,
+                        onAllow = { viewModel.answerCallback(message.id, "allow") },
+                        onDeny = { viewModel.answerCallback(message.id, "deny") },
+                        isSending = message.id in uiState.sendingCallbackIds
+                    )
+                    RelayMessageType.QUESTION -> QuestionCard(
+                        message = message,
+                        onOptionSelected = { option -> viewModel.answerQuestion(message.id, option) }
+                    )
+                    else -> MessageBubble(message = message)
+                }
             }
         }
     }
