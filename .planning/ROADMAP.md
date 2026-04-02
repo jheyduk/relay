@@ -81,13 +81,13 @@ Plans:
   4. User receives a high-priority push notification when any session requests permission, even with the app backgrounded
   5. User receives a normal-priority notification when a session completes its task
   6. Tapping a notification opens the app directly to the relevant session
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
-- [ ] 04-03: TBD
+- [ ] 04-01-PLAN.md -- Permission and question card composables, callback repository layer, DB schema extension
+- [ ] 04-02-PLAN.md -- Notification channels, PollingService notification triggers, deep-link navigation
+- [ ] 04-03-PLAN.md -- ChatScreen wiring for interactive cards, ChatViewModel callback actions, visual verification
 
 ### Phase 5: Voice Pipeline
 **Goal**: Users can speak to sessions and hear responses -- on-device Whisper transcription and Android TTS enable hands-free interaction
@@ -114,5 +114,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Transport & Foundation | 3/3 | Complete | 2026-04-02 |
 | 2. Session Discovery & Status | 0/3 | Planning complete | - |
 | 3. Messaging & Conversations | 0/2 | Planning complete | - |
-| 4. Permissions & Notifications | 0/3 | Not started | - |
+| 4. Permissions & Notifications | 0/3 | Planning complete | - |
 | 5. Voice Pipeline | 0/3 | Not started | - |
