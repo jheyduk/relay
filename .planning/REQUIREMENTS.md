@@ -13,7 +13,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TRNS-02**: App resolves 409 conflict with existing Mac-side bot polling
 - [x] **TRNS-03**: App sends messages in zellij-claude format (`@kuerzel message`)
 - [x] **TRNS-04**: App receives and parses incoming bot messages (status, responses, permission requests)
-- [ ] **TRNS-05**: App maintains connection through network transitions (WiFi/mobile)
+- [x] **TRNS-05**: App maintains connection through network transitions (WiFi/mobile)
 
 ### Sessions
 
@@ -97,7 +97,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TRNS-02 | Phase 1 | Complete |
 | TRNS-03 | Phase 1 | Complete |
 | TRNS-04 | Phase 1 | Complete |
-| TRNS-05 | Phase 1 | Pending |
+| TRNS-05 | Phase 1 | Complete |
 | SESS-01 | Phase 2 | Pending |
 | SESS-02 | Phase 2 | Pending |
 | SESS-03 | Phase 2 | Pending |
