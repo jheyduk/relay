@@ -97,12 +97,12 @@ Plans:
   1. User can hold a button to record voice, and the recording is transcribed on-device by Whisper without network access
   2. Transcribed text is automatically sent to the active session as a regular message (appears in conversation history as text)
   3. User can tap a play button on any Claude response to hear it read aloud via TTS
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
-- [ ] 05-03: TBD
+- [ ] 05-01-PLAN.md -- whisper.cpp native CMake build, JNI bridge, WhisperManager with model file handling
+- [ ] 05-02-PLAN.md -- TtsManager with Android TextToSpeech, speaker icon on message bubbles, play/stop controls
+- [ ] 05-03-PLAN.md -- AudioRecorder, hold-to-record button, transcript preview, voice-to-text-to-send pipeline wiring
 
 ## Progress
 
@@ -115,4 +115,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Session Discovery & Status | 0/3 | Planning complete | - |
 | 3. Messaging & Conversations | 0/2 | Planning complete | - |
 | 4. Permissions & Notifications | 0/3 | Planning complete | - |
-| 5. Voice Pipeline | 0/3 | Not started | - |
+| 5. Voice Pipeline | 0/3 | Planning complete | - |
