@@ -56,7 +56,17 @@ dependencies {
     implementation(libs.activity.compose)
 
     // Koin
+    implementation(libs.koin.android)
     implementation(libs.koin.compose)
+
+    // DataStore
+    implementation(libs.datastore.preferences)
+
+    // SQLDelight
+    implementation(libs.sqldelight.android.driver)
+
+    // Ktor (needed for HttpClient injection in PollingService)
+    implementation(libs.ktor.client.core)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)

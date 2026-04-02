@@ -1,6 +1,8 @@
 package dev.heyduk.relay
 
 import android.app.Application
+import dev.heyduk.relay.di.androidModule
+import dev.heyduk.relay.di.sharedModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -13,7 +15,7 @@ class RelayApp : Application() {
         }
         startKoin {
             androidContext(this@RelayApp)
-            modules(emptyList()) // Modules added in Plan 02
+            modules(sharedModule, androidModule)
         }
     }
 }
