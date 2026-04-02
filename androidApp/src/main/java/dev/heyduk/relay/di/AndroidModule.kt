@@ -12,6 +12,7 @@ import dev.heyduk.relay.presentation.setup.SetupViewModel
 import dev.heyduk.relay.presentation.status.StatusViewModel
 import dev.heyduk.relay.service.NetworkMonitor
 import dev.heyduk.relay.service.NotificationHelper
+import dev.heyduk.relay.voice.AudioRecorder
 import dev.heyduk.relay.voice.TtsManager
 import dev.heyduk.relay.voice.WhisperManager
 import org.koin.android.ext.koin.androidContext
@@ -47,6 +48,7 @@ val androidModule = module {
     // Voice
     single { WhisperManager(androidContext()) }
     single { TtsManager(androidContext()) }
+    single { AudioRecorder(androidContext().cacheDir) }
 
     // ViewModels
     viewModel { SetupViewModel(get(), get()) }
