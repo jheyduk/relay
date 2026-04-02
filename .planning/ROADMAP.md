@@ -85,8 +85,8 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01-PLAN.md -- Permission and question card composables, callback repository layer, DB schema extension
-- [ ] 04-02-PLAN.md -- Notification channels, PollingService notification triggers, deep-link navigation
+- [x] 04-01-PLAN.md -- Permission and question card composables, callback repository layer, DB schema extension
+- [x] 04-02-PLAN.md -- Notification channels, PollingService notification triggers, deep-link navigation
 - [ ] 04-03-PLAN.md -- ChatScreen wiring for interactive cards, ChatViewModel callback actions, visual verification
 
 ### Phase 5: Voice Pipeline
