@@ -13,6 +13,7 @@ import dev.heyduk.relay.presentation.status.StatusViewModel
 import dev.heyduk.relay.service.NetworkMonitor
 import dev.heyduk.relay.service.NotificationHelper
 import dev.heyduk.relay.voice.TtsManager
+import dev.heyduk.relay.voice.WhisperManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -43,7 +44,8 @@ val androidModule = module {
     single { AndroidSqliteDriver(RelayDatabase.Schema, androidContext(), "relay.db") }
     single { RelayDatabase(get<AndroidSqliteDriver>()) }
 
-    // TTS
+    // Voice
+    single { WhisperManager(androidContext()) }
     single { TtsManager(androidContext()) }
 
     // ViewModels
