@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.heyduk.relay.data.repository.ChatRepository
 import dev.heyduk.relay.domain.model.ChatMessage
+import dev.heyduk.relay.voice.TtsManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
  */
 class ChatViewModel(
     private val chatRepository: ChatRepository,
+    private val ttsManager: TtsManager,
     private val kuerzel: String
 ) : ViewModel() {
 
@@ -26,7 +28,8 @@ class ChatViewModel(
         val kuerzel: String = "",
         val isSending: Boolean = false,
         val errorMessage: String? = null,
-        val sendingCallbackIds: Set<Long> = emptySet()
+        val sendingCallbackIds: Set<Long> = emptySet(),
+        val ttsPlayingMessageId: Long? = null
     )
 
     private data class LocalState(
@@ -40,14 +43,16 @@ class ChatViewModel(
     val uiState: StateFlow<ChatUiState> = combine(
         chatRepository.messagesForSession(kuerzel),
         _localState,
-        _sendingCallbacks
-    ) { messages, local, sendingIds ->
+        _sendingCallbacks,
+        ttsManager.speakingMessageId
+    ) { messages, local, sendingIds, ttsId ->
         ChatUiState(
             messages = messages,
             kuerzel = kuerzel,
             isSending = local.isSending,
             errorMessage = local.errorMessage,
-            sendingCallbackIds = sendingIds
+            sendingCallbackIds = sendingIds,
+            ttsPlayingMessageId = ttsId
         )
     }.stateIn(
         scope = viewModelScope,
@@ -102,5 +107,20 @@ class ChatViewModel(
     /** Clear error message after snackbar dismissal. */
     fun clearError() {
         _localState.update { it.copy(errorMessage = null) }
+    }
+
+    /** Play TTS for a message. */
+    fun playTts(messageId: Long, text: String) {
+        ttsManager.speak(messageId, text)
+    }
+
+    /** Stop TTS playback. */
+    fun stopTts() {
+        ttsManager.stop()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        ttsManager.stop()
     }
 }

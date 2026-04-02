@@ -12,6 +12,7 @@ import dev.heyduk.relay.presentation.setup.SetupViewModel
 import dev.heyduk.relay.presentation.status.StatusViewModel
 import dev.heyduk.relay.service.NetworkMonitor
 import dev.heyduk.relay.service.NotificationHelper
+import dev.heyduk.relay.voice.TtsManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -42,9 +43,12 @@ val androidModule = module {
     single { AndroidSqliteDriver(RelayDatabase.Schema, androidContext(), "relay.db") }
     single { RelayDatabase(get<AndroidSqliteDriver>()) }
 
+    // TTS
+    single { TtsManager(androidContext()) }
+
     // ViewModels
     viewModel { SetupViewModel(get(), get()) }
     viewModel { StatusViewModel(get(), get()) }
     viewModel { SessionListViewModel(get(), get(), get()) }
-    viewModel { params -> ChatViewModel(get(), params.get<String>()) }
+    viewModel { params -> ChatViewModel(get(), get(), params.get<String>()) }
 }
