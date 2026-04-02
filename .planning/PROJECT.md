@@ -12,7 +12,9 @@ Remote session control with per-session separation — see all Claude Code sessi
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Telegram Bot API transport with two-bot architecture (409 conflict resolved) — Phase 1
+- ✓ Long polling with exponential backoff and network resilience — Phase 1
+- ✓ Structured JSON message parsing for relay protocol — Phase 1
 
 ### Active
 
@@ -81,4 +83,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after initialization*
+*Last updated: 2026-04-02 after Phase 1 completion*
