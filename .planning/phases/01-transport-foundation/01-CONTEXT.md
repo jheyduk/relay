@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Establish reliable bidirectional communication between the Android app and zellij-claude on the Mac via Telegram Bot API. Solve the 409 single-consumer conflict by using a dedicated second bot token for Relay. Set up the Android project scaffolding with Kotlin/Compose, Hilt DI, Ktor client, and a foreground service for continuous polling.
+Establish reliable bidirectional communication between the mobile app and zellij-claude on the Mac via Telegram Bot API. Solve the 409 single-consumer conflict by using a dedicated second bot token for Relay. Set up the KMP project scaffolding with shared module (Ktor client, kotlinx.serialization, SQLDelight, Coroutines/Flow) and Android app module (Compose UI, Hilt DI, Foreground Service for polling).
 
 </domain>
 
@@ -37,10 +37,17 @@ Establish reliable bidirectional communication between the Android app and zelli
 - Service runs continuously in background — persistent notification shows "Connected" / "Reconnecting"
 - Battery optimization warning shown during initial app setup
 
+### KMP Architecture (NEW — added after discuss)
+- KMP multi-module structure: `:shared` (common business logic), `:androidApp` (Compose UI + platform services), future `:iosApp`
+- Shared module contains: Telegram API client (Ktor), message models, repositories, domain use cases
+- Platform-specific via expect/actual: DataStore for offset persistence, platform-specific networking config
+- SQLDelight instead of Room for KMP-compatible database (shared schema across platforms)
+- Koin instead of Hilt for DI (Hilt is Android-only, Koin supports KMP)
+
 ### Claude's Discretion
-- Android project structure and package naming
+- Exact KMP module boundaries and package naming
 - Exact Ktor client configuration (timeouts, retry policies)
-- Room database schema for messages
+- SQLDelight schema for messages
 - JSON serialization format details (kotlinx.serialization)
 
 </decisions>
