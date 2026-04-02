@@ -6,6 +6,7 @@ import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import dev.heyduk.relay.data.DataStoreOffsetProvider
 import dev.heyduk.relay.data.remote.OffsetProvider
 import dev.heyduk.relay.db.RelayDatabase
+import dev.heyduk.relay.presentation.session.SessionListViewModel
 import dev.heyduk.relay.presentation.setup.SetupViewModel
 import dev.heyduk.relay.presentation.status.StatusViewModel
 import dev.heyduk.relay.service.NetworkMonitor
@@ -39,4 +40,5 @@ val androidModule = module {
     // ViewModels
     viewModel { SetupViewModel(get(), get()) }
     viewModel { StatusViewModel(get(), get()) }
+    viewModel { SessionListViewModel(get(), get(), get()) }
 }
