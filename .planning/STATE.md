@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-04-02T23:00:14.358Z"
-last_activity: 2026-04-02
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-04-03T09:27:35.320Z"
+last_activity: 2026-04-03
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 5
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 18
+  completed_plans: 15
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** Remote session control with per-session separation -- see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
-**Current focus:** Phase 05 — voice-pipeline
+**Current focus:** Phase 06 — direct-websocket-transport
 
 ## Current Position
 
-Phase: 05
-Plan: Not started
+Phase: 06 (direct-websocket-transport) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-04-03 - Completed quick task 260403-d2e: Auto-start PollingService after setup and on app launch
+Last activity: 2026-04-03
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -65,6 +65,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P03 | 1min | 2 tasks | 2 files |
 | Phase 05 P01 | 5min | 2 tasks | 6 files |
 | Phase 05 P03 | 3min | 2 tasks | 8 files |
+| Phase 06 P01 | 3min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Float array JNI interface instead of file path for whisper transcription flexibility
 - [Phase 05]: Lazy WhisperManager initialization on first recording -- avoids loading 141MB model at app start
 - [Phase 05]: TranscriptPreview replaces CommandInput when transcript available -- clean state-driven UI swap
+- [Phase 06]: Unix domain socket for hook-to-server IPC instead of HTTP localhost
+- [Phase 06]: dns-sd CLI for mDNS (macOS built-in, no npm dep)
+- [Phase 06]: Telegram fallback only for permission/completion after 30s disconnect
 
 ### Pending Todos
 
@@ -131,6 +135,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T22:06:45.595Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-04-03T09:27:35.317Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
