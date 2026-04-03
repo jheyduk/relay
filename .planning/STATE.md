@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-04-02T23:00:14.358Z"
-last_activity: 2026-04-02
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-04-03T09:27:34.726Z"
+last_activity: "2026-04-03 - Completed quick task 260403-d2e: Auto-start PollingService after setup and on app launch"
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 14
+  total_phases: 6
+  completed_phases: 3
+  total_plans: 15
   completed_plans: 14
   percent: 0
 ---
@@ -65,6 +65,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P03 | 1min | 2 tasks | 2 files |
 | Phase 05 P01 | 5min | 2 tasks | 6 files |
 | Phase 05 P03 | 3min | 2 tasks | 8 files |
+| Phase 06 P02 | 2min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Float array JNI interface instead of file path for whisper transcription flexibility
 - [Phase 05]: Lazy WhisperManager initialization on first recording -- avoids loading 141MB model at app start
 - [Phase 05]: TranscriptPreview replaces CommandInput when transcript available -- clean state-driven UI swap
+- [Phase 06]: Backoff resets to 1000ms (not 0) after successful connection to prevent rapid reconnect
+- [Phase 06]: WebSocketClient sends commands as JSON maps with action/kuerzel/message keys
+- [Phase 06]: Old Telegram files kept until Plan 03 cleanup to avoid breaking Android module
 
 ### Pending Todos
 
@@ -131,6 +135,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T22:06:45.595Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-04-03T09:27:34.723Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
