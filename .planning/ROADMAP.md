@@ -97,7 +97,12 @@ Plans:
   2. Hooks (session-start, session-stop, permission-notify, ask-notify) live in `server/hooks/` and reference relay-server directly (not zellij-claude)
   3. Server dispatches user responses to sessions via `zellij action write-chars` instead of `npx zellij-claude send`
   4. zellij-claude hooks directory no longer contains relay-server or relay-specific hooks
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 07-01-PLAN.md -- Standalone relay-server.cjs with package.json and direct Zellij dispatch
+- [ ] 07-02-PLAN.md -- Migrate hooks to server/hooks/ with standalone sendRelay (no Telegram)
+- [ ] 07-03-PLAN.md -- Hook installer and zellij-claude cleanup
 
 ### Phase 8: Interactive Controls & Reconnect
 **Goal**: Users can fully answer AskUserQuestion prompts from the app (single choice, multiple choice, free text) and see existing sessions after reconnecting
@@ -134,6 +139,6 @@ Phases execute in numeric order: 7 -> 8 -> 9
 | 4. Permissions & Notifications | v1.0 | 3/3 | Complete | 2026-04-02 |
 | 5. Voice Pipeline | v1.0 | 3/3 | Complete | 2026-04-02 |
 | 6. Direct WebSocket Transport | v1.0 | 4/4 | Complete | 2026-04-03 |
-| 7. Server Migration | v1.1 | 0/? | Not started | - |
+| 7. Server Migration | v1.1 | 0/3 | Planning | - |
 | 8. Interactive Controls & Reconnect | v1.1 | 0/? | Not started | - |
 | 9. Mac-Side Voice | v1.1 | 0/? | Not started | - |
