@@ -113,7 +113,11 @@ Plans:
   2. User can answer a multiple-choice AskUserQuestion by toggling options (number keys), navigating to Submit (Down arrow), and confirming (Enter)
   3. User can answer a free-text AskUserQuestion by selecting Other (Down + Enter), typing text, and confirming (Enter)
   4. User sees all active sessions immediately after the app reconnects to relay-server (no manual /ls needed)
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md -- Server answer action handler with keystroke computation + reconnect sync
+- [ ] 08-02-PLAN.md -- App answer protocol (DTOs, transport, repository) + QuestionCard UI overhaul
 **UI hint**: yes
 
 ### Phase 9: Mac-Side Voice
@@ -124,7 +128,11 @@ Plans:
   1. User can hold-to-record and audio data is sent over WebSocket to relay-server (not transcribed on device)
   2. Server transcribes received audio locally via whisper.cpp and sends the transcript back to the app
   3. APK no longer bundles the 141 MB Whisper model -- on-device transcription code is removed
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md -- Server answer action handler with keystroke computation + reconnect sync
+- [ ] 08-02-PLAN.md -- App answer protocol (DTOs, transport, repository) + QuestionCard UI overhaul
 
 ## Progress
 
