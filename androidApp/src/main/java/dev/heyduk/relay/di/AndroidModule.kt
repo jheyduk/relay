@@ -15,7 +15,6 @@ import dev.heyduk.relay.service.NotificationHelper
 import dev.heyduk.relay.service.NsdDiscovery
 import dev.heyduk.relay.voice.AudioRecorder
 import dev.heyduk.relay.voice.TtsManager
-import dev.heyduk.relay.voice.WhisperManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -45,7 +44,6 @@ val androidModule = module {
     single { RelayDatabase(get<AndroidSqliteDriver>()) }
 
     // Voice
-    single { WhisperManager(androidContext()) }
     single { TtsManager(androidContext()) }
     single { AudioRecorder(androidContext().cacheDir) }
 
@@ -53,5 +51,5 @@ val androidModule = module {
     viewModel { SetupViewModel(get()) }
     viewModel { StatusViewModel(get(), get()) }
     viewModel { SessionListViewModel(get(), get(), get()) }
-    viewModel { params -> ChatViewModel(get(), get(), get(), get(), params.get<String>()) }
+    viewModel { params -> ChatViewModel(get(), get(), get(), params.get<String>()) }
 }

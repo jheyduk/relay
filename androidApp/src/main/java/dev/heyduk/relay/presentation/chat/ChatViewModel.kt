@@ -6,11 +6,11 @@ import dev.heyduk.relay.data.repository.ChatRepository
 import dev.heyduk.relay.domain.model.ChatMessage
 import dev.heyduk.relay.voice.AudioRecorder
 import dev.heyduk.relay.voice.TtsManager
-import dev.heyduk.relay.voice.WhisperManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 class ChatViewModel(
     private val chatRepository: ChatRepository,
     private val ttsManager: TtsManager,
-    private val whisperManager: WhisperManager,
     private val audioRecorder: AudioRecorder,
     private val kuerzel: String
 ) : ViewModel() {
@@ -72,6 +71,22 @@ class ChatViewModel(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = ChatUiState(kuerzel = kuerzel)
     )
+
+    init {
+        // Observe incoming transcript messages from the server
+        viewModelScope.launch {
+            chatRepository.transcripts
+                .filter { it.session == kuerzel }
+                .collect { transcript ->
+                    _localState.update {
+                        it.copy(
+                            isTranscribing = false,
+                            transcriptPreview = transcript.message
+                        )
+                    }
+                }
+        }
+    }
 
     /** Send a text message to the current session. */
     fun sendMessage(text: String) {
@@ -133,22 +148,8 @@ class ChatViewModel(
 
     // --- Voice recording ---
 
-    /** Initialize whisper on first use. */
-    private var whisperInitialized = false
-
     fun startRecording() {
         viewModelScope.launch {
-            // Initialize whisper if needed (first use)
-            if (!whisperInitialized) {
-                try {
-                    whisperManager.initialize()
-                    whisperInitialized = true
-                } catch (e: Exception) {
-                    _localState.update { it.copy(errorMessage = "Whisper init failed: ${e.message}") }
-                    return@launch
-                }
-            }
-
             _localState.update { it.copy(isRecording = true) }
             try {
                 audioRecorder.startRecording()
@@ -168,21 +169,15 @@ class ChatViewModel(
             try {
                 val wavFile = audioRecorder.getOutputFile()
                     ?: throw IllegalStateException("No recording file available")
-                val transcript = whisperManager.transcribe(wavFile)
-                if (transcript.isBlank()) {
-                    _localState.update {
-                        it.copy(isTranscribing = false, errorMessage = "Could not transcribe audio")
-                    }
-                } else {
-                    _localState.update {
-                        it.copy(isTranscribing = false, transcriptPreview = transcript)
-                    }
-                }
+                val audioBytes = wavFile.readBytes()
+                // Send audio to server for transcription
+                chatRepository.sendAudio(kuerzel, audioBytes)
                 // Clean up temp file
                 wavFile.delete()
+                // Transcript will arrive asynchronously via WebSocket (handled in init block)
             } catch (e: Exception) {
                 _localState.update {
-                    it.copy(isTranscribing = false, errorMessage = "Transcription failed: ${e.message}")
+                    it.copy(isTranscribing = false, errorMessage = "Send audio failed: ${e.message}")
                 }
             }
         }
