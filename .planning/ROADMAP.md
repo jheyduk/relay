@@ -131,7 +131,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md -- Server-side audio receive and whisper-cli transcription
+- [x] 09-01-PLAN.md -- Server-side audio receive and whisper-cli transcription
 - [ ] 09-02-PLAN.md -- App sends audio to server, removes on-device Whisper (141 MB savings)
 
 ## Progress
