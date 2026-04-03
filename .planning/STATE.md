@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-04-03T09:28:00.000Z"
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-04-03T09:37:01.237Z"
 last_activity: 2026-04-03
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 18
-  completed_plans: 16
+  completed_plans: 17
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 ## Current Position
 
 Phase: 06 (direct-websocket-transport) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-03
 
@@ -67,6 +67,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05 P03 | 3min | 2 tasks | 8 files |
 | Phase 06 P01 | 3min | 2 tasks | 5 files |
 | Phase 06 P02 | 2min | 2 tasks | 8 files |
+| Phase 06 P03 | 5min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,8 @@ Recent decisions affecting current work:
 - [Phase 06]: Backoff resets to 1000ms (not 0) after successful connection to prevent rapid reconnect
 - [Phase 06]: WebSocketClient sends commands as JSON maps with action/kuerzel/message keys
 - [Phase 06]: Old Telegram files kept until Plan 03 cleanup to avoid breaking Android module
+- [Phase 06]: mDNS discovery with 5s timeout, WireGuard IP fallback for remote access
+- [Phase 06]: PollingService.kt and DataStoreOffsetProvider.kt removed as Telegram cleanup in Plan 03
 
 ### Pending Todos
 
@@ -139,6 +142,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03T09:28:00.000Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-04-03T09:37:01.234Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
