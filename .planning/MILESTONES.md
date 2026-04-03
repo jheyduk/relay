@@ -1,5 +1,20 @@
 # Milestones
 
+## v1.1 Standalone Server (Shipped: 2026-04-03)
+
+**Phases completed:** 3 phases, 7 plans, 11 tasks
+
+**Key accomplishments:**
+
+- 6 hook files migrated to server/hooks/ with standalone Unix socket IPC -- zero Telegram dependencies, relay-only notifications
+- Hook installer that registers relay server hooks in Claude Code settings.json and cleans up old zellij-claude entries
+- Answer action handler with single/multi/text keystroke dispatch and reconnect session sync on WebSocket connect
+- Full AskUserQuestion answer pipeline from interactive QuestionCard UI through ViewModel/Repository/WebSocket to server, supporting single-choice, multi-choice, and free-text answer modes
+- Binary WebSocket audio receive with whisper-cli transcription on Mac — receives WAV from app, transcribes locally with Metal acceleration, returns JSON transcript
+- Rewired app to send WAV audio to Mac server via binary WebSocket frames and receive transcript back, removing 141 MB on-device Whisper model and all native JNI code
+
+---
+
 ## v1.0 Relay MVP (Shipped: 2026-04-03)
 
 **Phases completed:** 6 phases, 18 plans, 40 tasks
