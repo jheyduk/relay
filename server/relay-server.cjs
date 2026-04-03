@@ -288,6 +288,40 @@ function listSessions(sessionId) {
   });
 }
 
+/**
+ * Send all active sessions to the app on reconnect.
+ * Reads /tmp/zellij-claude-tab-* files to build the session list,
+ * then sends a session_list message so the app doesn't need to /ls manually.
+ */
+function sendReconnectSync() {
+  try {
+    if (!appSocket || appSocket.readyState !== 1) return;
+
+    const tabFiles = fs.readdirSync('/tmp').filter(f => f.startsWith('zellij-claude-tab-'));
+    const sessions = [];
+
+    for (const f of tabFiles) {
+      try {
+        const kuerzel = fs.readFileSync(`/tmp/${f}`, 'utf8').trim();
+        if (kuerzel) {
+          sessions.push({ name: kuerzel, active: true });
+        }
+      } catch {}
+    }
+
+    if (sessions.length > 0) {
+      appSocket.send(JSON.stringify({
+        type: 'session_list',
+        sessions,
+        timestamp: Date.now(),
+      }));
+      process.stderr.write(`[relay-server] Reconnect sync: sent ${sessions.length} active session(s)\n`);
+    }
+  } catch (err) {
+    process.stderr.write(`[relay-server] Reconnect sync error: ${err.message}\n`);
+  }
+}
+
 // --- WebSocket Server ---
 const wss = new WebSocketServer({ port: config.port || DEFAULT_PORT });
 
@@ -310,6 +344,9 @@ wss.on('connection', (ws, req) => {
   appConnected = true;
   disconnectedAt = null;
   process.stderr.write(`[relay-server] App connected from ${req.socket.remoteAddress}\n`);
+
+  // Send active sessions after a short delay so the app has time to register message handlers
+  setTimeout(() => sendReconnectSync(), 500);
 
   ws.on('message', (data) => {
     try {
