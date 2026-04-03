@@ -44,6 +44,16 @@ function loadOrCreateConfig() {
     changed = true;
   }
 
+  if (!config.whisper_cli) {
+    config.whisper_cli = '/opt/homebrew/bin/whisper-cli';
+    changed = true;
+  }
+
+  if (!config.whisper_model) {
+    config.whisper_model = path.join(os.homedir(), '.cache', 'whisper', 'ggml-base.bin');
+    changed = true;
+  }
+
   if (changed) {
     const dir = path.dirname(CONFIG_PATH);
     fs.mkdirSync(dir, { recursive: true });
@@ -54,6 +64,24 @@ function loadOrCreateConfig() {
 }
 
 const config = loadOrCreateConfig();
+
+// --- Whisper availability check ---
+let whisperAvailable = false;
+try {
+  if (fs.existsSync(config.whisper_cli) && fs.existsSync(config.whisper_model)) {
+    whisperAvailable = true;
+    process.stderr.write(`[relay-server] Whisper available: ${config.whisper_cli} with model ${config.whisper_model}\n`);
+  } else {
+    if (!fs.existsSync(config.whisper_cli)) {
+      process.stderr.write(`[relay-server] Warning: whisper-cli not found at ${config.whisper_cli} — audio transcription disabled\n`);
+    }
+    if (!fs.existsSync(config.whisper_model)) {
+      process.stderr.write(`[relay-server] Warning: whisper model not found at ${config.whisper_model} — audio transcription disabled\n`);
+    }
+  }
+} catch (err) {
+  process.stderr.write(`[relay-server] Warning: whisper check failed: ${err.message}\n`);
+}
 
 // --- State ---
 let appSocket = null;
@@ -322,6 +350,69 @@ function sendReconnectSync() {
   }
 }
 
+// --- Audio Transcription ---
+
+/**
+ * Transcribe audio data using whisper-cli and send the transcript back to the app.
+ * Writes the audio buffer to a temp file, runs whisper-cli, parses output, cleans up.
+ */
+async function transcribeAudio(kuerzel, audioBuffer) {
+  if (!whisperAvailable) {
+    if (appSocket && appSocket.readyState === 1) {
+      appSocket.send(JSON.stringify({
+        type: 'transcript',
+        session: kuerzel,
+        text: '',
+        error: 'whisper-cli or model not available',
+      }));
+    }
+    return;
+  }
+
+  const tmpFile = `/tmp/relay-audio-${Date.now()}.wav`;
+
+  try {
+    fs.writeFileSync(tmpFile, audioBuffer);
+
+    const transcript = await new Promise((resolve, reject) => {
+      execFile(config.whisper_cli, ['-m', config.whisper_model, '--no-timestamps', '-nt', tmpFile], {
+        timeout: 30000,
+        encoding: 'utf8',
+        maxBuffer: 1024 * 1024,
+      }, (err, stdout, stderr) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(stdout.trim());
+      });
+    });
+
+    process.stderr.write(`[relay-server] Transcribed ${audioBuffer.length} bytes audio for @${kuerzel} -> "${transcript.slice(0, 80)}${transcript.length > 80 ? '...' : ''}"\n`);
+
+    if (appSocket && appSocket.readyState === 1) {
+      appSocket.send(JSON.stringify({
+        type: 'transcript',
+        session: kuerzel,
+        text: transcript,
+      }));
+    }
+  } catch (err) {
+    process.stderr.write(`[relay-server] Transcription failed for @${kuerzel}: ${err.message}\n`);
+
+    if (appSocket && appSocket.readyState === 1) {
+      appSocket.send(JSON.stringify({
+        type: 'transcript',
+        session: kuerzel,
+        text: '',
+        error: err.message,
+      }));
+    }
+  } finally {
+    try { fs.unlinkSync(tmpFile); } catch {}
+  }
+}
+
 // --- WebSocket Server ---
 const wss = new WebSocketServer({ port: config.port || DEFAULT_PORT });
 
@@ -349,6 +440,20 @@ wss.on('connection', (ws, req) => {
   setTimeout(() => sendReconnectSync(), 500);
 
   ws.on('message', (data) => {
+    // Binary frame: audio data with kuerzel prefix
+    if (Buffer.isBuffer(data) && data.length > 2) {
+      const kuerzelLen = data.readUInt16BE(0);
+      if (kuerzelLen > 0 && kuerzelLen < data.length - 2) {
+        const kuerzel = data.slice(2, 2 + kuerzelLen).toString('utf8');
+        const audioBuffer = data.slice(2 + kuerzelLen);
+        if (audioBuffer.length > 0) {
+          process.stderr.write(`[relay-server] Received ${audioBuffer.length} bytes audio for @${kuerzel}\n`);
+          transcribeAudio(kuerzel, audioBuffer);
+        }
+      }
+      return;
+    }
+
     try {
       const msg = JSON.parse(data.toString());
 
