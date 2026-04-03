@@ -8,7 +8,8 @@ data class RelayMessage(
     val type: RelayMessageTypeDto,
     val session: String,
     val status: SessionStatusDto? = null,
-    val message: String,
+    val message: String = "",
+    val text: String? = null,
     @SerialName("tool_details") val toolDetails: ToolDetails? = null,
     @SerialName("question_data") val questionData: QuestionDataDto? = null,
     val timestamp: Long = 0,
@@ -35,7 +36,8 @@ enum class RelayMessageTypeDto {
     @SerialName("response") RESPONSE,
     @SerialName("permission") PERMISSION,
     @SerialName("question") QUESTION,
-    @SerialName("completion") COMPLETION
+    @SerialName("completion") COMPLETION,
+    @SerialName("transcript") TRANSCRIPT
 }
 
 @Serializable

@@ -21,9 +21,9 @@
 
 ### Voice
 
-- [x] **VOIC-10**: Server receives audio data over WebSocket from the app
-- [x] **VOIC-11**: Server transcribes audio locally via whisper.cpp and sends transcript back
-- [ ] **VOIC-12**: App sends audio instead of transcribing locally (on-device Whisper removed to reduce APK size)
+- [ ] **VOIC-10**: Server receives audio data over WebSocket from the app
+- [ ] **VOIC-11**: Server transcribes audio locally via whisper.cpp and sends transcript back
+- [x] **VOIC-12**: App sends audio instead of transcribing locally (on-device Whisper removed to reduce APK size)
 
 ## Future Requirements
 
@@ -53,9 +53,9 @@ Deferred to later milestones.
 | CTRL-01 | Phase 8 | Complete |
 | CTRL-02 | Phase 8 | Complete |
 | CTRL-03 | Phase 8 | Complete |
-| VOIC-10 | Phase 9 | Complete |
-| VOIC-11 | Phase 9 | Complete |
-| VOIC-12 | Phase 9 | Pending |
+| VOIC-10 | Phase 9 | Pending |
+| VOIC-11 | Phase 9 | Pending |
+| VOIC-12 | Phase 9 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 11 total

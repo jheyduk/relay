@@ -30,4 +30,7 @@ interface RelayRepository {
 
     /** Send a structured answer payload for an AskUserQuestion prompt. */
     suspend fun sendAnswer(kuerzel: String, type: String, selections: List<Int>, text: String?, optionCount: Int)
+
+    /** Send audio data to the server for transcription via binary WebSocket frame. */
+    suspend fun sendAudio(kuerzel: String, audioData: ByteArray)
 }

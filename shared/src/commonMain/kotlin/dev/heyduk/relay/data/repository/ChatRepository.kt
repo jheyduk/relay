@@ -1,6 +1,7 @@
 package dev.heyduk.relay.data.repository
 
 import dev.heyduk.relay.domain.model.ChatMessage
+import dev.heyduk.relay.domain.model.RelayUpdate
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -19,4 +20,10 @@ interface ChatRepository {
 
     /** Answer a question with a structured payload (single/multi/text). */
     suspend fun answerQuestion(messageId: Long, kuerzel: String, type: String, selections: List<Int>, text: String?, optionCount: Int)
+
+    /** Send audio data to the server for transcription. */
+    suspend fun sendAudio(kuerzel: String, audioData: ByteArray)
+
+    /** Flow of incoming transcript updates from the server (type=TRANSCRIPT). */
+    val transcripts: Flow<RelayUpdate>
 }

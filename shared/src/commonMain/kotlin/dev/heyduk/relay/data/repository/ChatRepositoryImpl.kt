@@ -7,9 +7,11 @@ import dev.heyduk.relay.db.RelayDatabase
 import dev.heyduk.relay.domain.model.ChatMessage
 import dev.heyduk.relay.domain.model.QuestionData
 import dev.heyduk.relay.domain.model.RelayMessageType
+import dev.heyduk.relay.domain.model.RelayUpdate
 import dev.heyduk.relay.util.currentTimeMillis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
 /**
@@ -90,6 +92,13 @@ class ChatRepositoryImpl(
         // Clean up cache
         questionDataCache.remove(messageId)
     }
+
+    override suspend fun sendAudio(kuerzel: String, audioData: ByteArray) {
+        relayRepository.sendAudio(kuerzel, audioData)
+    }
+
+    override val transcripts: Flow<RelayUpdate> = relayRepository.updates
+        .filter { it.type == RelayMessageType.TRANSCRIPT }
 
     /** Cache question data from a live RelayUpdate for later retrieval by the UI. */
     fun cacheQuestionData(updateId: Long, data: QuestionData) {

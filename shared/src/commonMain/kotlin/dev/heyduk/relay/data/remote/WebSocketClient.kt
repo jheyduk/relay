@@ -167,6 +167,34 @@ class WebSocketClient(
     }
 
     /**
+     * Sends audio data as a binary WebSocket frame with the kuerzel+WAV protocol.
+     *
+     * Binary frame layout:
+     * - Bytes 0-1: uint16 big-endian = kuerzel UTF-8 byte length
+     * - Bytes 2..(2+len-1): kuerzel as UTF-8 bytes
+     * - Bytes (2+len)..end: WAV audio data
+     *
+     * @param kuerzel Session short name
+     * @param audioData Raw WAV audio bytes
+     */
+    suspend fun sendAudio(kuerzel: String, audioData: ByteArray) {
+        try {
+            val kuerzelBytes = kuerzel.encodeToByteArray()
+            val payload = ByteArray(2 + kuerzelBytes.size + audioData.size)
+            // Write kuerzel length as uint16 big-endian
+            payload[0] = (kuerzelBytes.size shr 8).toByte()
+            payload[1] = (kuerzelBytes.size and 0xFF).toByte()
+            // Write kuerzel bytes
+            kuerzelBytes.copyInto(payload, destinationOffset = 2)
+            // Write audio data
+            audioData.copyInto(payload, destinationOffset = 2 + kuerzelBytes.size)
+            session?.send(Frame.Binary(true, payload))
+        } catch (_: Exception) {
+            // WebSocket may be closing -- ignore send failures
+        }
+    }
+
+    /**
      * Gracefully closes the WebSocket connection.
      */
     suspend fun disconnect() {
