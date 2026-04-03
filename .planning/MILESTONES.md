@@ -1,0 +1,28 @@
+# Milestones
+
+## v1.0 Relay MVP (Shipped: 2026-04-03)
+
+**Phases completed:** 6 phases, 18 plans, 40 tasks
+
+**Key accomplishments:**
+
+- KMP multi-module project with Ktor/SQLDelight/Koin, Telegram API DTOs, Relay JSON protocol models, and SQLDelight message schema
+- Ktor-based Telegram Bot API client with long-polling, exponential backoff, two-bot read/write architecture, and Koin DI wiring
+- Foreground polling service with network recovery, DataStore token storage, Compose setup/status screens, and conditional navigation producing a 72MB debug APK
+- Session data model, /ls response parser, command router, and SessionRepository for session discovery and state management in shared KMP module
+- Material 3 session list with Dynamic Color theming, color-coded status chips, pull-to-refresh, drawer navigation, and command input bar
+- Koin DI wiring for SessionRepository singleton and SessionListViewModel injection, navigation updated to route to session list as main destination
+- ChatRepository with optimistic send-and-persist, reactive SQLDelight queries, and ChatMessage domain model for per-session chat
+- Per-session chat screen with sender-distinguished message bubbles, reverse-layout LazyColumn, and session-card-to-chat navigation wiring
+- PermissionCard and QuestionCard composables with callback_response DB tracking and ChatRepository.answerCallback for native Allow/Deny and option selection
+- Two-channel notification system with deep-link navigation for permission requests (HIGH priority) and session completions (DEFAULT priority)
+- Type-aware ChatScreen rendering with PermissionCard/QuestionCard dispatch and ViewModel callback actions
+- whisper.cpp v1.8.3 compiled as arm64-v8a native library via CMake with JNI bridge and WhisperManager Kotlin API registered in Koin
+- Android TTS integration with play/stop icon on incoming message bubbles and code block stripping
+- Hold-to-record voice input with on-device Whisper transcription, editable transcript preview, and send-as-text flow through existing ChatRepository
+- WebSocket relay server with Unix socket IPC, mDNS discovery, and hook routing updated to WebSocket-first with Telegram fallback after 30s disconnect
+- Ktor WebSocket client with exponential backoff reconnect, RelayRepository replacing TelegramRepository, and updated DI wiring
+- WebSocketService replaces PollingService with mDNS discovery, simplified setup screen (shared secret only), and full Telegram code removal from Android layer
+- Deleted all Telegram transport code (8 files, 656 lines) and verified clean build with WebSocket-only transport
+
+---
