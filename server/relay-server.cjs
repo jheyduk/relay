@@ -238,27 +238,9 @@ function sendEnter(sessionId, paneId) {
 const KEYSTROKE_DELAY = 80; // ms between keystrokes for TUI to process
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Auto-submit timer: after answering a question, wait 1s for the next question.
-// If no new answer arrives, send "1" + Enter to confirm "Ready to submit your answers?"
-let autoSubmitTimer = null;
-
-function scheduleAutoSubmit(sessionId, paneId) {
-  if (autoSubmitTimer) clearTimeout(autoSubmitTimer);
-  autoSubmitTimer = setTimeout(async () => {
-    autoSubmitTimer = null;
-    process.stderr.write('[relay-server] Auto-submitting (no further answers within 1s)\n');
-    await writeCharsToPane(sessionId, paneId, '1');
-    await delay(KEYSTROKE_DELAY);
-    await sendEnter(sessionId, paneId);
-  }, 1000);
-}
-
-function cancelAutoSubmit() {
-  if (autoSubmitTimer) {
-    clearTimeout(autoSubmitTimer);
-    autoSubmitTimer = null;
-  }
-}
+// Track pending questions per session for auto-submit after the last answer
+// Key: kuerzel, Value: { total: number, answered: number }
+const pendingQuestions = new Map();
 
 /**
  * Dispatch an answer to an AskUserQuestion prompt.
@@ -276,14 +258,26 @@ async function dispatchAnswer(kuerzel, msg) {
     return;
   }
 
-  cancelAutoSubmit(); // Cancel any pending auto-submit from a previous question
   process.stderr.write(`[relay-server] answer: type=${msg.type} selections=${JSON.stringify(msg.selections)} text=${msg.text || ''} options=${msg.option_count}\n`);
 
   if (msg.type === 'single') {
-    // Single choice: press number key, then Enter
+    // Single choice: number key selects the option
     await writeCharsToPane(sessionId, paneId, String(msg.selections[0]));
-    await delay(KEYSTROKE_DELAY);
-    await sendEnter(sessionId, paneId);
+    // Track answered count and auto-submit if this was the last question
+    const pending = pendingQuestions.get(kuerzel);
+    if (pending) {
+      pending.answered++;
+      process.stderr.write(`[relay-server] Answered ${pending.answered}/${pending.total} for @${kuerzel}\n`);
+      if (pending.answered >= pending.total && pending.total > 1) {
+        // Last question in a multi-question set — confirm "Ready to submit?"
+        await delay(500);
+        await writeCharsToPane(sessionId, paneId, '1');
+        process.stderr.write(`[relay-server] Auto-submitted for @${kuerzel}\n`);
+        pendingQuestions.delete(kuerzel);
+      } else if (pending.answered >= pending.total) {
+        pendingQuestions.delete(kuerzel);
+      }
+    }
     return;
   }
 
@@ -579,6 +573,14 @@ const hookServer = net.createServer((conn) => {
 
       if (msg.action === 'send') {
         if (appSocket && appSocket.readyState === 1) {
+          // Track question count per session for auto-submit after last answer
+          if (msg.payload && msg.payload.type === 'question' && msg.payload.session) {
+            const session = msg.payload.session;
+            const current = pendingQuestions.get(session) || { total: 0, answered: 0 };
+            current.total++;
+            pendingQuestions.set(session, current);
+            process.stderr.write(`[relay-server] Question ${current.total} queued for @${session}\n`);
+          }
           appSocket.send(JSON.stringify(msg.payload));
           conn.end(JSON.stringify({ sent: true }));
         } else {
