@@ -1,6 +1,7 @@
 package dev.heyduk.relay.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,6 +10,7 @@ import dev.heyduk.relay.presentation.chat.ChatScreen
 import dev.heyduk.relay.presentation.session.SessionListScreen
 import dev.heyduk.relay.presentation.setup.SetupScreen
 import dev.heyduk.relay.presentation.status.StatusScreen
+import dev.heyduk.relay.util.startPollingService
 
 /**
  * Navigation graph for Relay.
@@ -21,8 +23,10 @@ fun RelayNavGraph(navController: NavHostController, isConfigured: Boolean) {
         startDestination = if (isConfigured) "sessions" else "setup"
     ) {
         composable("setup") {
+            val context = LocalContext.current
             SetupScreen(
                 onConfigured = {
+                    startPollingService(context)
                     navController.navigate("sessions") {
                         popUpTo("setup") { inclusive = true }
                     }
