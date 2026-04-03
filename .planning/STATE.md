@@ -120,9 +120,13 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260403-d2e | Auto-start PollingService after setup and on app launch | 2026-04-03 | bfbffe3 | [260403-d2e-auto-start-pollingservice-after-setup-an](./quick/260403-d2e-auto-start-pollingservice-after-setup-an/) |
 
+### Roadmap Evolution
+
+- Phase 6 added: Direct WebSocket Transport — replace Telegram Bot API transport with direct WebSocket, Telegram as notification fallback only
+
 ### Blockers/Concerns
 
-- [Phase 1]: 409 conflict resolution mechanism between Relay and zellij-claude polling is undefined -- needs investigation during Phase 1 planning
+- [Phase 1-5]: Telegram Bot API transport is fundamentally broken — a bot cannot receive its own sent messages via getUpdates. Phase 6 replaces this with direct WebSocket.
 - [Phase 5]: Whisper performance on target device is unvalidated -- early prototyping recommended
 
 ## Session Continuity
