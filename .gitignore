@@ -31,3 +31,6 @@ androidApp/src/main/cpp/whisper.cpp/
 # Whisper model files (large binaries, downloaded separately)
 androidApp/src/main/assets/*.bin
 androidApp/.cxx/
+
+# Server dependencies
+server/node_modules/
