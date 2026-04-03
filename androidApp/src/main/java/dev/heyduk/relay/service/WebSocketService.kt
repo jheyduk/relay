@@ -105,8 +105,9 @@ class WebSocketService : Service() {
                     )
 
                     // Cache question data for live questions (transient, not persisted to DB)
-                    if (update.type == RelayMessageType.QUESTION && update.questionData != null) {
-                        chatRepositoryImpl.cacheQuestionData(update.updateId, update.questionData)
+                    val qd = update.questionData
+                    if (update.type == RelayMessageType.QUESTION && qd != null) {
+                        chatRepositoryImpl.cacheQuestionData(update.updateId, qd)
                     }
 
                     // Trigger notifications for permission and completion messages
