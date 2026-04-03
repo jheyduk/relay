@@ -1,23 +1,23 @@
 package dev.heyduk.relay.presentation.chat
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
 /**
- * Hold-to-record microphone button.
- * Press and hold to record, release to stop and transcribe.
- * Shows red background while recording.
+ * Tap-to-toggle microphone button.
+ * First tap starts recording, second tap stops and triggers transcription.
+ * Shows red background with stop icon while recording.
  */
 @Composable
 fun VoiceRecordButton(
@@ -35,24 +35,16 @@ fun VoiceRecordButton(
         label = "recordButtonColor"
     )
 
-    FloatingActionButton(
-        onClick = { /* handled by pointer input */ },
-        containerColor = containerColor,
-        modifier = modifier
-            .size(48.dp)
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        onStartRecording()
-                        tryAwaitRelease()
-                        onStopRecording()
-                    }
-                )
-            }
+    IconButton(
+        onClick = {
+            if (isRecording) onStopRecording() else onStartRecording()
+        },
+        colors = IconButtonDefaults.iconButtonColors(containerColor = containerColor),
+        modifier = modifier.size(48.dp)
     ) {
         Icon(
-            imageVector = Icons.Filled.Mic,
-            contentDescription = if (isRecording) "Recording..." else "Hold to record",
+            imageVector = if (isRecording) Icons.Filled.Stop else Icons.Filled.Mic,
+            contentDescription = if (isRecording) "Stop recording" else "Start recording",
             tint = if (isRecording) {
                 MaterialTheme.colorScheme.onError
             } else {
