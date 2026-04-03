@@ -161,7 +161,9 @@ fun ChatScreen(
                     )
                     RelayMessageType.QUESTION -> QuestionCard(
                         message = message,
-                        onOptionSelected = { option -> viewModel.answerQuestion(message.id, option) }
+                        onAnswer = { type, selections, text, optionCount ->
+                            viewModel.answerQuestion(message.id, type, selections, text, optionCount)
+                        }
                     )
                     else -> MessageBubble(
                         message = message,

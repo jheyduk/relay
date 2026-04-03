@@ -102,13 +102,12 @@ class ChatViewModel(
         }
     }
 
-    /** Answer a question by sending the callback and the option text as a message. */
-    fun answerQuestion(messageId: Long, option: String) {
+    /** Answer a question with a structured payload (single/multi/text). */
+    fun answerQuestion(messageId: Long, type: String, selections: List<Int>, text: String?, optionCount: Int) {
         viewModelScope.launch {
             _sendingCallbacks.update { it + messageId }
             try {
-                chatRepository.answerCallback(messageId, kuerzel, option)
-                chatRepository.sendMessage(kuerzel, option)
+                chatRepository.answerQuestion(messageId, kuerzel, type, selections, text, optionCount)
             } catch (e: Exception) {
                 _localState.update { it.copy(errorMessage = "Answer failed: ${e.message}") }
             } finally {
