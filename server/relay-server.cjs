@@ -132,16 +132,16 @@ function findPaneForTab(sessionId, kuerzel) {
         const panes = JSON.parse(stdout);
         // Find a pane whose tab name matches @{kuerzel} and is focused in that tab
         const target = panes.find(p =>
-          p.tab_name === `@${kuerzel}` && p.is_focused
+          p.tab_name === `@${kuerzel}` && p.is_focused && !p.is_plugin
         );
         if (target) {
-          resolve(String(target.pane_id));
+          resolve(String(target.id));
           return;
         }
-        // Fallback: any pane in the matching tab
-        const anyInTab = panes.find(p => p.tab_name === `@${kuerzel}`);
+        // Fallback: any non-plugin pane in the matching tab
+        const anyInTab = panes.find(p => p.tab_name === `@${kuerzel}` && !p.is_plugin);
         if (anyInTab) {
-          resolve(String(anyInTab.pane_id));
+          resolve(String(anyInTab.id));
           return;
         }
       } catch (e) {
@@ -158,7 +158,7 @@ function findPaneForTab(sessionId, kuerzel) {
  */
 function writeCharsToPane(sessionId, paneId, chars) {
   return new Promise((resolve) => {
-    const args = ['--session', sessionId, 'action', 'write-chars', '--pane-id', paneId, chars];
+    const args = ['--session', sessionId, 'action', 'write-chars', '--pane-id', `terminal_${paneId}`, chars];
     execFile('zellij', args, { timeout: 5000 }, (err) => {
       if (err) {
         process.stderr.write(`[relay-server] write-chars error: ${err.message}\n`);
