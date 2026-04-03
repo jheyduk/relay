@@ -86,8 +86,9 @@ class WebSocketClient(
                 session = null
                 _connectionState.value = ConnectionState.DISCONNECTED
                 throw e // CRITICAL: never swallow cancellation
-            } catch (_: Exception) {
+            } catch (e: Exception) {
                 session = null
+                println("WebSocketClient: connection error: ${e::class.simpleName}: ${e.message}")
             }
 
             _connectionState.value = ConnectionState.DISCONNECTED
