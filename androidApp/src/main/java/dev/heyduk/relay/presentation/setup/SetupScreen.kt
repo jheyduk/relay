@@ -33,7 +33,7 @@ fun SetupScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     // Navigate away when successfully configured
-    LaunchedEffect(uiState.isConfigured) {
+    LaunchedEffect(uiState.isConfigured, uiState.validationResult) {
         if (uiState.isConfigured && uiState.validationResult?.contains("saved") == true) {
             onConfigured()
         }

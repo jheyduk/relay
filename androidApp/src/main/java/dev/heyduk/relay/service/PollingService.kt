@@ -51,6 +51,7 @@ class PollingService : Service() {
     private val notificationHelper: NotificationHelper by inject()
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    @Volatile private var pollingStarted = false
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -58,6 +59,12 @@ class PollingService : Service() {
         createNotificationChannel()
         val notification = buildNotification("Relay connected")
         startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+
+        // Guard against multiple poll loops from repeated startService() calls
+        if (pollingStarted) {
+            return START_STICKY
+        }
+        pollingStarted = true
 
         serviceScope.launch {
             val prefs = dataStore.data.first()

@@ -1,45 +1,49 @@
 package dev.heyduk.relay.data.repository
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import dev.heyduk.relay.db.RelayDatabase
 import dev.heyduk.relay.domain.model.Session
-import dev.heyduk.relay.domain.parser.SessionListParser
-import kotlinx.coroutines.CoroutineScope
+import dev.heyduk.relay.domain.model.SessionStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 /**
- * Session repository implementation that discovers sessions via /ls command
- * and auto-parses responses from the Telegram update stream.
+ * Session repository implementation that discovers sessions from the database.
  *
- * Listens to [TelegramRepository.updates] and attempts to parse each incoming
- * message as /ls output. If at least one session is found, the session list
- * is updated. This avoids request/response correlation complexity.
+ * The PollingService writes incoming updates into SQLDelight. This repository
+ * observes distinct sessions from the DB reactively, so any new message
+ * automatically surfaces the session in the list.
  */
 class SessionRepositoryImpl(
     private val telegramRepository: TelegramRepository,
-    scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+    private val database: RelayDatabase
 ) : SessionRepository {
 
-    private val _sessions = MutableStateFlow<List<Session>>(emptyList())
     private val _selectedKuerzel = MutableStateFlow<String?>(null)
 
-    override val sessions: Flow<List<Session>> = _sessions.asStateFlow()
-    override val selectedKuerzel: Flow<String?> = _selectedKuerzel.asStateFlow()
-
-    init {
-        // Listen to all incoming updates and try to parse /ls responses
-        scope.launch {
-            telegramRepository.updates.collect { update ->
-                val parsed = SessionListParser.parse(update.message)
-                if (parsed.isNotEmpty()) {
-                    _sessions.value = parsed
+    override val sessions: Flow<List<Session>> =
+        database.messagesQueries.getDistinctSessions()
+            .asFlow()
+            .mapToList(Dispatchers.Default)
+            .map { rows ->
+                rows.map { row ->
+                    val status = row.status?.let { s ->
+                        SessionStatus.entries.find { it.name.equals(s, ignoreCase = true) }
+                    } ?: SessionStatus.READY
+                    Session(
+                        kuerzel = row.session,
+                        status = status,
+                        lastActivity = null,
+                        isActive = status == SessionStatus.WORKING
+                    )
                 }
             }
-        }
-    }
+
+    override val selectedKuerzel: Flow<String?> = _selectedKuerzel
 
     override suspend fun refreshSessions() {
         telegramRepository.sendRawCommand("/ls")
@@ -50,7 +54,7 @@ class SessionRepositoryImpl(
     }
 
     override suspend fun getLastResponse(kuerzel: String): String? {
-        val messages = telegramRepository.getMessagesForSession(kuerzel).firstOrNull()
-        return messages?.lastOrNull()?.message
+        val list = telegramRepository.getMessagesForSession(kuerzel).first()
+        return list.lastOrNull()?.message
     }
 }

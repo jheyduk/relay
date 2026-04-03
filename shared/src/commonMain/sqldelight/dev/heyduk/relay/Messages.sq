@@ -34,3 +34,11 @@ SELECT COUNT(*) FROM messages WHERE session = ? AND is_from_relay = 1;
 
 markAnswered:
 UPDATE messages SET callback_response = ? WHERE update_id = ?;
+
+-- Returns distinct session names with their latest status and timestamp
+getDistinctSessions:
+SELECT session, status, MAX(timestamp) AS last_seen
+FROM messages
+WHERE session != ''
+GROUP BY session
+ORDER BY last_seen DESC;

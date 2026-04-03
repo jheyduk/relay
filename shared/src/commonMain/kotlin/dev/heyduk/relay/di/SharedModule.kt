@@ -85,8 +85,8 @@ val sharedModule = module {
         )
     }
 
-    // Session repository: discovers sessions via /ls and parses update stream
-    single<SessionRepository> { SessionRepositoryImpl(get()) }
+    // Session repository: discovers sessions from database (populated by PollingService)
+    single<SessionRepository> { SessionRepositoryImpl(get(), get()) }
 
     // Chat repository: per-session message history and send-with-persist
     single<ChatRepository> { ChatRepositoryImpl(get(), get()) }
