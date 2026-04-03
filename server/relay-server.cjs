@@ -169,6 +169,21 @@ function writeCharsToPane(sessionId, paneId, chars) {
 }
 
 /**
+ * Write raw bytes to a specific pane (e.g. Enter key = byte 13).
+ */
+function writeToPane(sessionId, paneId, ...bytes) {
+  return new Promise((resolve) => {
+    const args = ['--session', sessionId, 'action', 'write', '--pane-id', `terminal_${paneId}`, ...bytes.map(String)];
+    execFile('zellij', args, { timeout: 5000 }, (err) => {
+      if (err) {
+        process.stderr.write(`[relay-server] write error: ${err.message}\n`);
+      }
+      resolve(!err);
+    });
+  });
+}
+
+/**
  * Dispatch a command to the session identified by kuerzel.
  * Writes the message text followed by Enter to the focused pane in the matching tab.
  */
@@ -190,16 +205,19 @@ async function dispatchCommand(kuerzel, message) {
         process.stderr.write(`[relay-server] go-to-tab-name error: ${err.message}\n`);
         return;
       }
-      execFile('zellij', ['--session', sessionId, 'action', 'write-chars', message + '\n'], {
+      execFile('zellij', ['--session', sessionId, 'action', 'write-chars', message], {
         timeout: 5000,
       }, (err2) => {
-        if (err2) process.stderr.write(`[relay-server] write-chars fallback error: ${err2.message}\n`);
+        if (err2) { process.stderr.write(`[relay-server] write-chars fallback error: ${err2.message}\n`); return; }
+        execFile('zellij', ['--session', sessionId, 'action', 'write', '13'], { timeout: 5000 });
       });
     });
     return;
   }
 
-  await writeCharsToPane(sessionId, paneId, message + '\n');
+  process.stderr.write(`[relay-server] Dispatching to @${kuerzel} pane terminal_${paneId} in session ${sessionId}\n`);
+  await writeCharsToPane(sessionId, paneId, message);
+  await writeToPane(sessionId, paneId, 13); // Enter key (carriage return)
 }
 
 /**
@@ -441,9 +459,10 @@ wss.on('connection', (ws, req) => {
   // Send active sessions after a short delay so the app has time to register message handlers
   setTimeout(() => sendReconnectSync(), 500);
 
-  ws.on('message', (data) => {
+  ws.on('message', (data, isBinary) => {
+    process.stderr.write(`[relay-server] on('message') isBinary=${isBinary}, len=${data.length}\n`);
     // Binary frame: audio data with kuerzel prefix
-    if (Buffer.isBuffer(data) && data.length > 2) {
+    if (isBinary && data.length > 2) {
       const kuerzelLen = data.readUInt16BE(0);
       if (kuerzelLen > 0 && kuerzelLen < data.length - 2) {
         const kuerzel = data.slice(2, 2 + kuerzelLen).toString('utf8');
@@ -458,6 +477,7 @@ wss.on('connection', (ws, req) => {
 
     try {
       const msg = JSON.parse(data.toString());
+      process.stderr.write(`[relay-server] Received: action=${msg.action} kuerzel=${msg.kuerzel} message=${(msg.message||'').slice(0,50)}\n`);
 
       if (msg.action === 'command') {
         // Dispatch command directly via Zellij write-chars
