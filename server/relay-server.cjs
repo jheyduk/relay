@@ -261,6 +261,13 @@ async function dispatchAnswer(kuerzel, msg) {
     await writeCharsToPane(sessionId, paneId, String(msg.selections[0]));
     await delay(KEYSTROKE_DELAY);
     await sendEnter(sessionId, paneId);
+    // If this is the final answer in a multi-question set, auto-confirm "Submit answers"
+    if (msg.submit) {
+      await delay(500);
+      await writeCharsToPane(sessionId, paneId, '1');
+      await delay(KEYSTROKE_DELAY);
+      await sendEnter(sessionId, paneId);
+    }
     return;
   }
 
