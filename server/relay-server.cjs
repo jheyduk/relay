@@ -96,18 +96,20 @@ let mdnsChild = null;
  * Looks up /tmp/zellij-claude-tab-{sessionId} files whose content matches the kuerzel.
  */
 function findSessionForKuerzel(kuerzel) {
+  // Verify the kuerzel exists in tab files (session is active)
   try {
     const tabFiles = fs.readdirSync('/tmp').filter(f => f.startsWith('zellij-claude-tab-'));
-    for (const f of tabFiles) {
+    const found = tabFiles.some(f => {
       try {
-        const content = fs.readFileSync(`/tmp/${f}`, 'utf8').trim();
-        if (content === kuerzel) {
-          return f.replace('zellij-claude-tab-', '');
-        }
-      } catch {}
-    }
-  } catch {}
-  return null;
+        return fs.readFileSync(`/tmp/${f}`, 'utf8').trim() === kuerzel;
+      } catch { return false; }
+    });
+    if (!found) return null;
+  } catch { return null; }
+
+  // Return the Zellij session name (not the Claude session UUID)
+  // The relay-server inherits ZELLIJ_SESSION_NAME from the hook that started it
+  return process.env.ZELLIJ_SESSION_NAME || null;
 }
 
 /**
