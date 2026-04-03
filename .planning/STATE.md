@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 Phase: 05
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-04-02
+Last activity: 2026-04-03 - Completed quick task 260403-d2e: Auto-start PollingService after setup and on app launch
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -113,6 +113,12 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260403-d2e | Auto-start PollingService after setup and on app launch | 2026-04-03 | bfbffe3 | [260403-d2e-auto-start-pollingservice-after-setup-an](./quick/260403-d2e-auto-start-pollingservice-after-setup-an/) |
 
 ### Blockers/Concerns
 
