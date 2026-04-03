@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-04-03T09:27:35.320Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-04-03T09:28:00.000Z"
 last_activity: 2026-04-03
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 18
-  completed_plans: 15
+  completed_plans: 16
   percent: 0
 ---
 
@@ -66,6 +66,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05 P01 | 5min | 2 tasks | 6 files |
 | Phase 05 P03 | 3min | 2 tasks | 8 files |
 | Phase 06 P01 | 3min | 2 tasks | 5 files |
+| Phase 06 P02 | 2min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,9 @@ Recent decisions affecting current work:
 - [Phase 06]: Unix domain socket for hook-to-server IPC instead of HTTP localhost
 - [Phase 06]: dns-sd CLI for mDNS (macOS built-in, no npm dep)
 - [Phase 06]: Telegram fallback only for permission/completion after 30s disconnect
+- [Phase 06]: Backoff resets to 1000ms (not 0) after successful connection to prevent rapid reconnect
+- [Phase 06]: WebSocketClient sends commands as JSON maps with action/kuerzel/message keys
+- [Phase 06]: Old Telegram files kept until Plan 03 cleanup to avoid breaking Android module
 
 ### Pending Todos
 
@@ -135,6 +139,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03T09:27:35.317Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-04-03T09:28:00.000Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None

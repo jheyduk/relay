@@ -13,13 +13,13 @@ import kotlinx.coroutines.flow.map
 
 /**
  * Implementation of [ChatRepository] that persists outgoing messages
- * to SQLDelight and delegates sending to [TelegramRepository].
+ * to SQLDelight and delegates sending to [RelayRepository].
  *
  * Outgoing messages are inserted optimistically before the network call,
  * so chat history survives process death even if send fails.
  */
 class ChatRepositoryImpl(
-    private val telegramRepository: TelegramRepository,
+    private val relayRepository: RelayRepository,
     private val database: RelayDatabase
 ) : ChatRepository {
 
@@ -42,16 +42,16 @@ class ChatRepositoryImpl(
             timestamp = now
         )
 
-        // Delegate actual delivery to Telegram
-        telegramRepository.sendCommand(kuerzel, text)
+        // Delegate actual delivery to relay server
+        relayRepository.sendCommand(kuerzel, text)
     }
 
     override suspend fun answerCallback(messageId: Long, kuerzel: String, response: String) {
         // Persist the decision locally so the UI reflects the answered state immediately
         database.messagesQueries.markAnswered(response, messageId)
 
-        // Send callback to Telegram (format: callback:allow:kuerzel / callback:deny:kuerzel)
-        telegramRepository.sendCommand(kuerzel, "callback:$response:$kuerzel")
+        // Send callback via relay server (format: callback:allow:kuerzel / callback:deny:kuerzel)
+        relayRepository.sendCommand(kuerzel, "callback:$response:$kuerzel")
     }
 }
 
