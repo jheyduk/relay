@@ -6,8 +6,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.heyduk.relay.data.remote.TelegramApiImpl
-import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,27 +14,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel for the bot token setup screen.
- * Persists tokens to DataStore and validates them against Telegram's getMe endpoint.
+ * ViewModel for the server setup screen.
+ * Persists the shared secret and optional WireGuard IP to DataStore.
+ * No network validation needed -- the server may not be running during setup.
  */
 class SetupViewModel(
-    private val dataStore: DataStore<Preferences>,
-    private val httpClient: HttpClient
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
 
     data class SetupUiState(
-        val relayBotToken: String = "",
-        val commandBotToken: String = "",
-        val chatId: String = "",
+        val serverSecret: String = "",
+        val wireguardIp: String = "",
         val isValidating: Boolean = false,
         val validationResult: String? = null,
         val isConfigured: Boolean = false
     )
 
     companion object {
-        val RELAY_BOT_TOKEN_KEY = stringPreferencesKey("relay_bot_token")
-        val COMMAND_BOT_TOKEN_KEY = stringPreferencesKey("command_bot_token")
-        val CHAT_ID_KEY = stringPreferencesKey("chat_id")
+        val SERVER_SECRET_KEY = stringPreferencesKey("server_secret")
+        val WIREGUARD_IP_KEY = stringPreferencesKey("wireguard_ip")
     }
 
     private val _uiState = MutableStateFlow(SetupUiState())
@@ -51,31 +47,25 @@ class SetupViewModel(
             val prefs = dataStore.data.first()
             _uiState.update { state ->
                 state.copy(
-                    relayBotToken = prefs[RELAY_BOT_TOKEN_KEY] ?: "",
-                    commandBotToken = prefs[COMMAND_BOT_TOKEN_KEY] ?: "",
-                    chatId = prefs[CHAT_ID_KEY] ?: "",
-                    isConfigured = !prefs[RELAY_BOT_TOKEN_KEY].isNullOrBlank()
-                            && !prefs[COMMAND_BOT_TOKEN_KEY].isNullOrBlank()
-                            && !prefs[CHAT_ID_KEY].isNullOrBlank()
+                    serverSecret = prefs[SERVER_SECRET_KEY] ?: "",
+                    wireguardIp = prefs[WIREGUARD_IP_KEY] ?: "",
+                    isConfigured = !prefs[SERVER_SECRET_KEY].isNullOrBlank()
                 )
             }
         }
     }
 
-    fun updateRelayBotToken(value: String) {
-        _uiState.update { it.copy(relayBotToken = value, validationResult = null) }
+    fun updateServerSecret(value: String) {
+        _uiState.update { it.copy(serverSecret = value, validationResult = null) }
     }
 
-    fun updateCommandBotToken(value: String) {
-        _uiState.update { it.copy(commandBotToken = value, validationResult = null) }
-    }
-
-    fun updateChatId(value: String) {
-        _uiState.update { it.copy(chatId = value, validationResult = null) }
+    fun updateWireguardIp(value: String) {
+        _uiState.update { it.copy(wireguardIp = value, validationResult = null) }
     }
 
     /**
-     * Validates bot tokens by calling Telegram's getMe endpoint, then saves to DataStore.
+     * Validates that the server secret is not blank, then saves to DataStore.
+     * WireGuard IP is optional -- used as fallback when mDNS discovery fails.
      */
     fun validateAndSave() {
         viewModelScope.launch {
@@ -83,26 +73,17 @@ class SetupViewModel(
 
             try {
                 val state = _uiState.value
-                if (state.relayBotToken.isBlank() || state.commandBotToken.isBlank() || state.chatId.isBlank()) {
+                if (state.serverSecret.isBlank()) {
                     _uiState.update {
-                        it.copy(isValidating = false, validationResult = "All fields are required")
+                        it.copy(isValidating = false, validationResult = "Server secret is required")
                     }
                     return@launch
                 }
 
-                // Validate relay bot token
-                val relayApi = TelegramApiImpl(httpClient, state.relayBotToken, state.chatId)
-                relayApi.sendMessage("Relay bot connected") // Simple connectivity test
-
-                // Validate command bot token
-                val cmdApi = TelegramApiImpl(httpClient, state.commandBotToken, state.chatId)
-                cmdApi.sendMessage("Command bot connected") // Simple connectivity test
-
-                // Save tokens to DataStore
+                // Save to DataStore
                 dataStore.edit { prefs ->
-                    prefs[RELAY_BOT_TOKEN_KEY] = state.relayBotToken
-                    prefs[COMMAND_BOT_TOKEN_KEY] = state.commandBotToken
-                    prefs[CHAT_ID_KEY] = state.chatId
+                    prefs[SERVER_SECRET_KEY] = state.serverSecret
+                    prefs[WIREGUARD_IP_KEY] = state.wireguardIp
                 }
 
                 _uiState.update {
@@ -116,7 +97,7 @@ class SetupViewModel(
                 _uiState.update {
                     it.copy(
                         isValidating = false,
-                        validationResult = "Validation failed: ${e.message}"
+                        validationResult = "Save failed: ${e.message}"
                     )
                 }
             }

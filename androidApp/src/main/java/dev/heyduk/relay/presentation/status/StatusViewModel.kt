@@ -2,7 +2,7 @@ package dev.heyduk.relay.presentation.status
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.heyduk.relay.data.repository.TelegramRepository
+import dev.heyduk.relay.data.repository.RelayRepository
 import dev.heyduk.relay.domain.model.RelayUpdate
 import dev.heyduk.relay.service.NetworkMonitor
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
  * Combines network connectivity state with recent messages from the repository.
  */
 class StatusViewModel(
-    private val repository: TelegramRepository,
+    private val repository: RelayRepository,
     private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
@@ -43,7 +43,7 @@ class StatusViewModel(
     )
 
     /**
-     * Send a raw command (e.g. /ls) via the command bot.
+     * Send a raw command (e.g. /ls) via the relay server.
      */
     suspend fun sendRawCommand(command: String) {
         try {

@@ -2,8 +2,8 @@ package dev.heyduk.relay.presentation.session
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.heyduk.relay.data.repository.RelayRepository
 import dev.heyduk.relay.data.repository.SessionRepository
-import dev.heyduk.relay.data.repository.TelegramRepository
 import dev.heyduk.relay.domain.CommandRouter
 import dev.heyduk.relay.domain.model.Session
 import dev.heyduk.relay.service.NetworkMonitor
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
  */
 class SessionListViewModel(
     private val sessionRepository: SessionRepository,
-    private val telegramRepository: TelegramRepository,
+    private val relayRepository: RelayRepository,
     private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
@@ -133,11 +133,11 @@ class SessionListViewModel(
             try {
                 when (result) {
                     is CommandRouter.CommandResult.Global ->
-                        telegramRepository.sendRawCommand(result.command)
+                        relayRepository.sendRawCommand(result.command)
                     is CommandRouter.CommandResult.SessionTargeted ->
-                        telegramRepository.sendRawCommand(result.command)
+                        relayRepository.sendRawCommand(result.command)
                     is CommandRouter.CommandResult.Message ->
-                        telegramRepository.sendCommand(result.kuerzel, result.text)
+                        relayRepository.sendCommand(result.kuerzel, result.text)
                     is CommandRouter.CommandResult.NoSessionSelected ->
                         _localState.update { it.copy(errorMessage = "Select a session first") }
                 }

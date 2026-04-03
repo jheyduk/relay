@@ -22,8 +22,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Setup screen for entering bot tokens and chat ID.
- * Navigates to the status screen on successful configuration.
+ * Setup screen for entering the server shared secret and optional WireGuard IP.
+ * Navigates to the session list screen on successful configuration.
  */
 @Composable
 fun SetupScreen(
@@ -54,9 +54,9 @@ fun SetupScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedTextField(
-            value = uiState.relayBotToken,
-            onValueChange = viewModel::updateRelayBotToken,
-            label = { Text("Relay Bot Token") },
+            value = uiState.serverSecret,
+            onValueChange = viewModel::updateServerSecret,
+            label = { Text("Server Secret") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -64,19 +64,10 @@ fun SetupScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = uiState.commandBotToken,
-            onValueChange = viewModel::updateCommandBotToken,
-            label = { Text("Command Bot Token (zellij-claude)") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = uiState.chatId,
-            onValueChange = viewModel::updateChatId,
-            label = { Text("Chat ID") },
+            value = uiState.wireguardIp,
+            onValueChange = viewModel::updateWireguardIp,
+            label = { Text("WireGuard IP (optional)") },
+            placeholder = { Text("e.g., fd00::1") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -94,7 +85,7 @@ fun SetupScreen(
                     strokeWidth = 2.dp
                 )
             } else {
-                Text("Validate & Save")
+                Text("Save")
             }
         }
 
