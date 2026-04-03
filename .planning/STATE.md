@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Standalone Server
 status: verifying
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-04-03T17:05:20.867Z"
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-04-03T17:17:36.235Z"
 last_activity: 2026-04-03
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
   percent: 0
 ---
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 08 P01 | 2min | 2 tasks | 1 files |
 | Phase 08 P02 | 6min | 3 tasks | 14 files |
+| Phase 09 P02 | 4min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting current work:
 - [Phase 08]: In-memory questionDataCache for transient live question data (not DB-persisted)
 - [Phase 08]: Dual Koin registration (concrete + interface) for ChatRepositoryImpl cache access
 - [Phase 08]: buildJsonObject for sendAnswer payload (kotlinx.serialization cannot encode Map<String, Any>)
+- [Phase 09]: Transcript messages skip DB persistence, flow directly to ViewModel via SharedFlow
+- [Phase 09]: Binary frame protocol: 2-byte big-endian kuerzel length + UTF-8 kuerzel + WAV payload
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03T17:05:20.864Z
-Stopped at: Completed 08-02-PLAN.md
+Last session: 2026-04-03T17:17:36.232Z
+Stopped at: Completed 09-02-PLAN.md
 Resume file: None
