@@ -1,8 +1,9 @@
 # Roadmap: Relay
 
-## Overview
+## Milestones
 
-Relay goes from zero to a fully functional Android companion for Claude Code sessions in five phases. The journey follows the architecture's natural dependency chain: establish reliable Telegram transport first (solving the critical 409 polling conflict), then build the session-aware UI, add text messaging with persistent history, layer in the permission and notification system, and finally integrate the on-device voice pipeline. Each phase delivers a testable, usable capability that builds on the previous one.
+- ✅ **v1.0 MVP** - Phases 1-6 (shipped 2026-04-03)
+- 🚧 **v1.1 Standalone Server** - Phases 7-9 (in progress)
 
 ## Phases
 
@@ -12,24 +13,12 @@ Relay goes from zero to a fully functional Android companion for Claude Code ses
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Transport & Foundation** - Establish reliable Telegram Bot API polling with 409 conflict resolution and project scaffolding
-- [ ] **Phase 2: Session Discovery & Status** - Display all active sessions with live status and session commands
-- [ ] **Phase 3: Messaging & Conversations** - Send and receive text messages per session with persistent history
-- [ ] **Phase 4: Permissions & Notifications** - Native Allow/Deny permission handling with prioritized push notifications
-- [ ] **Phase 5: Voice Pipeline** - On-device Whisper transcription and TTS playback for hands-free interaction
-
-## Phase Details
+<details>
+<summary>✅ v1.0 MVP (Phases 1-6) - SHIPPED 2026-04-03</summary>
 
 ### Phase 1: Transport & Foundation
 **Goal**: The app can connect to the Telegram Bot API, receive messages reliably, and survive network transitions -- with the 409 single-consumer conflict fully resolved
-**Depends on**: Nothing (first phase)
 **Requirements**: TRNS-01, TRNS-02, TRNS-03, TRNS-04, TRNS-05
-**Success Criteria** (what must be TRUE):
-  1. App connects to Telegram Bot API and receives updates via long polling without triggering 409 conflict with the Mac-side poller
-  2. App can send a message in zellij-claude format (`@kuerzel message`) and see it arrive on the Mac side
-  3. App correctly parses incoming bot messages (distinguishes status updates, responses, and permission requests)
-  4. App maintains polling connection when switching between WiFi and mobile data
-  5. Foreground service keeps polling alive when the app is backgrounded or the screen is off
 **Plans**: 3 plans
 
 Plans:
@@ -39,16 +28,8 @@ Plans:
 
 ### Phase 2: Session Discovery & Status
 **Goal**: Users can see all active zellij-claude sessions at a glance with live status indicators and execute session management commands
-**Depends on**: Phase 1
 **Requirements**: SESS-01, SESS-02, SESS-03, SESS-04, SESS-05, UI-01
-**Success Criteria** (what must be TRUE):
-  1. User can see a list of all active sessions with their kuerzel and current status (working, waiting, ready, shell) visually distinguished
-  2. User can pull-to-refresh or tap a button to execute `/ls` and see the session list update
-  3. User can execute `/last @kuerzel` to view the last response from a specific session
-  4. User can execute `/open`, `/goto`, `/rename` commands for session management
-  5. App renders in dark mode via Material 3 dynamic theming
 **Plans**: 3 plans
-**UI hint**: yes
 
 Plans:
 - [x] 02-01-PLAN.md -- Session domain model, /ls parser, command router, SessionRepository (shared module)
@@ -57,14 +38,8 @@ Plans:
 
 ### Phase 3: Messaging & Conversations
 **Goal**: Users can have text conversations with individual sessions and review history across app restarts
-**Depends on**: Phase 2
 **Requirements**: MSG-01, MSG-02, MSG-05
-**Success Criteria** (what must be TRUE):
-  1. User can select a session and send a text message that arrives at the correct zellij-claude session on the Mac
-  2. User can view the full conversation history for any session, with messages displayed in chronological order
-  3. Conversation history persists across app restarts (stored in SQLDelight database)
 **Plans**: 2 plans
-**UI hint**: yes
 
 Plans:
 - [x] 03-01-PLAN.md -- ChatMessage model, Messages.sq outgoing persistence, ChatRepository with send+persist
@@ -72,17 +47,8 @@ Plans:
 
 ### Phase 4: Permissions & Notifications
 **Goal**: Users never miss a permission request or session completion -- native Allow/Deny buttons replace Telegram inline keyboards, with push notifications surfacing time-critical events
-**Depends on**: Phase 3
 **Requirements**: MSG-03, MSG-04, MSG-06, NOTF-01, NOTF-02, NOTF-03, NOTF-04
-**Success Criteria** (what must be TRUE):
-  1. User sees native Allow/Deny buttons on permission request messages, showing tool details (command, file path)
-  2. Tapping Allow or Deny sends the correct callback to Telegram and the permission is processed on the Mac side
-  3. User can answer AskUserQuestion prompts by tapping native option buttons (multiple choice)
-  4. User receives a high-priority push notification when any session requests permission, even with the app backgrounded
-  5. User receives a normal-priority notification when a session completes its task
-  6. Tapping a notification opens the app directly to the relevant session
 **Plans**: 3 plans
-**UI hint**: yes
 
 Plans:
 - [x] 04-01-PLAN.md -- Permission and question card composables, callback repository layer, DB schema extension
@@ -91,12 +57,7 @@ Plans:
 
 ### Phase 5: Voice Pipeline
 **Goal**: Users can speak to sessions and hear responses -- on-device Whisper transcription and Android TTS enable hands-free interaction
-**Depends on**: Phase 3
 **Requirements**: VOIC-01, VOIC-02, VOIC-03
-**Success Criteria** (what must be TRUE):
-  1. User can hold a button to record voice, and the recording is transcribed on-device by Whisper without network access
-  2. Transcribed text is automatically sent to the active session as a regular message (appears in conversation history as text)
-  3. User can tap a play button on any Claude response to hear it read aloud via TTS
 **Plans**: 3 plans
 
 Plans:
@@ -104,36 +65,75 @@ Plans:
 - [x] 05-02-PLAN.md -- TtsManager with Android TextToSpeech, speaker icon on message bubbles, play/stop controls
 - [x] 05-03-PLAN.md -- AudioRecorder, hold-to-record button, transcript preview, voice-to-text-to-send pipeline wiring
 
-## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Transport & Foundation | 3/3 | Complete | 2026-04-02 |
-| 2. Session Discovery & Status | 0/3 | Planning complete | - |
-| 3. Messaging & Conversations | 0/2 | Planning complete | - |
-| 4. Permissions & Notifications | 0/3 | Planning complete | - |
-| 5. Voice Pipeline | 0/3 | Planning complete | - |
-| 6. Direct WebSocket Transport | 0/4 | Planning complete | - |
-
 ### Phase 6: Direct WebSocket Transport
-
-**Goal:** Replace Telegram Bot API transport with direct WebSocket connection between Mac and Android app. Mac runs a lightweight WebSocket server, app discovers it via mDNS (local) or stable WireGuard IPv6 (VPN). Hooks route messages via WebSocket with Telegram as push notification fallback only.
-**Requirements:**
-- R-06-01: WebSocket server on Mac (Node.js, runs alongside zellij-claude)
-- R-06-02: mDNS/Bonjour service advertisement for local network discovery
-- R-06-03: Stable WireGuard IPv6 as fallback connection target
-- R-06-04: Configurable transport layer in zellij-claude hooks (Telegram / WebSocket)
-- R-06-05: App auto-discovers Mac via mDNS or configured WireGuard IP
-- R-06-06: Bidirectional real-time messaging over WebSocket
-- R-06-07: Telegram degraded to push notification fallback (app not connected)
-**Depends on:** Phase 1 (transport foundation)
-**Plans:** 4 plans
+**Goal**: Replace Telegram Bot API transport with direct WebSocket connection between Mac and Android app
+**Requirements**: R-06-01, R-06-02, R-06-03, R-06-04, R-06-05, R-06-06, R-06-07
+**Plans**: 4 plans
 
 Plans:
 - [x] 06-01-PLAN.md -- Mac-side WebSocket server (relay-server.cjs), mDNS advertisement, hook routing update
 - [x] 06-02-PLAN.md -- App-side WebSocket client, ConnectionState, RelayRepository replacing TelegramRepository
 - [x] 06-03-PLAN.md -- WebSocketService, NSD discovery, setup screen rewrite, Telegram code removal from Android
 - [x] 06-04-PLAN.md -- Telegram code deletion, build verification, end-to-end integration checkpoint
+
+</details>
+
+### 🚧 v1.1 Standalone Server (In Progress)
+
+**Milestone Goal:** Make relay-server a standalone component in the relay repo, eliminate zellij-claude dependency, add interactive AskUserQuestion controls, and move voice transcription to the Mac for speed.
+
+- [ ] **Phase 7: Server Migration** - Move relay-server and hooks to relay repo with direct Zellij dispatching
+- [ ] **Phase 8: Interactive Controls & Reconnect** - AskUserQuestion keystroke mapping and session sync on reconnect
+- [ ] **Phase 9: Mac-Side Voice** - Server-side Whisper transcription replacing on-device processing
+
+## Phase Details
+
+### Phase 7: Server Migration
+**Goal**: relay-server is a standalone Node.js component in the relay repo that dispatches directly to Zellij -- no dependency on zellij-claude for anything except Claude Code itself
+**Depends on**: Phase 6 (WebSocket transport)
+**Requirements**: SERV-01, SERV-02, SERV-03, SERV-05
+**Success Criteria** (what must be TRUE):
+  1. relay-server.cjs runs from `server/` in the relay repo with its own package.json and dependencies
+  2. Hooks (session-start, session-stop, permission-notify, ask-notify) live in `server/hooks/` and reference relay-server directly (not zellij-claude)
+  3. Server dispatches user responses to sessions via `zellij action write-chars` instead of `npx zellij-claude send`
+  4. zellij-claude hooks directory no longer contains relay-server or relay-specific hooks
+**Plans**: TBD
+
+### Phase 8: Interactive Controls & Reconnect
+**Goal**: Users can fully answer AskUserQuestion prompts from the app (single choice, multiple choice, free text) and see existing sessions after reconnecting
+**Depends on**: Phase 7 (direct Zellij dispatch needed for keystroke sequences)
+**Requirements**: CTRL-01, CTRL-02, CTRL-03, SERV-04
+**Success Criteria** (what must be TRUE):
+  1. User can answer a single-choice AskUserQuestion by tapping an option, which sends the correct number key + Enter as keystrokes to the session
+  2. User can answer a multiple-choice AskUserQuestion by toggling options (number keys), navigating to Submit (Down arrow), and confirming (Enter)
+  3. User can answer a free-text AskUserQuestion by selecting Other (Down + Enter), typing text, and confirming (Enter)
+  4. User sees all active sessions immediately after the app reconnects to relay-server (no manual /ls needed)
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 9: Mac-Side Voice
+**Goal**: Voice transcription happens on the Mac (fast, high quality) instead of the phone -- the app streams audio to the server and receives text back
+**Depends on**: Phase 7 (server must be in relay repo to add Whisper capability)
+**Requirements**: VOIC-10, VOIC-11, VOIC-12
+**Success Criteria** (what must be TRUE):
+  1. User can hold-to-record and audio data is sent over WebSocket to relay-server (not transcribed on device)
+  2. Server transcribes received audio locally via whisper.cpp and sends the transcript back to the app
+  3. APK no longer bundles the 141 MB Whisper model -- on-device transcription code is removed
+**Plans**: TBD
+
+## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 7 -> 8 -> 9
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Transport & Foundation | v1.0 | 3/3 | Complete | 2026-04-02 |
+| 2. Session Discovery & Status | v1.0 | 3/3 | Complete | 2026-04-02 |
+| 3. Messaging & Conversations | v1.0 | 2/2 | Complete | 2026-04-02 |
+| 4. Permissions & Notifications | v1.0 | 3/3 | Complete | 2026-04-02 |
+| 5. Voice Pipeline | v1.0 | 3/3 | Complete | 2026-04-02 |
+| 6. Direct WebSocket Transport | v1.0 | 4/4 | Complete | 2026-04-03 |
+| 7. Server Migration | v1.1 | 0/? | Not started | - |
+| 8. Interactive Controls & Reconnect | v1.1 | 0/? | Not started | - |
+| 9. Mac-Side Voice | v1.1 | 0/? | Not started | - |

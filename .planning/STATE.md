@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Standalone Server
-status: defining_requirements
-stopped_at: Milestone v1.1 started
-last_updated: "2026-04-03T16:17:04.545Z"
+status: ready_to_plan
+stopped_at: Roadmap created for v1.1
+last_updated: "2026-04-03T17:00:00.000Z"
 last_activity: 2026-04-03
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 18
-  completed_plans: 18
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 0
 ---
 
@@ -18,58 +18,38 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-02)
+See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Remote session control with per-session separation -- see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
-**Current focus:** Milestone v1.1 — Standalone Server
+**Current focus:** Phase 7 -- Server Migration
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-04-03 — Milestone v1.1 started
-Last activity: 2026-04-03
+Phase: 7 of 9 (Server Migration)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-04-03 -- Roadmap created for v1.1 milestone (phases 7-9)
 
 Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
-**Velocity:**
+**Velocity (v1.0):**
+- Total plans completed: 18
+- Average duration: ~3.5 min
+- Total execution time: ~1.1 hours
 
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
-
-**By Phase:**
+**By Phase (v1.1):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | - | - | - | - |
 
-**Recent Trend:**
-
-- Last 5 plans: -
-- Trend: -
+**Recent Trend (v1.0):**
+- Last 5 plans: 3min, 5min, 2min, 5min, 3min
+- Trend: Stable
 
 *Updated after each plan completion*
-| Phase 01 P01 | 10min | 2 tasks | 14 files |
-| Phase 01 P02 | 9min | 2 tasks | 9 files |
-| Phase 01 P03 | 6min | 3 tasks | 13 files |
-| Phase 02 P01 | 2min | 2 tasks | 7 files |
-| Phase 02 P02 | 4min | 2 tasks | 10 files |
-| Phase 02 P03 | 2min | 3 tasks | 2 files |
-| Phase 03 P01 | 3min | 2 tasks | 9 files |
-| Phase 03 P02 | 2min | 3 tasks | 6 files |
-| Phase 04 P01 | 3min | 2 tasks | 8 files |
-| Phase 04-02 Pnotifications | 3min | 2 tasks | 7 files |
-| Phase 04 P03 | 1min | 2 tasks | 2 files |
-| Phase 05 P01 | 5min | 2 tasks | 6 files |
-| Phase 05 P03 | 3min | 2 tasks | 8 files |
-| Phase 06 P01 | 3min | 2 tasks | 5 files |
-| Phase 06 P02 | 2min | 2 tasks | 8 files |
-| Phase 06 P03 | 5min | 2 tasks | 14 files |
-| Phase 06 P04 | 3min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -78,73 +58,21 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Roadmap]: 409 conflict resolution is the first thing to solve -- no other work proceeds until single-consumer polling is established
-- [Roadmap]: Voice pipeline (Phase 5) depends only on Phase 3 (messaging), not Phase 4 (permissions) -- can be parallelized if needed
-- [Roadmap]: UI-01 (dark mode) assigned to Phase 2 since Material 3 theming should be set up when first UI screens are built
-- [Phase 01]: Gradle 9.4.1 for JDK 25 compat (8.14 doesn't support JDK 25)
-- [Phase 01]: android.builtInKotlin=false for AGP 9 + traditional KMP plugin compat
-- [Phase 01]: KSP 2.3.6 (new simplified versioning, replaces old 2.x.y-1.0.z format)
-- [Phase 01]: Extracted TelegramApi as interface (not class) for testability in poller and repository tests
-- [Phase 01]: Two-bot architecture via named Koin qualifiers: relayApi for reading, commandApi for writing
-- [Phase 01]: At-least-once delivery: offset persisted before processing updates
-- [Phase 01]: Tokens read from DataStore at service start, not Koin singletons -- avoids unresolvable deps at startup
-- [Phase 01]: PollingService inserts updates into SQLDelight directly, decoupled from SharedModule repository
-- [Phase 02]: SessionListParser uses heuristic /ls detection: any update parsing to >=1 session triggers session list update
-- [Phase 02]: CommandRouter uses sealed interface CommandResult for type-safe routing outcomes
-- [Phase 02]: ModalNavigationDrawer wraps Scaffold (correct nesting per Material 3 guidelines)
-- [Phase 02]: ViewModel uses private MutableStateFlow<LocalState> combined with repository flows for single uiState StateFlow
-- [Phase 02]: MainActivity uses RelayTheme instead of raw MaterialTheme for Dynamic Color support
-- [Phase 02]: Named route 'sessions' for SessionListScreen, kept 'status' route for StatusScreen backward compat
-- [Phase 03]: Negative epoch millis as synthetic update_id to avoid collision with Telegram positive IDs
-- [Phase 03]: Optimistic insert before network send for offline resilience
-- [Phase 03]: expect/actual currentTimeMillis instead of adding kotlinx-datetime dependency
-- [Phase 03]: Added TEXT to RelayMessageType enum for outgoing message type compatibility
-- [Phase 03]: ChatViewModel uses combine(repoFlow, localState) pattern from SessionListViewModel
-- [Phase 03]: SessionCard tap navigates to chat screen instead of fetching /last response
-- [Phase 03]: parametersOf pattern for Koin ViewModel injection with per-screen parameters
-- [Phase 04]: Callback format: callback:{response}:{kuerzel} sent via sendCommand (per D-01 CONTEXT)
-- [Phase 04]: Local variable extraction for cross-module nullable smart casts in Compose (Kotlin compiler limitation)
-- [Phase 04-02]: LaunchedEffect with mutableStateOf for deep-link navigation to avoid navigating before NavHost is composed
-- [Phase 04-02]: PendingIntent uses session.hashCode() as requestCode for unique per-session intents
-- [Phase 04-02]: Notification channel separation: relay_permissions (HIGH) for permission requests, relay_updates (DEFAULT) for completions
-- [Phase 04]: sendingCallbackIds as Set<Long> in UiState for per-message loading indicators
-- [Phase 04]: answerQuestion sends both callback and text message for question flow
-- [Phase 05]: FetchContent for ggml build from whisper.cpp source tree (official whisper.android approach)
-- [Phase 05]: arm64-v8a only ABI filter for initial native build, x86_64 emulator support deferred
-- [Phase 05]: Float array JNI interface instead of file path for whisper transcription flexibility
-- [Phase 05]: Lazy WhisperManager initialization on first recording -- avoids loading 141MB model at app start
-- [Phase 05]: TranscriptPreview replaces CommandInput when transcript available -- clean state-driven UI swap
-- [Phase 06]: Unix domain socket for hook-to-server IPC instead of HTTP localhost
-- [Phase 06]: dns-sd CLI for mDNS (macOS built-in, no npm dep)
-- [Phase 06]: Telegram fallback only for permission/completion after 30s disconnect
-- [Phase 06]: Backoff resets to 1000ms (not 0) after successful connection to prevent rapid reconnect
-- [Phase 06]: WebSocketClient sends commands as JSON maps with action/kuerzel/message keys
-- [Phase 06]: Old Telegram files kept until Plan 03 cleanup to avoid breaking Android module
-- [Phase 06]: mDNS discovery with 5s timeout, WireGuard IP fallback for remote access
-- [Phase 06]: PollingService.kt and DataStoreOffsetProvider.kt removed as Telegram cleanup in Plan 03
-- [Phase 06]: SessionRepositoryImpl uses RelayRepository instead of deleted TelegramRepository
+- [v1.1 Roadmap]: Server migration (Phase 7) before interactive controls -- direct Zellij dispatch is prerequisite for keystroke mapping
+- [v1.1 Roadmap]: SERV-04 (reconnect sync) grouped with CTRL-* not SERV-* -- reconnect sync is a UX feature, not server infrastructure
+- [v1.1 Roadmap]: Mac-side voice (Phase 9) last -- independent feature, can ship v1.1 without it if needed
 
 ### Pending Todos
 
 None yet.
 
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260403-d2e | Auto-start PollingService after setup and on app launch | 2026-04-03 | bfbffe3 | [260403-d2e-auto-start-pollingservice-after-setup-an](./quick/260403-d2e-auto-start-pollingservice-after-setup-an/) |
-
-### Roadmap Evolution
-
-- Phase 6 added: Direct WebSocket Transport — replace Telegram Bot API transport with direct WebSocket, Telegram as notification fallback only
-
 ### Blockers/Concerns
 
-- [Phase 1-5]: Telegram Bot API transport is fundamentally broken — a bot cannot receive its own sent messages via getUpdates. Phase 6 replaces this with direct WebSocket.
-- [Phase 5]: Whisper performance on target device is unvalidated -- early prototyping recommended
+- [Phase 7]: relay-server.cjs currently in zellij-claude repo -- need to understand hook registration mechanism for migration
+- [Phase 9]: whisper.cpp must be compiled/available on Mac -- need to verify installation path
 
 ## Session Continuity
 
-Last session: 2026-04-03T09:42:06.478Z
-Stopped at: Completed 06-04-PLAN.md
+Last session: 2026-04-03
+Stopped at: Roadmap created for v1.1 milestone
 Resume file: None

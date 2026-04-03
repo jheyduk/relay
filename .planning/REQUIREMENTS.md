@@ -45,22 +45,23 @@ Deferred to later milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SERV-01 | TBD | Pending |
-| SERV-02 | TBD | Pending |
-| SERV-03 | TBD | Pending |
-| SERV-04 | TBD | Pending |
-| SERV-05 | TBD | Pending |
-| CTRL-01 | TBD | Pending |
-| CTRL-02 | TBD | Pending |
-| CTRL-03 | TBD | Pending |
-| VOIC-10 | TBD | Pending |
-| VOIC-11 | TBD | Pending |
-| VOIC-12 | TBD | Pending |
+| SERV-01 | Phase 7 | Pending |
+| SERV-02 | Phase 7 | Pending |
+| SERV-03 | Phase 7 | Pending |
+| SERV-04 | Phase 8 | Pending |
+| SERV-05 | Phase 7 | Pending |
+| CTRL-01 | Phase 8 | Pending |
+| CTRL-02 | Phase 8 | Pending |
+| CTRL-03 | Phase 8 | Pending |
+| VOIC-10 | Phase 9 | Pending |
+| VOIC-11 | Phase 9 | Pending |
+| VOIC-12 | Phase 9 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
+*Traceability updated: 2026-04-03*
