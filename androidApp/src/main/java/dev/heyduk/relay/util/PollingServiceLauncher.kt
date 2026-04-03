@@ -9,27 +9,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import dev.heyduk.relay.service.PollingService
+import dev.heyduk.relay.service.WebSocketService
 
 /**
- * Starts the PollingService as a foreground service.
+ * Starts the WebSocketService as a foreground service.
  * Shared utility used by StatusScreen and auto-start logic.
  */
-fun startPollingService(context: Context) {
+fun startWebSocketService(context: Context) {
     ContextCompat.startForegroundService(
         context,
-        Intent(context, PollingService::class.java)
+        Intent(context, WebSocketService::class.java)
     )
 }
 
 /**
  * Invisible composable that requests POST_NOTIFICATIONS permission on Android 13+
- * and starts the PollingService. On older Android versions, starts immediately.
+ * and starts the WebSocketService. On older Android versions, starts immediately.
  *
  * Renders no visible UI -- purely side-effect driven.
  */
 @Composable
-fun RequestNotificationPermissionAndStartPolling() {
+fun RequestNotificationPermissionAndStartConnection() {
     val context = LocalContext.current
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -37,14 +37,14 @@ fun RequestNotificationPermissionAndStartPolling() {
     ) { _ ->
         // Start regardless of grant result -- service works without notification permission,
         // the foreground notification just won't be visible if denied.
-        startPollingService(context)
+        startWebSocketService(context)
     }
 
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            startPollingService(context)
+            startWebSocketService(context)
         }
     }
 }

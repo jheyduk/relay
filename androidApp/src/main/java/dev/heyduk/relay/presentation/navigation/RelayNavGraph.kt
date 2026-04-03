@@ -10,7 +10,7 @@ import dev.heyduk.relay.presentation.chat.ChatScreen
 import dev.heyduk.relay.presentation.session.SessionListScreen
 import dev.heyduk.relay.presentation.setup.SetupScreen
 import dev.heyduk.relay.presentation.status.StatusScreen
-import dev.heyduk.relay.util.startPollingService
+import dev.heyduk.relay.util.startWebSocketService
 
 /**
  * Navigation graph for Relay.
@@ -26,7 +26,7 @@ fun RelayNavGraph(navController: NavHostController, isConfigured: Boolean) {
             val context = LocalContext.current
             SetupScreen(
                 onConfigured = {
-                    startPollingService(context)
+                    startWebSocketService(context)
                     navController.navigate("sessions") {
                         popUpTo("setup") { inclusive = true }
                     }

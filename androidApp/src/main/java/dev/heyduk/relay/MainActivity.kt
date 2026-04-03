@@ -15,7 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import dev.heyduk.relay.presentation.navigation.RelayNavGraph
 import dev.heyduk.relay.presentation.theme.RelayTheme
-import dev.heyduk.relay.util.RequestNotificationPermissionAndStartPolling
+import dev.heyduk.relay.util.RequestNotificationPermissionAndStartConnection
 import kotlinx.coroutines.flow.map
 import org.koin.android.ext.android.inject
 
@@ -42,9 +42,7 @@ class MainActivity : ComponentActivity() {
                 // Determine if tokens are already configured
                 val isConfigured by dataStore.data
                     .map { prefs ->
-                        !prefs[stringPreferencesKey("relay_bot_token")].isNullOrBlank()
-                                && !prefs[stringPreferencesKey("command_bot_token")].isNullOrBlank()
-                                && !prefs[stringPreferencesKey("chat_id")].isNullOrBlank()
+                        !prefs[stringPreferencesKey("server_secret")].isNullOrBlank()
                     }
                     .collectAsStateWithLifecycle(initialValue = false)
 
@@ -59,9 +57,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // Auto-start PollingService when tokens are configured
+                // Auto-start WebSocketService when server secret is configured
                 if (isConfigured) {
-                    RequestNotificationPermissionAndStartPolling()
+                    RequestNotificationPermissionAndStartConnection()
                 }
 
                 RelayNavGraph(

@@ -48,8 +48,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.heyduk.relay.domain.model.RelayUpdate
-import dev.heyduk.relay.service.PollingService
-import dev.heyduk.relay.util.startPollingService
+import dev.heyduk.relay.service.WebSocketService
+import dev.heyduk.relay.util.startWebSocketService
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
@@ -76,7 +76,7 @@ fun StatusScreen(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            startPollingService(context)
+            startWebSocketService(context)
             isPollingStarted = true
         }
     }
@@ -123,7 +123,7 @@ fun StatusScreen(
             Button(
                 onClick = {
                     if (isPollingStarted) {
-                        context.stopService(Intent(context, PollingService::class.java))
+                        context.stopService(Intent(context, WebSocketService::class.java))
                         isPollingStarted = false
                     } else {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -131,7 +131,7 @@ fun StatusScreen(
                                 android.Manifest.permission.POST_NOTIFICATIONS
                             )
                         } else {
-                            startPollingService(context)
+                            startWebSocketService(context)
                             isPollingStarted = true
                         }
                     }
@@ -247,4 +247,4 @@ private fun MessageCard(update: RelayUpdate) {
     }
 }
 
-// startPollingService is now in dev.heyduk.relay.util.PollingServiceLauncher
+// startWebSocketService is now in dev.heyduk.relay.util.PollingServiceLauncher
