@@ -20,12 +20,18 @@ object RelayMessageParser {
     fun parse(updateId: Long, messageText: String, timestamp: Long): RelayUpdate? {
         return try {
             val relay = json.decodeFromString<RelayMessage>(messageText)
+            // For transcript messages, prefer "text" field over "message"
+            val messageContent = if (relay.type == RelayMessageTypeDto.TRANSCRIPT) {
+                relay.text ?: relay.message
+            } else {
+                relay.message
+            }
             RelayUpdate(
                 updateId = updateId,
                 type = relay.type.toDomain(),
                 session = relay.session,
                 status = relay.status?.toDomain(),
-                message = relay.message,
+                message = messageContent,
                 toolName = relay.toolDetails?.toolName,
                 command = relay.toolDetails?.command,
                 filePath = relay.toolDetails?.filePath,
@@ -53,6 +59,7 @@ fun RelayMessageTypeDto.toDomain(): RelayMessageType = when (this) {
     RelayMessageTypeDto.PERMISSION -> RelayMessageType.PERMISSION
     RelayMessageTypeDto.QUESTION -> RelayMessageType.QUESTION
     RelayMessageTypeDto.COMPLETION -> RelayMessageType.COMPLETION
+    RelayMessageTypeDto.TRANSCRIPT -> RelayMessageType.TRANSCRIPT
 }
 
 fun SessionStatusDto.toDomain(): SessionStatus = when (this) {

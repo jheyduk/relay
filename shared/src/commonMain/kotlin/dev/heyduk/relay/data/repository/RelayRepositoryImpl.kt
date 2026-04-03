@@ -52,6 +52,10 @@ class RelayRepositoryImpl(
     override suspend fun sendAnswer(kuerzel: String, type: String, selections: List<Int>, text: String?, optionCount: Int) {
         webSocketClient.sendAnswer(kuerzel, type, selections, text, optionCount)
     }
+
+    override suspend fun sendAudio(kuerzel: String, audioData: ByteArray) {
+        webSocketClient.sendAudio(kuerzel, audioData)
+    }
 }
 
 /**

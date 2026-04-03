@@ -91,6 +91,10 @@ class ChatRepositoryImpl(
         questionDataCache.remove(messageId)
     }
 
+    override suspend fun sendAudio(kuerzel: String, audioData: ByteArray) {
+        relayRepository.sendAudio(kuerzel, audioData)
+    }
+
     /** Cache question data from a live RelayUpdate for later retrieval by the UI. */
     fun cacheQuestionData(updateId: Long, data: QuestionData) {
         questionDataCache[updateId] = data
