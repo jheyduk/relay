@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-stopped_at: Completed 06-04-PLAN.md
+milestone: v1.1
+milestone_name: Standalone Server
+status: defining_requirements
+stopped_at: Milestone v1.1 started
 last_updated: "2026-04-03T16:17:04.545Z"
 last_activity: 2026-04-03
 progress:
@@ -21,13 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** Remote session control with per-session separation -- see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
-**Current focus:** Phase 06 — direct-websocket-transport
+**Current focus:** Milestone v1.1 — Standalone Server
 
 ## Current Position
 
-Phase: 06
-Plan: Not started
-Status: Ready to execute
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-03 — Milestone v1.1 started
 Last activity: 2026-04-03
 
 Progress: [░░░░░░░░░░] 0%

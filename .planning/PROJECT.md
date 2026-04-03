@@ -67,9 +67,20 @@ Remote session control with per-session separation — see all Claude Code sessi
 | Power Mode from day one | Multi-session is primary use case | ✓ Good — drawer navigation works well |
 | relay-server in zellij-claude | Quick prototyping during Phase 6 | ⚠️ Revisit — should move to relay repo |
 
+## Current Milestone: v1.1 Standalone Server
+
+**Goal:** Make relay-server a standalone component in the relay repo, eliminate zellij-claude dependency, and add missing interactive features.
+
+**Target features:**
+- relay-server + hooks as `server/` directory in relay repo
+- Direct Zellij dispatching (no zellij-claude dependency)
+- AskUserQuestion keystroke mapping
+- Session sync on reconnect
+- Mac-side Whisper transcription
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-04-03 after v1.0 milestone*
+*Last updated: 2026-04-03 after v1.1 milestone start*
