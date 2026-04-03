@@ -11,7 +11,7 @@
 - [ ] **SERV-02**: Claude Code hooks live in `server/hooks/` and are generic (not zellij-claude-specific)
 - [ ] **SERV-03**: Server dispatches commands directly via `zellij action write-chars` (no npx zellij-claude dependency)
 - [ ] **SERV-04**: Server sends all active sessions to newly connected clients (reconnect sync)
-- [ ] **SERV-05**: zellij-claude hooks are removed/updated after migration
+- [x] **SERV-05**: zellij-claude hooks are removed/updated after migration
 
 ### Interactive Controls
 
@@ -49,7 +49,7 @@ Deferred to later milestones.
 | SERV-02 | Phase 7 | Pending |
 | SERV-03 | Phase 7 | Pending |
 | SERV-04 | Phase 8 | Pending |
-| SERV-05 | Phase 7 | Pending |
+| SERV-05 | Phase 7 | Complete |
 | CTRL-01 | Phase 8 | Pending |
 | CTRL-02 | Phase 8 | Pending |
 | CTRL-03 | Phase 8 | Pending |
