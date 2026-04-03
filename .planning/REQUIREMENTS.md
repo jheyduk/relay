@@ -1,128 +1,66 @@
-# Requirements: Relay
+# Requirements: Relay v1.1 — Standalone Server
 
-**Defined:** 2026-04-02
-**Core Value:** Remote session control with per-session separation -- see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
+**Defined:** 2026-04-03
+**Core Value:** Remote session control with per-session separation — see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
 
-## v1 Requirements
+## v1.1 Requirements
 
-Requirements for initial release. Each maps to roadmap phases.
+### Server Independence
 
-### Transport
+- [ ] **SERV-01**: relay-server.cjs lives in `server/` in the relay repo with its own package.json
+- [ ] **SERV-02**: Claude Code hooks live in `server/hooks/` and are generic (not zellij-claude-specific)
+- [ ] **SERV-03**: Server dispatches commands directly via `zellij action write-chars` (no npx zellij-claude dependency)
+- [ ] **SERV-04**: Server sends all active sessions to newly connected clients (reconnect sync)
+- [ ] **SERV-05**: zellij-claude hooks are removed/updated after migration
 
-- [x] **TRNS-01**: App connects to Telegram Bot API via long polling (getUpdates)
-- [x] **TRNS-02**: App resolves 409 conflict with existing Mac-side bot polling
-- [x] **TRNS-03**: App sends messages in zellij-claude format (`@kuerzel message`)
-- [x] **TRNS-04**: App receives and parses incoming bot messages (status, responses, permission requests)
-- [x] **TRNS-05**: App maintains connection through network transitions (WiFi/mobile)
+### Interactive Controls
 
-### Sessions
-
-- [x] **SESS-01**: User can view list of all active zellij-claude sessions with status
-- [x] **SESS-02**: User can see session status (working, waiting, ready, shell) with visual indicator
-- [x] **SESS-03**: User can execute `/ls` to refresh session list
-- [x] **SESS-04**: User can execute `/last @kuerzel` to see last response
-- [x] **SESS-05**: User can execute `/open`, `/goto`, `/rename` session commands
-
-### Messaging
-
-- [x] **MSG-01**: User can send text messages to a specific session
-- [x] **MSG-02**: User can view per-session conversation history
-- [x] **MSG-03**: User can tap Allow or Deny on permission requests with native buttons
-- [x] **MSG-04**: Permission requests show tool details (command, file path)
-- [x] **MSG-05**: Conversation history persists across app restarts (Room DB)
-- [x] **MSG-06**: User can answer AskUserQuestion prompts with native option buttons (multiple choice)
+- [ ] **CTRL-01**: App can answer AskUserQuestion single-choice (number + Enter as keystrokes)
+- [ ] **CTRL-02**: App can answer AskUserQuestion multiple-choice (toggle numbers, Down to Submit, Enter)
+- [ ] **CTRL-03**: App can answer AskUserQuestion free-text (Down to Other, Enter, type text, Enter)
 
 ### Voice
 
-- [x] **VOIC-01**: User can record voice and get on-device Whisper transcription
-- [x] **VOIC-02**: Transcribed text is sent to the active session as a regular message
-- [ ] **VOIC-03**: User can play back Claude responses via TTS
+- [ ] **VOIC-10**: Server receives audio data over WebSocket from the app
+- [ ] **VOIC-11**: Server transcribes audio locally via whisper.cpp and sends transcript back
+- [ ] **VOIC-12**: App sends audio instead of transcribing locally (on-device Whisper removed to reduce APK size)
 
-### Notifications
+## Future Requirements
 
-- [x] **NOTF-01**: User receives push notification when a session needs permission
-- [x] **NOTF-02**: User receives push notification when a session completes
-- [x] **NOTF-03**: Permission notifications use high-priority channel
-- [x] **NOTF-04**: Completion/info notifications use normal-priority channel
+Deferred to later milestones.
 
-### UI
-
-- [x] **UI-01**: App supports dark mode via Material 3 dynamic theming
-
-## v2 Requirements
-
-Deferred to future release. Tracked but not in current roadmap.
-
-### Session Management
-
-- **SESS-06**: Multi-session dashboard with color-coded grid/card view
-- **SESS-07**: Session-aware routing (auto-prefix messages with active session kuerzel)
-
-### Voice
-
-- **VOIC-04**: Voice-to-session pipeline (speak to a specific session by name)
-- **VOIC-05**: Unified chat stream (text + voice in one timeline with transcript + playback)
-
-### Notifications
-
-- **NOTF-05**: FCM push for real-time notifications when app is backgrounded (replaces polling)
-
-### UI
-
-- **UI-02**: Configurable notification sounds per session
-- **UI-03**: Message search across sessions
+- **iOS UI** — SwiftUI frontend using KMP shared module
+- **FCM Push** — Firebase push when app is backgrounded and WebSocket disconnected
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
-
 | Feature | Reason |
 |---------|--------|
-| Code editor / file browser | Relay is a control surface, not an IDE |
-| Terminal emulator | Structured messaging is the interaction model, not raw terminal |
-| Custom relay server | Telegram Bot API handles routing, persistence, delivery |
-| Multi-user / team features | Single developer tool, bot token is the auth |
-| iOS version | Android only for v1, Kotlin/Compose |
-| Git operations | Git happens through Claude Code on the Mac |
-| Cloud-based voice | On-device Whisper is the differentiator |
-| Kanban / project management | Relay is a control surface, not a project manager |
+| Cloud transcription | Local-only voice (on-device or Mac) |
+| Multi-user support | Single developer tool |
+| Web UI | Native mobile focus |
+| Custom relay protocol | Keep JSON message format from v1.0 |
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TRNS-01 | Phase 1 | Complete |
-| TRNS-02 | Phase 1 | Complete |
-| TRNS-03 | Phase 1 | Complete |
-| TRNS-04 | Phase 1 | Complete |
-| TRNS-05 | Phase 1 | Complete |
-| SESS-01 | Phase 2 | Complete |
-| SESS-02 | Phase 2 | Complete |
-| SESS-03 | Phase 2 | Complete |
-| SESS-04 | Phase 2 | Complete |
-| SESS-05 | Phase 2 | Complete |
-| MSG-01 | Phase 3 | Complete |
-| MSG-02 | Phase 3 | Complete |
-| MSG-03 | Phase 4 | Complete |
-| MSG-04 | Phase 4 | Complete |
-| MSG-05 | Phase 3 | Complete |
-| VOIC-01 | Phase 5 | Complete |
-| VOIC-02 | Phase 5 | Complete |
-| VOIC-03 | Phase 5 | Pending |
-| NOTF-01 | Phase 4 | Complete |
-| NOTF-02 | Phase 4 | Complete |
-| NOTF-03 | Phase 4 | Complete |
-| NOTF-04 | Phase 4 | Complete |
-| UI-01 | Phase 2 | Complete |
-| MSG-06 | Phase 4 | Complete |
+| SERV-01 | TBD | Pending |
+| SERV-02 | TBD | Pending |
+| SERV-03 | TBD | Pending |
+| SERV-04 | TBD | Pending |
+| SERV-05 | TBD | Pending |
+| CTRL-01 | TBD | Pending |
+| CTRL-02 | TBD | Pending |
+| CTRL-03 | TBD | Pending |
+| VOIC-10 | TBD | Pending |
+| VOIC-11 | TBD | Pending |
+| VOIC-12 | TBD | Pending |
 
 **Coverage:**
-- v1 requirements: 24 total
-- Mapped to phases: 24
-- Unmapped: 0
+- v1.1 requirements: 11 total
+- Mapped to phases: 0
+- Unmapped: 11
 
 ---
-*Requirements defined: 2026-04-02*
-*Last updated: 2026-04-02 after roadmap creation*
+*Requirements defined: 2026-04-03*
