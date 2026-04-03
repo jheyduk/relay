@@ -173,6 +173,91 @@ async function dispatchCommand(kuerzel, message) {
 }
 
 /**
+ * Compute the keystroke sequence for an answer payload.
+ * Returns the full string to send to the TUI pane.
+ */
+function computeKeystrokeSequence(msg) {
+  const downArrow = '\x1b[B';
+
+  if (msg.type === 'single') {
+    // Single choice: number key + Enter
+    return String(msg.selections[0]) + '\n';
+  }
+
+  if (msg.type === 'multi') {
+    // Multi choice: toggle numbers + Down arrows to Submit + Enter
+    // Note: individual numbers sent separately with delays (see dispatchMultiSelectAnswer)
+    const toggles = msg.selections.map(n => String(n));
+    const downs = downArrow.repeat(msg.option_count);
+    return toggles.join('') + downs + '\n';
+  }
+
+  if (msg.type === 'text') {
+    // Free text: Down past options to Other + Enter + text + Enter
+    const downs = downArrow.repeat(msg.option_count);
+    return downs + '\n' + msg.text + '\n';
+  }
+
+  return '';
+}
+
+/**
+ * Dispatch raw keystrokes to a pane (no appended newline — sequence already has them).
+ */
+async function dispatchKeystrokesToPane(kuerzel, keystrokes) {
+  const sessionId = findSessionForKuerzel(kuerzel);
+  if (!sessionId) {
+    process.stderr.write(`[relay-server] No session found for @${kuerzel}\n`);
+    return;
+  }
+
+  const paneId = await findPaneForTab(sessionId, kuerzel);
+  if (!paneId) {
+    process.stderr.write(`[relay-server] No pane found for @${kuerzel} in session ${sessionId}\n`);
+    return;
+  }
+
+  await writeCharsToPane(sessionId, paneId, keystrokes);
+}
+
+/**
+ * Dispatch a multi-select answer with delays between each toggle.
+ * Each number key is sent separately with a 50ms gap so the TUI can process each toggle.
+ * After all toggles, sends Down arrows to Submit + Enter.
+ */
+async function dispatchMultiSelectAnswer(kuerzel, selections, optionCount) {
+  const sessionId = findSessionForKuerzel(kuerzel);
+  if (!sessionId) {
+    process.stderr.write(`[relay-server] No session found for @${kuerzel}\n`);
+    return;
+  }
+
+  const paneId = await findPaneForTab(sessionId, kuerzel);
+  if (!paneId) {
+    process.stderr.write(`[relay-server] No pane found for @${kuerzel} in session ${sessionId}\n`);
+    return;
+  }
+
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const downArrow = '\x1b[B';
+
+  // Send each selection number individually with 50ms delay between toggles
+  for (let i = 0; i < selections.length; i++) {
+    await writeCharsToPane(sessionId, paneId, String(selections[i]));
+    if (i < selections.length - 1) {
+      await delay(50);
+    }
+  }
+
+  // Wait before sending Down arrows + Enter
+  await delay(50);
+
+  // Down arrows to reach Submit button + Enter
+  const submitSequence = downArrow.repeat(optionCount) + '\n';
+  await writeCharsToPane(sessionId, paneId, submitSequence);
+}
+
+/**
  * List active sessions from Zellij tabs.
  * Returns session list via the app WebSocket connection.
  */
@@ -244,6 +329,23 @@ wss.on('connection', (ws, req) => {
           }
         }
         // Other raw_command types are Telegram-era relics — ignored
+      } else if (msg.action === 'answer') {
+        // Answer action: translate structured answer into keystrokes for AskUserQuestion TUI
+        if (!msg.kuerzel || !msg.type) {
+          process.stderr.write('[relay-server] answer action missing kuerzel or type\n');
+          return;
+        }
+
+        if (msg.type === 'multi') {
+          // Multi-select needs per-keystroke delays for TUI toggle processing
+          dispatchMultiSelectAnswer(msg.kuerzel, msg.selections || [], msg.option_count || 0);
+        } else {
+          // Single and text: send full keystroke sequence at once
+          const keystrokes = computeKeystrokeSequence(msg);
+          if (keystrokes) {
+            dispatchKeystrokesToPane(msg.kuerzel, keystrokes);
+          }
+        }
       }
     } catch {
       // Malformed message — ignore
