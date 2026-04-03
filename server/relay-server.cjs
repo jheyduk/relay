@@ -238,6 +238,28 @@ function sendEnter(sessionId, paneId) {
 const KEYSTROKE_DELAY = 80; // ms between keystrokes for TUI to process
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Auto-submit timer: after answering a question, wait 1s for the next question.
+// If no new answer arrives, send "1" + Enter to confirm "Ready to submit your answers?"
+let autoSubmitTimer = null;
+
+function scheduleAutoSubmit(sessionId, paneId) {
+  if (autoSubmitTimer) clearTimeout(autoSubmitTimer);
+  autoSubmitTimer = setTimeout(async () => {
+    autoSubmitTimer = null;
+    process.stderr.write('[relay-server] Auto-submitting (no further answers within 1s)\n');
+    await writeCharsToPane(sessionId, paneId, '1');
+    await delay(KEYSTROKE_DELAY);
+    await sendEnter(sessionId, paneId);
+  }, 1000);
+}
+
+function cancelAutoSubmit() {
+  if (autoSubmitTimer) {
+    clearTimeout(autoSubmitTimer);
+    autoSubmitTimer = null;
+  }
+}
+
 /**
  * Dispatch an answer to an AskUserQuestion prompt.
  * Resolves pane once, then sends the appropriate keystroke sequence.
@@ -254,6 +276,7 @@ async function dispatchAnswer(kuerzel, msg) {
     return;
   }
 
+  cancelAutoSubmit(); // Cancel any pending auto-submit from a previous question
   process.stderr.write(`[relay-server] answer: type=${msg.type} selections=${JSON.stringify(msg.selections)} text=${msg.text || ''} options=${msg.option_count}\n`);
 
   if (msg.type === 'single') {
@@ -261,13 +284,6 @@ async function dispatchAnswer(kuerzel, msg) {
     await writeCharsToPane(sessionId, paneId, String(msg.selections[0]));
     await delay(KEYSTROKE_DELAY);
     await sendEnter(sessionId, paneId);
-    // If this is the final answer in a multi-question set, auto-confirm "Submit answers"
-    if (msg.submit) {
-      await delay(500);
-      await writeCharsToPane(sessionId, paneId, '1');
-      await delay(KEYSTROKE_DELAY);
-      await sendEnter(sessionId, paneId);
-    }
     return;
   }
 
@@ -298,11 +314,7 @@ async function dispatchAnswer(kuerzel, msg) {
     }
     // Enter to confirm selection
     await sendEnter(sessionId, paneId);
-    // Claude Code shows "Ready to submit?" confirmation — auto-confirm with "1" + Enter
-    await delay(500);
-    await writeCharsToPane(sessionId, paneId, '1');
-    await delay(KEYSTROKE_DELAY);
-    await sendEnter(sessionId, paneId);
+    // "Ready to submit?" will appear as a new single-choice question via the hook
     return;
   }
 

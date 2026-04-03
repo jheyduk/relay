@@ -65,6 +65,6 @@ process.stdin.on('end', async () => {
         timestamp: Date.now(),
       });
     }
-  } catch { /* silent */ }
+  } catch (e) { process.stderr.write('ask-notify error: ' + e.message + '\n'); }
   process.exit(0);
 });
