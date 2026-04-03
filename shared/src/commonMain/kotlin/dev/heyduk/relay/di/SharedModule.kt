@@ -46,7 +46,7 @@ val sharedModule = module {
 
     single<RelayRepository> { RelayRepositoryImpl(webSocketClient = get(), database = get()) }
 
-    // Session repository: discovers sessions from database (populated by PollingService)
+    // Session repository: discovers sessions from database (populated by WebSocketService)
     single<SessionRepository> { SessionRepositoryImpl(get(), get()) }
 
     // Chat repository: per-session message history and send-with-persist

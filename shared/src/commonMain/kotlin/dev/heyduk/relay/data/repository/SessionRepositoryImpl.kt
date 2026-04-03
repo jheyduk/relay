@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.map
 /**
  * Session repository implementation that discovers sessions from the database.
  *
- * The PollingService writes incoming updates into SQLDelight. This repository
+ * The WebSocketService writes incoming updates into SQLDelight. This repository
  * observes distinct sessions from the DB reactively, so any new message
  * automatically surfaces the session in the list.
  */
 class SessionRepositoryImpl(
-    private val telegramRepository: TelegramRepository,
+    private val relayRepository: RelayRepository,
     private val database: RelayDatabase
 ) : SessionRepository {
 
@@ -46,7 +46,7 @@ class SessionRepositoryImpl(
     override val selectedKuerzel: Flow<String?> = _selectedKuerzel
 
     override suspend fun refreshSessions() {
-        telegramRepository.sendRawCommand("/ls")
+        relayRepository.sendRawCommand("/ls")
     }
 
     override fun selectSession(kuerzel: String?) {
@@ -54,7 +54,7 @@ class SessionRepositoryImpl(
     }
 
     override suspend fun getLastResponse(kuerzel: String): String? {
-        val list = telegramRepository.getMessagesForSession(kuerzel).first()
+        val list = relayRepository.getMessagesForSession(kuerzel).first()
         return list.lastOrNull()?.message
     }
 }
