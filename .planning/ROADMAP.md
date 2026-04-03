@@ -107,7 +107,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -116,10 +116,11 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Messaging & Conversations | 0/2 | Planning complete | - |
 | 4. Permissions & Notifications | 0/3 | Planning complete | - |
 | 5. Voice Pipeline | 0/3 | Planning complete | - |
+| 6. Direct WebSocket Transport | 0/4 | Planning complete | - |
 
 ### Phase 6: Direct WebSocket Transport
 
-**Goal:** Replace Telegram Bot API transport with direct WebSocket connection between Mac and Android app. Mac runs a lightweight WebSocket server, app discovers it via mDNS (local) or stable WireGuard IPv6 (VPN). zellij-claude hooks become configurable (Telegram or WebSocket). Telegram remains as push notification fallback only.
+**Goal:** Replace Telegram Bot API transport with direct WebSocket connection between Mac and Android app. Mac runs a lightweight WebSocket server, app discovers it via mDNS (local) or stable WireGuard IPv6 (VPN). Hooks route messages via WebSocket with Telegram as push notification fallback only.
 **Requirements:**
 - R-06-01: WebSocket server on Mac (Node.js, runs alongside zellij-claude)
 - R-06-02: mDNS/Bonjour service advertisement for local network discovery
@@ -129,7 +130,10 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 - R-06-06: Bidirectional real-time messaging over WebSocket
 - R-06-07: Telegram degraded to push notification fallback (app not connected)
 **Depends on:** Phase 1 (transport foundation)
-**Plans:** 0 plans
+**Plans:** 4 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 6 to break down)
+- [ ] 06-01-PLAN.md -- Mac-side WebSocket server (relay-server.cjs), mDNS advertisement, hook routing update
+- [ ] 06-02-PLAN.md -- App-side WebSocket client, ConnectionState, RelayRepository replacing TelegramRepository
+- [ ] 06-03-PLAN.md -- WebSocketService, NSD discovery, setup screen rewrite, Telegram code removal from Android
+- [ ] 06-04-PLAN.md -- Telegram code deletion, build verification, end-to-end integration checkpoint
