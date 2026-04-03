@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import dev.heyduk.relay.presentation.navigation.RelayNavGraph
 import dev.heyduk.relay.presentation.theme.RelayTheme
+import dev.heyduk.relay.util.RequestNotificationPermissionAndStartPolling
 import kotlinx.coroutines.flow.map
 import org.koin.android.ext.android.inject
 
@@ -56,6 +57,11 @@ class MainActivity : ComponentActivity() {
                         }
                         pendingDeepLinkKuerzel = null
                     }
+                }
+
+                // Auto-start PollingService when tokens are configured
+                if (isConfigured) {
+                    RequestNotificationPermissionAndStartPolling()
                 }
 
                 RelayNavGraph(

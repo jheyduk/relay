@@ -46,10 +46,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.heyduk.relay.domain.model.RelayUpdate
 import dev.heyduk.relay.service.PollingService
+import dev.heyduk.relay.util.startPollingService
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
@@ -247,9 +247,4 @@ private fun MessageCard(update: RelayUpdate) {
     }
 }
 
-private fun startPollingService(context: Context) {
-    ContextCompat.startForegroundService(
-        context,
-        Intent(context, PollingService::class.java)
-    )
-}
+// startPollingService is now in dev.heyduk.relay.util.PollingServiceLauncher
