@@ -116,7 +116,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 08-01-PLAN.md -- Server answer action handler with keystroke computation + reconnect sync
+- [x] 08-01-PLAN.md -- Server answer action handler with keystroke computation + reconnect sync
 - [ ] 08-02-PLAN.md -- App answer protocol (DTOs, transport, repository) + QuestionCard UI overhaul
 **UI hint**: yes
 

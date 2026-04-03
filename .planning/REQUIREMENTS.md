@@ -10,14 +10,14 @@
 - [ ] **SERV-01**: relay-server.cjs lives in `server/` in the relay repo with its own package.json
 - [ ] **SERV-02**: Claude Code hooks live in `server/hooks/` and are generic (not zellij-claude-specific)
 - [ ] **SERV-03**: Server dispatches commands directly via `zellij action write-chars` (no npx zellij-claude dependency)
-- [ ] **SERV-04**: Server sends all active sessions to newly connected clients (reconnect sync)
+- [x] **SERV-04**: Server sends all active sessions to newly connected clients (reconnect sync)
 - [x] **SERV-05**: zellij-claude hooks are removed/updated after migration
 
 ### Interactive Controls
 
-- [ ] **CTRL-01**: App can answer AskUserQuestion single-choice (number + Enter as keystrokes)
-- [ ] **CTRL-02**: App can answer AskUserQuestion multiple-choice (toggle numbers, Down to Submit, Enter)
-- [ ] **CTRL-03**: App can answer AskUserQuestion free-text (Down to Other, Enter, type text, Enter)
+- [x] **CTRL-01**: App can answer AskUserQuestion single-choice (number + Enter as keystrokes)
+- [x] **CTRL-02**: App can answer AskUserQuestion multiple-choice (toggle numbers, Down to Submit, Enter)
+- [x] **CTRL-03**: App can answer AskUserQuestion free-text (Down to Other, Enter, type text, Enter)
 
 ### Voice
 
@@ -48,11 +48,11 @@ Deferred to later milestones.
 | SERV-01 | Phase 7 | Pending |
 | SERV-02 | Phase 7 | Pending |
 | SERV-03 | Phase 7 | Pending |
-| SERV-04 | Phase 8 | Pending |
+| SERV-04 | Phase 8 | Complete |
 | SERV-05 | Phase 7 | Complete |
-| CTRL-01 | Phase 8 | Pending |
-| CTRL-02 | Phase 8 | Pending |
-| CTRL-03 | Phase 8 | Pending |
+| CTRL-01 | Phase 8 | Complete |
+| CTRL-02 | Phase 8 | Complete |
+| CTRL-03 | Phase 8 | Complete |
 | VOIC-10 | Phase 9 | Pending |
 | VOIC-11 | Phase 9 | Pending |
 | VOIC-12 | Phase 9 | Pending |
