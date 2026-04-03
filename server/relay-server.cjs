@@ -221,88 +221,98 @@ async function dispatchCommand(kuerzel, message) {
 }
 
 /**
- * Compute the keystroke sequence for an answer payload.
- * Returns the full string to send to the TUI pane.
+ * Helper: send Down arrow key to a pane.
+ * Down arrow = ESC [ B = bytes 27, 91, 66
  */
-function computeKeystrokeSequence(msg) {
-  const downArrow = '\x1b[B';
+function sendDownArrow(sessionId, paneId) {
+  return writeToPane(sessionId, paneId, 27, 91, 66);
+}
+
+/**
+ * Helper: send Enter key to a pane.
+ */
+function sendEnter(sessionId, paneId) {
+  return writeToPane(sessionId, paneId, 13);
+}
+
+const KEYSTROKE_DELAY = 80; // ms between keystrokes for TUI to process
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Dispatch an answer to an AskUserQuestion prompt.
+ * Resolves pane once, then sends the appropriate keystroke sequence.
+ */
+async function dispatchAnswer(kuerzel, msg) {
+  const sessionId = findSessionForKuerzel(kuerzel);
+  if (!sessionId) {
+    process.stderr.write(`[relay-server] answer: no session for @${kuerzel}\n`);
+    return;
+  }
+  const paneId = await findPaneForTab(sessionId, kuerzel);
+  if (!paneId) {
+    process.stderr.write(`[relay-server] answer: no pane for @${kuerzel}\n`);
+    return;
+  }
+
+  process.stderr.write(`[relay-server] answer: type=${msg.type} selections=${JSON.stringify(msg.selections)} text=${msg.text || ''} options=${msg.option_count}\n`);
 
   if (msg.type === 'single') {
-    // Single choice: number key + Enter
-    return String(msg.selections[0]) + '\n';
+    // Single choice: press number key, then Enter
+    await writeCharsToPane(sessionId, paneId, String(msg.selections[0]));
+    await delay(KEYSTROKE_DELAY);
+    await sendEnter(sessionId, paneId);
+    return;
   }
 
   if (msg.type === 'multi') {
-    // Multi choice: toggle numbers + Down arrows to Submit + Enter
-    // Note: individual numbers sent separately with delays (see dispatchMultiSelectAnswer)
-    const toggles = msg.selections.map(n => String(n));
-    const downs = downArrow.repeat(msg.option_count);
-    return toggles.join('') + downs + '\n';
+    // Multi choice: cursor starts at option 1.
+    // Navigate with Down arrows, toggle with Space (byte 32).
+    // Selections are 1-based indices. Cursor starts at position 1.
+    const sorted = [...msg.selections].sort((a, b) => a - b);
+    let cursorPos = 1;
+
+    for (const sel of sorted) {
+      // Move cursor to the target option
+      while (cursorPos < sel) {
+        await sendDownArrow(sessionId, paneId);
+        await delay(KEYSTROKE_DELAY);
+        cursorPos++;
+      }
+      // Toggle with Space
+      await writeToPane(sessionId, paneId, 32);
+      await delay(KEYSTROKE_DELAY);
+    }
+    // Move cursor past all options AND past "Other" to the submit area
+    // Layout: options (1..N) → Other → implicit submit
+    while (cursorPos <= msg.option_count + 1) {
+      await sendDownArrow(sessionId, paneId);
+      await delay(KEYSTROKE_DELAY);
+      cursorPos++;
+    }
+    // Enter to confirm selection
+    await sendEnter(sessionId, paneId);
+    // Claude Code shows "Ready to submit?" confirmation — auto-confirm with "1" + Enter
+    await delay(500);
+    await writeCharsToPane(sessionId, paneId, '1');
+    await delay(KEYSTROKE_DELAY);
+    await sendEnter(sessionId, paneId);
+    return;
   }
 
   if (msg.type === 'text') {
-    // Free text: Down past options to Other + Enter + text + Enter
-    const downs = downArrow.repeat(msg.option_count);
-    return downs + '\n' + msg.text + '\n';
-  }
-
-  return '';
-}
-
-/**
- * Dispatch raw keystrokes to a pane (no appended newline — sequence already has them).
- */
-async function dispatchKeystrokesToPane(kuerzel, keystrokes) {
-  const sessionId = findSessionForKuerzel(kuerzel);
-  if (!sessionId) {
-    process.stderr.write(`[relay-server] No session found for @${kuerzel}\n`);
-    return;
-  }
-
-  const paneId = await findPaneForTab(sessionId, kuerzel);
-  if (!paneId) {
-    process.stderr.write(`[relay-server] No pane found for @${kuerzel} in session ${sessionId}\n`);
-    return;
-  }
-
-  await writeCharsToPane(sessionId, paneId, keystrokes);
-}
-
-/**
- * Dispatch a multi-select answer with delays between each toggle.
- * Each number key is sent separately with a 50ms gap so the TUI can process each toggle.
- * After all toggles, sends Down arrows to Submit + Enter.
- */
-async function dispatchMultiSelectAnswer(kuerzel, selections, optionCount) {
-  const sessionId = findSessionForKuerzel(kuerzel);
-  if (!sessionId) {
-    process.stderr.write(`[relay-server] No session found for @${kuerzel}\n`);
-    return;
-  }
-
-  const paneId = await findPaneForTab(sessionId, kuerzel);
-  if (!paneId) {
-    process.stderr.write(`[relay-server] No pane found for @${kuerzel} in session ${sessionId}\n`);
-    return;
-  }
-
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-  const downArrow = '\x1b[B';
-
-  // Send each selection number individually with 50ms delay between toggles
-  for (let i = 0; i < selections.length; i++) {
-    await writeCharsToPane(sessionId, paneId, String(selections[i]));
-    if (i < selections.length - 1) {
-      await delay(50);
+    // Free text "Other": navigate Down past all options to "Other", Enter, type, Enter.
+    // Cursor starts at option 1, "Other" is after all options.
+    for (let i = 0; i < msg.option_count; i++) {
+      await sendDownArrow(sessionId, paneId);
+      await delay(KEYSTROKE_DELAY);
     }
+    await sendEnter(sessionId, paneId); // Select "Other"
+    await delay(200); // Wait for text input to appear
+    await writeCharsToPane(sessionId, paneId, msg.text);
+    await delay(KEYSTROKE_DELAY);
+    await sendEnter(sessionId, paneId); // Confirm text
+    return;
   }
-
-  // Wait before sending Down arrows + Enter
-  await delay(50);
-
-  // Down arrows to reach Submit button + Enter
-  const submitSequence = downArrow.repeat(optionCount) + '\n';
-  await writeCharsToPane(sessionId, paneId, submitSequence);
 }
 
 /**
@@ -477,7 +487,7 @@ wss.on('connection', (ws, req) => {
 
     try {
       const msg = JSON.parse(data.toString());
-      process.stderr.write(`[relay-server] Received: action=${msg.action} kuerzel=${msg.kuerzel} message=${(msg.message||'').slice(0,50)}\n`);
+      process.stderr.write(`[relay-server] Received: ${JSON.stringify(msg).slice(0,200)}\n`);
 
       if (msg.action === 'command') {
         // Dispatch command directly via Zellij write-chars
@@ -500,16 +510,7 @@ wss.on('connection', (ws, req) => {
           return;
         }
 
-        if (msg.type === 'multi') {
-          // Multi-select needs per-keystroke delays for TUI toggle processing
-          dispatchMultiSelectAnswer(msg.kuerzel, msg.selections || [], msg.option_count || 0);
-        } else {
-          // Single and text: send full keystroke sequence at once
-          const keystrokes = computeKeystrokeSequence(msg);
-          if (keystrokes) {
-            dispatchKeystrokesToPane(msg.kuerzel, keystrokes);
-          }
-        }
+        dispatchAnswer(msg.kuerzel, msg);
       }
     } catch {
       // Malformed message — ignore
