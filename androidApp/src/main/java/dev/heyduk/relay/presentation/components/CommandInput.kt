@@ -1,7 +1,11 @@
 package dev.heyduk.relay.presentation.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Icon
@@ -41,6 +45,7 @@ fun CommandInput(
         tonalElevation = 3.dp,
         modifier = modifier
     ) {
+        Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -84,6 +89,7 @@ fun CommandInput(
                     onStopRecording = onMicReleased
                 )
             }
+        }
         }
     }
 }
