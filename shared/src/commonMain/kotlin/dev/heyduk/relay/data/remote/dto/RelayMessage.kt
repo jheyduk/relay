@@ -10,8 +10,23 @@ data class RelayMessage(
     val status: SessionStatusDto? = null,
     val message: String,
     @SerialName("tool_details") val toolDetails: ToolDetails? = null,
+    @SerialName("question_data") val questionData: QuestionDataDto? = null,
     val timestamp: Long = 0,
     @SerialName("__relay") val relayMarker: Boolean? = null
+)
+
+@Serializable
+data class QuestionOptionDto(
+    val label: String,
+    val description: String? = null
+)
+
+@Serializable
+data class QuestionDataDto(
+    val question: String,
+    val header: String? = null,
+    val multiSelect: Boolean = false,
+    val options: List<QuestionOptionDto> = emptyList()
 )
 
 @Serializable

@@ -3,6 +3,8 @@ package dev.heyduk.relay.data.remote
 import dev.heyduk.relay.data.remote.dto.RelayMessage
 import dev.heyduk.relay.data.remote.dto.RelayMessageTypeDto
 import dev.heyduk.relay.data.remote.dto.SessionStatusDto
+import dev.heyduk.relay.domain.model.QuestionData
+import dev.heyduk.relay.domain.model.QuestionOption
 import dev.heyduk.relay.domain.model.RelayMessageType
 import dev.heyduk.relay.domain.model.RelayUpdate
 import dev.heyduk.relay.domain.model.SessionStatus
@@ -27,6 +29,14 @@ object RelayMessageParser {
                 toolName = relay.toolDetails?.toolName,
                 command = relay.toolDetails?.command,
                 filePath = relay.toolDetails?.filePath,
+                questionData = relay.questionData?.let { qd ->
+                    QuestionData(
+                        question = qd.question,
+                        header = qd.header,
+                        multiSelect = qd.multiSelect,
+                        options = qd.options.map { QuestionOption(it.label, it.description) }
+                    )
+                },
                 timestamp = if (relay.timestamp > 0) relay.timestamp else timestamp
             )
         } catch (_: Exception) {

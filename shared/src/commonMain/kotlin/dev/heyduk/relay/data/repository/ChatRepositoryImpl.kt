@@ -5,6 +5,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import dev.heyduk.relay.Messages
 import dev.heyduk.relay.db.RelayDatabase
 import dev.heyduk.relay.domain.model.ChatMessage
+import dev.heyduk.relay.domain.model.QuestionData
 import dev.heyduk.relay.domain.model.RelayMessageType
 import dev.heyduk.relay.util.currentTimeMillis
 import kotlinx.coroutines.Dispatchers
@@ -23,11 +24,25 @@ class ChatRepositoryImpl(
     private val database: RelayDatabase
 ) : ChatRepository {
 
+    /**
+     * In-memory cache for transient question data from live WebSocket messages.
+     * Question data is not persisted to the DB -- it's only needed for active questions.
+     */
+    private val questionDataCache = mutableMapOf<Long, QuestionData>()
+
     override fun messagesForSession(kuerzel: String): Flow<List<ChatMessage>> {
         return database.messagesQueries.getMessagesForSession(kuerzel)
             .asFlow()
             .mapToList(Dispatchers.Default)
-            .map { rows -> rows.map { it.toChatMessage() } }
+            .map { rows ->
+                rows.map { row ->
+                    row.toChatMessage().let { msg ->
+                        // Attach cached question data for live questions
+                        val cached = questionDataCache[msg.id]
+                        if (cached != null) msg.copy(questionData = cached) else msg
+                    }
+                }
+            }
     }
 
     override suspend fun sendMessage(kuerzel: String, text: String) {
@@ -52,6 +67,33 @@ class ChatRepositoryImpl(
 
         // Send callback via relay server (format: callback:allow:kuerzel / callback:deny:kuerzel)
         relayRepository.sendCommand(kuerzel, "callback:$response:$kuerzel")
+    }
+
+    override suspend fun answerQuestion(
+        messageId: Long,
+        kuerzel: String,
+        type: String,
+        selections: List<Int>,
+        text: String?,
+        optionCount: Int
+    ) {
+        // Mark as answered in DB (store a human-readable summary)
+        val responseText = when (type) {
+            "text" -> text ?: ""
+            else -> selections.joinToString(", ") { "#$it" }
+        }
+        database.messagesQueries.markAnswered(responseText, messageId)
+
+        // Send structured answer payload to server
+        relayRepository.sendAnswer(kuerzel, type, selections, text, optionCount)
+
+        // Clean up cache
+        questionDataCache.remove(messageId)
+    }
+
+    /** Cache question data from a live RelayUpdate for later retrieval by the UI. */
+    fun cacheQuestionData(updateId: Long, data: QuestionData) {
+        questionDataCache[updateId] = data
     }
 }
 

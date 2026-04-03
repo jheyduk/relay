@@ -50,5 +50,7 @@ val sharedModule = module {
     single<SessionRepository> { SessionRepositoryImpl(get(), get()) }
 
     // Chat repository: per-session message history and send-with-persist
-    single<ChatRepository> { ChatRepositoryImpl(get<RelayRepository>(), get()) }
+    // Register concrete impl so WebSocketService can access cacheQuestionData()
+    single { ChatRepositoryImpl(get<RelayRepository>(), get()) }
+    single<ChatRepository> { get<ChatRepositoryImpl>() }
 }

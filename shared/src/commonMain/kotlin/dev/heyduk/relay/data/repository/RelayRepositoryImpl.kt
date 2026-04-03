@@ -48,6 +48,10 @@ class RelayRepositoryImpl(
     override suspend fun sendRawCommand(command: String) {
         webSocketClient.sendRawCommand(command)
     }
+
+    override suspend fun sendAnswer(kuerzel: String, type: String, selections: List<Int>, text: String?, optionCount: Int) {
+        webSocketClient.sendAnswer(kuerzel, type, selections, text, optionCount)
+    }
 }
 
 /**

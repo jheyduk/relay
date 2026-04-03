@@ -13,6 +13,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import dev.heyduk.relay.data.remote.ConnectionState
 import dev.heyduk.relay.data.remote.WebSocketClient
+import dev.heyduk.relay.data.repository.ChatRepositoryImpl
 import dev.heyduk.relay.db.RelayDatabase
 import dev.heyduk.relay.domain.model.RelayMessageType
 import kotlinx.coroutines.CancellationException
@@ -48,6 +49,7 @@ class WebSocketService : Service() {
     private val database: RelayDatabase by inject()
     private val notificationHelper: NotificationHelper by inject()
     private val nsdDiscovery: NsdDiscovery by inject()
+    private val chatRepositoryImpl: ChatRepositoryImpl by inject()
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     @Volatile private var connectionStarted = false
@@ -97,6 +99,11 @@ class WebSocketService : Service() {
                         is_from_relay = if (update.isFromRelay) 1L else 0L,
                         callback_response = null
                     )
+
+                    // Cache question data for live questions (transient, not persisted to DB)
+                    if (update.type == RelayMessageType.QUESTION && update.questionData != null) {
+                        chatRepositoryImpl.cacheQuestionData(update.updateId, update.questionData)
+                    }
 
                     // Trigger notifications for permission and completion messages
                     when (update.type) {

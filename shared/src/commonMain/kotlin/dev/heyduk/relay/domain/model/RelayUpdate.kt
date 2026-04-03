@@ -1,5 +1,14 @@
 package dev.heyduk.relay.domain.model
 
+data class QuestionOption(val label: String, val description: String? = null)
+
+data class QuestionData(
+    val question: String,
+    val header: String? = null,
+    val multiSelect: Boolean = false,
+    val options: List<QuestionOption> = emptyList()
+)
+
 data class RelayUpdate(
     val updateId: Long,
     val type: RelayMessageType,
@@ -9,6 +18,7 @@ data class RelayUpdate(
     val toolName: String? = null,
     val command: String? = null,
     val filePath: String? = null,
+    val questionData: QuestionData? = null,
     val timestamp: Long,
     val isFromRelay: Boolean = false  // true = sent by the Relay app
 )

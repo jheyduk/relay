@@ -14,5 +14,6 @@ data class ChatMessage(
     val toolName: String? = null,           // tool name for permission display (e.g. "Bash", "Edit")
     val command: String? = null,            // command details for permission display
     val filePath: String? = null,           // file path for permission display
-    val callbackResponse: String? = null    // answered state: "allow", "deny", or selected option text
+    val callbackResponse: String? = null,   // answered state: "allow", "deny", or selected option text
+    val questionData: QuestionData? = null  // structured question data for interactive answering
 )

@@ -17,6 +17,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 
 /**
  * WebSocket client that connects to the Mac-side relay-server.
@@ -133,6 +137,33 @@ class WebSocketClient(
             mapOf("action" to "raw_command", "command" to command)
         )
         send(payload)
+    }
+
+    /**
+     * Sends a structured answer payload for an AskUserQuestion prompt.
+     *
+     * @param kuerzel Session short name
+     * @param type Answer type: "single", "multi", or "text"
+     * @param selections 1-based option indices selected by the user
+     * @param text Free text for "text" type answers
+     * @param optionCount Total number of options in the question
+     */
+    suspend fun sendAnswer(
+        kuerzel: String,
+        type: String,
+        selections: List<Int>,
+        text: String?,
+        optionCount: Int
+    ) {
+        val payload = buildJsonObject {
+            put("action", "answer")
+            put("kuerzel", kuerzel)
+            put("type", type)
+            putJsonArray("selections") { selections.forEach { add(JsonPrimitive(it)) } }
+            put("option_count", optionCount)
+            if (text != null) put("text", text)
+        }
+        send(payload.toString())
     }
 
     /**

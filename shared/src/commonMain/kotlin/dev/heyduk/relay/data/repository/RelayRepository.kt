@@ -27,4 +27,7 @@ interface RelayRepository {
 
     /** Send a raw command (e.g. /ls, /last) via the relay server. */
     suspend fun sendRawCommand(command: String)
+
+    /** Send a structured answer payload for an AskUserQuestion prompt. */
+    suspend fun sendAnswer(kuerzel: String, type: String, selections: List<Int>, text: String?, optionCount: Int)
 }
