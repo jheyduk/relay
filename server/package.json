@@ -4,7 +4,8 @@
   "description": "WebSocket relay server for Claude Code session control",
   "main": "relay-server.cjs",
   "scripts": {
-    "start": "node relay-server.cjs"
+    "start": "node relay-server.cjs",
+    "install-hooks": "node install.cjs"
   },
   "dependencies": {
     "ws": "^8.20.0"
