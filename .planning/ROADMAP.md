@@ -131,8 +131,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [x] 08-01-PLAN.md -- Server answer action handler with keystroke computation + reconnect sync
-- [ ] 08-02-PLAN.md -- App answer protocol (DTOs, transport, repository) + QuestionCard UI overhaul
+- [ ] 09-01-PLAN.md -- Server-side audio receive and whisper-cli transcription
+- [ ] 09-02-PLAN.md -- App sends audio to server, removes on-device Whisper (141 MB savings)
 
 ## Progress
 
@@ -148,5 +148,5 @@ Phases execute in numeric order: 7 -> 8 -> 9
 | 5. Voice Pipeline | v1.0 | 3/3 | Complete | 2026-04-02 |
 | 6. Direct WebSocket Transport | v1.0 | 4/4 | Complete | 2026-04-03 |
 | 7. Server Migration | v1.1 | 0/3 | Planning | - |
-| 8. Interactive Controls & Reconnect | v1.1 | 0/? | Not started | - |
-| 9. Mac-Side Voice | v1.1 | 0/? | Not started | - |
+| 8. Interactive Controls & Reconnect | v1.1 | 2/2 | Complete | 2026-04-03 |
+| 9. Mac-Side Voice | v1.1 | 0/2 | Planning | - |
