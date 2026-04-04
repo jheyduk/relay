@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import dev.heyduk.relay.domain.model.SessionStatus
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -170,14 +171,24 @@ fun ChatScreen(
                         }
                     }
                 )
-                // Status color bar under the top bar
+                // Status color bar under the top bar — animated when working
                 if (uiState.sessionStatus != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(3.dp)
-                            .background(statusColor)
-                    )
+                    if (uiState.sessionStatus == SessionStatus.WORKING) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(3.dp),
+                            color = statusColor,
+                            trackColor = statusColor.copy(alpha = 0.2f)
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(3.dp)
+                                .background(statusColor)
+                        )
+                    }
                 }
             }
         },
