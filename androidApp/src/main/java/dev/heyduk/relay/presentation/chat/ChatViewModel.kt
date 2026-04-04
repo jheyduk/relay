@@ -106,6 +106,11 @@ class ChatViewModel(
         }
     }
 
+    /** Show a transient message (snackbar). */
+    fun showMessage(text: String) {
+        _localState.update { it.copy(errorMessage = text) }
+    }
+
     /** Send a file attachment to the current session. */
     fun sendAttachment(filename: String, base64Data: String) {
         viewModelScope.launch {

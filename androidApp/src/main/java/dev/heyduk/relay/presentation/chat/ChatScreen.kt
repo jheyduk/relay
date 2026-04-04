@@ -97,8 +97,9 @@ fun ChatScreen(
 
                 val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
                 viewModel.sendAttachment(filename, base64)
+                viewModel.showMessage("Attachment sent")
             } catch (_: Exception) {
-                // Ignore file read errors
+                viewModel.showMessage("Failed to send attachment")
             }
         }
     }
