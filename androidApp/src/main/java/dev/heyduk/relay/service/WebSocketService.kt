@@ -119,15 +119,31 @@ class WebSocketService : Service() {
                 }
             }
 
-            // Update notification based on connection state
+            // Update notification based on connection state — only warn on disconnect
             launch {
+                var disconnectedSince = 0L
                 webSocketClient.connectionState.collect { state ->
-                    val text = when (state) {
-                        ConnectionState.CONNECTED -> "Relay connected"
-                        ConnectionState.CONNECTING -> "Connecting..."
-                        ConnectionState.DISCONNECTED -> "Disconnected — reconnecting"
+                    when (state) {
+                        ConnectionState.CONNECTED -> {
+                            disconnectedSince = 0L
+                            updateNotification("Connected", warn = false)
+                        }
+                        ConnectionState.CONNECTING -> {
+                            if (disconnectedSince == 0L) disconnectedSince = System.currentTimeMillis()
+                            // Only show warning after 30s disconnect
+                            val elapsed = System.currentTimeMillis() - disconnectedSince
+                            if (elapsed > 30_000) {
+                                updateNotification("Reconnecting...", warn = true)
+                            }
+                        }
+                        ConnectionState.DISCONNECTED -> {
+                            if (disconnectedSince == 0L) disconnectedSince = System.currentTimeMillis()
+                            val elapsed = System.currentTimeMillis() - disconnectedSince
+                            if (elapsed > 30_000) {
+                                updateNotification("Disconnected — reconnecting", warn = true)
+                            }
+                        }
                     }
-                    updateNotification(text)
                 }
             }
 
@@ -191,25 +207,27 @@ class WebSocketService : Service() {
         val channel = NotificationChannel(
             CHANNEL_ID,
             "Relay Connection",
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_MIN
         ).apply {
-            description = "Shows relay WebSocket connection status"
+            description = "Relay background service"
         }
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
     }
 
-    private fun buildNotification(text: String): Notification {
+    private fun buildNotification(text: String, warn: Boolean = false): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Relay")
+            .setContentTitle(if (warn) "Relay — Disconnected" else "Relay")
             .setContentText(text)
             .setSmallIcon(dev.heyduk.relay.R.drawable.ic_notification)
             .setOngoing(true)
+            .setPriority(if (warn) NotificationCompat.PRIORITY_LOW else NotificationCompat.PRIORITY_MIN)
+            .setSilent(true)
             .build()
     }
 
-    private fun updateNotification(text: String) {
+    private fun updateNotification(text: String, warn: Boolean = false) {
         val manager = getSystemService(NotificationManager::class.java)
-        manager.notify(NOTIFICATION_ID, buildNotification(text))
+        manager.notify(NOTIFICATION_ID, buildNotification(text, warn))
     }
 }
