@@ -4,16 +4,25 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class DirectoryEntryDto(val path: String, val name: String)
+
+@Serializable
 data class RelayMessage(
     val type: RelayMessageTypeDto,
-    val session: String,
+    val session: String = "",
     val status: SessionStatusDto? = null,
     val message: String = "",
     val text: String? = null,
     @SerialName("tool_details") val toolDetails: ToolDetails? = null,
     @SerialName("question_data") val questionData: QuestionDataDto? = null,
     val timestamp: Long = 0,
-    @SerialName("__relay") val relayMarker: Boolean? = null
+    @SerialName("__relay") val relayMarker: Boolean? = null,
+    val directories: List<DirectoryEntryDto>? = null,
+    val defaultFlags: String? = null,
+    val success: Boolean? = null,
+    val error: String? = null,
+    val kuerzel: String? = null,
+    val path: String? = null
 )
 
 @Serializable
@@ -37,7 +46,9 @@ enum class RelayMessageTypeDto {
     @SerialName("permission") PERMISSION,
     @SerialName("question") QUESTION,
     @SerialName("completion") COMPLETION,
-    @SerialName("transcript") TRANSCRIPT
+    @SerialName("transcript") TRANSCRIPT,
+    @SerialName("directory_list") DIRECTORY_LIST,
+    @SerialName("session_created") SESSION_CREATED
 }
 
 @Serializable

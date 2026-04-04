@@ -3,6 +3,7 @@ package dev.heyduk.relay.data.remote
 import dev.heyduk.relay.data.remote.dto.RelayMessage
 import dev.heyduk.relay.data.remote.dto.RelayMessageTypeDto
 import dev.heyduk.relay.data.remote.dto.SessionStatusDto
+import dev.heyduk.relay.domain.model.DirectoryEntry
 import dev.heyduk.relay.domain.model.QuestionData
 import dev.heyduk.relay.domain.model.QuestionOption
 import dev.heyduk.relay.domain.model.RelayMessageType
@@ -43,7 +44,13 @@ object RelayMessageParser {
                         options = qd.options.map { QuestionOption(it.label, it.description) }
                     )
                 },
-                timestamp = if (relay.timestamp > 0) relay.timestamp else timestamp
+                timestamp = if (relay.timestamp > 0) relay.timestamp else timestamp,
+                directoryList = relay.directories?.map { DirectoryEntry(it.path, it.name) },
+                defaultFlags = relay.defaultFlags,
+                sessionCreatedKuerzel = relay.kuerzel,
+                sessionCreatedPath = relay.path,
+                sessionCreatedSuccess = relay.success,
+                sessionCreatedError = relay.error
             )
         } catch (_: Exception) {
             null // Not a relay JSON message
@@ -60,6 +67,8 @@ fun RelayMessageTypeDto.toDomain(): RelayMessageType = when (this) {
     RelayMessageTypeDto.QUESTION -> RelayMessageType.QUESTION
     RelayMessageTypeDto.COMPLETION -> RelayMessageType.COMPLETION
     RelayMessageTypeDto.TRANSCRIPT -> RelayMessageType.TRANSCRIPT
+    RelayMessageTypeDto.DIRECTORY_LIST -> RelayMessageType.DIRECTORY_LIST
+    RelayMessageTypeDto.SESSION_CREATED -> RelayMessageType.SESSION_CREATED
 }
 
 fun SessionStatusDto.toDomain(): SessionStatus = when (this) {
