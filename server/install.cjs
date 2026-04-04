@@ -129,6 +129,18 @@ function addRelayHooks(settings) {
     added.push('  - PreToolUse(AskUserQuestion) -> ask-notify.cjs');
   }
 
+  // PreToolUse(*): activity notify — fires on every tool use, debounced
+  if (!hasRelayHook(settings.hooks.PreToolUse, 'activity-notify.cjs')) {
+    settings.hooks.PreToolUse.push({
+      hooks: [{
+        type: 'command',
+        command: `node "${join(hooksDir, 'activity-notify.cjs')}"`,
+        async: true,
+      }],
+    });
+    added.push('  - PreToolUse(*) -> activity-notify.cjs');
+  }
+
   return added;
 }
 
