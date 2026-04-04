@@ -29,6 +29,10 @@ insertOutgoing:
 INSERT INTO messages (update_id, session, type, message, status, tool_name, command, file_path, timestamp, is_from_relay)
 VALUES (?, ?, 'TEXT', ?, NULL, NULL, NULL, NULL, ?, 1);
 
+insertIncoming:
+INSERT INTO messages (update_id, session, type, message, status, tool_name, command, file_path, timestamp, is_from_relay)
+VALUES (?, ?, 'RESPONSE', ?, NULL, NULL, NULL, NULL, ?, 0);
+
 countOutgoingForSession:
 SELECT COUNT(*) FROM messages WHERE session = ? AND is_from_relay = 1;
 

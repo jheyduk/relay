@@ -22,8 +22,11 @@ interface ChatRepository {
     /** Answer a question with a structured payload (single/multi/text). */
     suspend fun answerQuestion(messageId: Long, kuerzel: String, type: String, selections: List<Int>, text: String?, optionCount: Int)
 
-    /** Insert a local-only message into DB (no network send). For attachment display. */
+    /** Insert a local-only outgoing message into DB (no network send). For attachment display. */
     suspend fun insertLocalMessage(kuerzel: String, text: String)
+
+    /** Insert an incoming server message into DB (displayed as server-side bubble). */
+    suspend fun insertIncomingMessage(kuerzel: String, text: String)
 
     /** Send a command to the terminal without DB insert. */
     suspend fun sendCommand(kuerzel: String, text: String)

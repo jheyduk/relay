@@ -74,6 +74,16 @@ class ChatRepositoryImpl(
         )
     }
 
+    override suspend fun insertIncomingMessage(kuerzel: String, text: String) {
+        val now = currentTimeMillis()
+        database.messagesQueries.insertIncoming(
+            update_id = -now,
+            session = kuerzel,
+            message = text,
+            timestamp = now
+        )
+    }
+
     override suspend fun sendCommand(kuerzel: String, text: String) {
         relayRepository.sendCommand(kuerzel, text)
     }

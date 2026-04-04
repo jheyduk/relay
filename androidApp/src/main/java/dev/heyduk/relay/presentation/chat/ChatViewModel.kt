@@ -159,7 +159,7 @@ class ChatViewModel(
                         .first()
                 }
                 if (update != null && update.sessionCreatedSuccess == true) {
-                    chatRepository.insertLocalMessage(kuerzel, update.message)
+                    chatRepository.insertIncomingMessage(kuerzel, update.message)
                 } else if (update != null) {
                     _localState.update { it.copy(errorMessage = update.sessionCreatedError ?: "Failed to fetch") }
                 } else {
