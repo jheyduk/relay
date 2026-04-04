@@ -393,6 +393,77 @@ function sendReconnectSync() {
   }
 }
 
+// --- Status Polling ---
+
+/**
+ * Derive session status from Zellij pane title.
+ * Spinner characters = working, permission keywords = waiting, else = ready.
+ */
+function deriveStatus(title) {
+  if (!title) return 'ready';
+  if (/[\u280b\u2819\u2839\u2838\u283c\u2834\u2826\u2827\u2807\u280f\u2810]/.test(title)) return 'working';
+  if (/\bpermission\b|\bAllow\b|\bDeny\b/i.test(title) || /\?\s*$/.test(title)) return 'waiting';
+  return 'ready';
+}
+
+let statusPollInterval = null;
+let lastStatusMap = new Map(); // kuerzel -> status
+
+/**
+ * Poll Zellij pane titles every 10s and send status updates for changed sessions.
+ */
+function startStatusPolling() {
+  if (statusPollInterval) return;
+  const zellijSession = process.env.ZELLIJ_SESSION_NAME;
+  if (!zellijSession) return;
+
+  statusPollInterval = setInterval(() => {
+    if (!appSocket || appSocket.readyState !== 1) return;
+
+    execFile('zellij', ['--session', zellijSession, 'action', 'list-panes', '--json', '--tab', '--state'], {
+      timeout: 5000,
+      encoding: 'utf8',
+    }, (err, stdout) => {
+      if (err) return;
+      try {
+        const panes = JSON.parse(stdout);
+        // Group by tab, pick the focused non-plugin pane per tab
+        const tabStatus = new Map();
+        for (const p of panes) {
+          if (!p.tab_name || !p.tab_name.startsWith('@') || p.is_plugin) continue;
+          const kuerzel = p.tab_name.slice(1);
+          if (!tabStatus.has(kuerzel) || p.is_focused) {
+            tabStatus.set(kuerzel, deriveStatus(p.title));
+          }
+        }
+
+        // Send updates only for changed statuses
+        for (const [kuerzel, status] of tabStatus) {
+          if (lastStatusMap.get(kuerzel) !== status) {
+            lastStatusMap.set(kuerzel, status);
+            appSocket.send(JSON.stringify({
+              type: 'status',
+              session: kuerzel,
+              status,
+              message: `Session ${kuerzel} ${status}`,
+              timestamp: Date.now(),
+              __relay: true,
+            }));
+          }
+        }
+      } catch {}
+    });
+  }, 10000);
+}
+
+function stopStatusPolling() {
+  if (statusPollInterval) {
+    clearInterval(statusPollInterval);
+    statusPollInterval = null;
+  }
+  lastStatusMap.clear();
+}
+
 // --- Attachments ---
 
 /**
@@ -526,6 +597,7 @@ wss.on('connection', (ws, req) => {
 
   // Send active sessions after a short delay so the app has time to register message handlers
   setTimeout(() => sendReconnectSync(), 500);
+  startStatusPolling();
 
   ws.on('message', (data, isBinary) => {
     process.stderr.write(`[relay-server] on('message') isBinary=${isBinary}, len=${data.length}\n`);
@@ -582,6 +654,7 @@ wss.on('connection', (ws, req) => {
     appSocket = null;
     disconnectedAt = Date.now();
     process.stderr.write('[relay-server] App disconnected\n');
+    stopStatusPolling();
   });
 
   ws.on('error', () => {
