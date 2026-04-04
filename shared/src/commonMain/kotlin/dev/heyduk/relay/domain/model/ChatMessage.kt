@@ -11,6 +11,7 @@ data class ChatMessage(
     val timestamp: Long,                    // epoch millis
     val isOutgoing: Boolean,                // true = sent by user via Relay
     val type: RelayMessageType,             // message type for rendering hints
+    val status: SessionStatus? = null,      // session status (for STATUS messages)
     val toolName: String? = null,           // tool name for permission display (e.g. "Bash", "Edit")
     val command: String? = null,            // command details for permission display
     val filePath: String? = null,           // file path for permission display

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dev.heyduk.relay.data.repository.ChatRepository
 import dev.heyduk.relay.domain.model.ChatMessage
 import dev.heyduk.relay.domain.model.RelayMessageType
+import dev.heyduk.relay.domain.model.SessionStatus
 import dev.heyduk.relay.voice.AudioRecorder
 import dev.heyduk.relay.voice.TtsManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,7 @@ class ChatViewModel(
     data class ChatUiState(
         val messages: List<ChatMessage> = emptyList(),
         val kuerzel: String = "",
+        val sessionStatus: SessionStatus? = null,
         val isSending: Boolean = false,
         val errorMessage: String? = null,
         val sendingCallbackIds: Set<Long> = emptySet(),
@@ -60,11 +62,14 @@ class ChatViewModel(
         _sendingCallbacks,
         ttsManager.speakingMessageId
     ) { messages, local, sendingIds, ttsId ->
+        // Derive current session status from the latest STATUS message
+        val currentStatus = messages.lastOrNull { it.type == RelayMessageType.STATUS }?.status
         // Filter out STATUS messages — they're for the session list, not the conversation
         val filtered = messages.filter { it.type != RelayMessageType.STATUS }
         ChatUiState(
             messages = filtered,
             kuerzel = kuerzel,
+            sessionStatus = currentStatus,
             isSending = local.isSending,
             errorMessage = local.errorMessage,
             sendingCallbackIds = sendingIds,

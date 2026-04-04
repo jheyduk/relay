@@ -7,6 +7,7 @@ import dev.heyduk.relay.db.RelayDatabase
 import dev.heyduk.relay.domain.model.ChatMessage
 import dev.heyduk.relay.domain.model.QuestionData
 import dev.heyduk.relay.domain.model.RelayMessageType
+import dev.heyduk.relay.domain.model.SessionStatus
 import dev.heyduk.relay.domain.model.RelayUpdate
 import dev.heyduk.relay.util.currentTimeMillis
 import kotlinx.coroutines.Dispatchers
@@ -134,6 +135,7 @@ private fun Messages.toChatMessage() = ChatMessage(
     timestamp = timestamp,
     isOutgoing = is_from_relay != 0L,
     type = RelayMessageType.valueOf(type),
+    status = status?.let { try { SessionStatus.valueOf(it) } catch (_: Exception) { null } },
     toolName = tool_name,
     command = command,
     filePath = file_path,
