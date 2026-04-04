@@ -1,5 +1,9 @@
 package dev.heyduk.relay.presentation.session
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.heyduk.relay.data.repository.RelayRepository
@@ -12,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -23,8 +28,13 @@ import kotlinx.coroutines.launch
 class SessionListViewModel(
     private val sessionRepository: SessionRepository,
     private val relayRepository: RelayRepository,
-    private val networkMonitor: NetworkMonitor
+    private val networkMonitor: NetworkMonitor,
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
+
+    companion object {
+        private val FAVORITES_KEY = stringSetPreferencesKey("favorite_sessions")
+    }
 
     data class SessionListUiState(
         val sessions: List<Session> = emptyList(),
@@ -33,6 +43,7 @@ class SessionListViewModel(
         val isConnected: Boolean = false,
         val lastResponses: Map<String, String> = emptyMap(),
         val expandedCards: Set<String> = emptySet(),
+        val favorites: Set<String> = emptySet(),
         val errorMessage: String? = null
     )
 
@@ -46,12 +57,17 @@ class SessionListViewModel(
         val errorMessage: String? = null
     )
 
+    private val favoritesFlow = dataStore.data.map { prefs ->
+        prefs[FAVORITES_KEY] ?: emptySet()
+    }
+
     val uiState: StateFlow<SessionListUiState> = combine(
         sessionRepository.sessions,
         sessionRepository.selectedKuerzel,
         networkMonitor.isConnected,
-        _localState
-    ) { sessions, selectedKuerzel, isConnected, local ->
+        _localState,
+        favoritesFlow
+    ) { sessions, selectedKuerzel, isConnected, local, favorites ->
         SessionListUiState(
             sessions = sessions,
             selectedKuerzel = selectedKuerzel,
@@ -59,6 +75,7 @@ class SessionListViewModel(
             isConnected = isConnected,
             lastResponses = local.lastResponses,
             expandedCards = local.expandedCards,
+            favorites = favorites,
             errorMessage = local.errorMessage
         )
     }.stateIn(
@@ -143,6 +160,17 @@ class SessionListViewModel(
                 }
             } catch (e: Exception) {
                 _localState.update { it.copy(errorMessage = "Command failed: ${e.message}") }
+            }
+        }
+    }
+
+    /** Toggle a session as favorite. Persisted to DataStore. */
+    fun toggleFavorite(kuerzel: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                val current = prefs[FAVORITES_KEY]?.toMutableSet() ?: mutableSetOf()
+                if (kuerzel in current) current.remove(kuerzel) else current.add(kuerzel)
+                prefs[FAVORITES_KEY] = current
             }
         }
     }

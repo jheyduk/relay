@@ -50,6 +50,6 @@ val androidModule = module {
     // ViewModels
     viewModel { SetupViewModel(get()) }
     viewModel { StatusViewModel(get(), get()) }
-    viewModel { SessionListViewModel(get(), get(), get()) }
+    viewModel { SessionListViewModel(get(), get(), get(), get()) }
     viewModel { params -> ChatViewModel(get(), get(), get(), params.get<String>()) }
 }

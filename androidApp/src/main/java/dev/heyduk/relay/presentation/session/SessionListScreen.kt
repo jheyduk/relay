@@ -15,6 +15,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -96,19 +103,33 @@ fun SessionListScreen(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { Text("Relay") },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Open drawer")
+                Column {
+                    TopAppBar(
+                        title = { Text("Relay") },
+                        navigationIcon = {
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                Icon(Icons.Default.Menu, contentDescription = "Open drawer")
+                            }
+                        },
+                        actions = {
+                            // Favorite quick-access chips
+                            uiState.favorites.forEach { fav ->
+                                AssistChip(
+                                    onClick = { onNavigateToChat(fav) },
+                                    label = { Text("@$fav", style = MaterialTheme.typography.labelSmall) },
+                                    leadingIcon = {
+                                        Icon(Icons.Filled.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.primary)
+                                    },
+                                    modifier = Modifier.height(28.dp).padding(end = 4.dp),
+                                    colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                                )
+                            }
+                            IconButton(onClick = onNavigateToSetup) {
+                                Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            }
                         }
-                    },
-                    actions = {
-                        IconButton(onClick = onNavigateToSetup) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
-                        }
-                    }
-                )
+                    )
+                }
             },
             bottomBar = {
                 Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
@@ -157,7 +178,9 @@ fun SessionListScreen(
                             session = session,
                             lastResponse = uiState.lastResponses[session.kuerzel],
                             isExpanded = session.kuerzel in uiState.expandedCards,
+                            isFavorite = session.kuerzel in uiState.favorites,
                             onToggleExpand = { viewModel.toggleCardExpanded(session.kuerzel) },
+                            onToggleFavorite = { viewModel.toggleFavorite(session.kuerzel) },
                             onSelect = {
                                 viewModel.selectSession(session.kuerzel)
                                 onNavigateToChat(session.kuerzel)
