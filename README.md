@@ -17,24 +17,24 @@ Relay connects your Android phone to Claude Code sessions running in [Zellij](ht
 ## Architecture
 
 ```
-                        WebSocket
- +-----------------+  <----------->  +--------------------+
- |                 |  mDNS discovery  |                    |
- |  Android App    |                  |  relay-server      |
- |                 |                  |  (Node.js)         |
- |  Kotlin/        |                  |                    |
- |  Compose        |                  |  +--------------+  |
- |                 |                  |  | whisper.cpp  |  |
- +-----------------+                  |  +--------------+  |
-                                      |        |           |
-                                      |  zellij write      |
-                                      |        v           |
-                                      |  +--------------+  |
-                                      |  |   Zellij     |  |
-                                      |  |  Sessions    |  |
-                                      |  +--------------+  |
-                                      +--------------------+
-                                              Mac
+                       WebSocket
++-----------------+  <----------->  +---------------------+
+|                 |  mDNS discovery |                     |
+|  Android App    |                 |  relay-server       |
+|                 |                 |  (Node.js)          |
+|  Kotlin/        |                 |                     |
+|  Compose        |                 |  +---------------+  |
+|                 |                 |  | whisper.cpp   |  |
++-----------------+                 |  +---------------+  |
+                                    |        |            |
+                                    |  zellij write       |
+                                    |        v            |
+                                    |  +---------------+  |
+                                    |  | Zellij        |  |
+                                    |  | Sessions      |  |
+                                    |  +---------------+  |
+                                    +---------------------+
+                                             Mac
 ```
 
 **App** (Kotlin Multiplatform + Jetpack Compose):
