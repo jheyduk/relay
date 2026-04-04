@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +37,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -145,10 +147,14 @@ fun ChatScreen(
     val statusColor = dev.heyduk.relay.presentation.theme.statusColor(uiState.sessionStatus)
     val statusLabel = uiState.sessionStatus?.name?.lowercase() ?: ""
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = {
             Column {
                 TopAppBar(
+                    scrollBehavior = scrollBehavior,
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("@$kuerzel")
