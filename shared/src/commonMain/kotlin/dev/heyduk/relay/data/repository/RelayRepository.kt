@@ -42,4 +42,7 @@ interface RelayRepository {
 
     /** Request creation of a new Claude Code session. */
     suspend fun sendCreateSession(path: String, kuerzel: String, flags: String)
+
+    /** Request the last N messages from a session via the server. */
+    suspend fun sendGetLast(kuerzel: String, count: Int = 2)
 }

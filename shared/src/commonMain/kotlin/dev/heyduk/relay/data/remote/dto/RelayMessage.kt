@@ -49,7 +49,8 @@ enum class RelayMessageTypeDto {
     @SerialName("completion") COMPLETION,
     @SerialName("transcript") TRANSCRIPT,
     @SerialName("directory_list") DIRECTORY_LIST,
-    @SerialName("session_created") SESSION_CREATED
+    @SerialName("session_created") SESSION_CREATED,
+    @SerialName("last_response") LAST_RESPONSE
 }
 
 @Serializable

@@ -89,7 +89,8 @@ class WebSocketService : Service() {
                     // Skip DB persistence for non-chat message types
                     if (update.type == RelayMessageType.TRANSCRIPT ||
                         update.type == RelayMessageType.DIRECTORY_LIST ||
-                        update.type == RelayMessageType.SESSION_CREATED) return@collect
+                        update.type == RelayMessageType.SESSION_CREATED ||
+                        update.type == RelayMessageType.LAST_RESPONSE) return@collect
 
                     database.messagesQueries.insertOrIgnore(
                         update_id = update.updateId,

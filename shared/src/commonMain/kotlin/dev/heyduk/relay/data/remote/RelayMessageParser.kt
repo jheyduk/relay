@@ -70,6 +70,7 @@ fun RelayMessageTypeDto.toDomain(): RelayMessageType = when (this) {
     RelayMessageTypeDto.TRANSCRIPT -> RelayMessageType.TRANSCRIPT
     RelayMessageTypeDto.DIRECTORY_LIST -> RelayMessageType.DIRECTORY_LIST
     RelayMessageTypeDto.SESSION_CREATED -> RelayMessageType.SESSION_CREATED
+    RelayMessageTypeDto.LAST_RESPONSE -> RelayMessageType.LAST_RESPONSE
 }
 
 fun SessionStatusDto.toDomain(): SessionStatus = when (this) {

@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
-const { spawn, execFile } = require('child_process');
+const { spawn, execFile, execFileSync } = require('child_process');
 
 // --- Constants ---
 const CONFIG_PATH = path.join(os.homedir(), '.config', 'relay', 'server.json');
@@ -896,6 +896,29 @@ wss.on('connection', (ws, req) => {
           }
           // session-start hook fires automatically when claude starts in the new tab
         });
+      } else if (msg.action === 'get_last') {
+        const reqKuerzel = msg.kuerzel;
+        const count = msg.count || 2;
+        if (!reqKuerzel) {
+          if (appSocket && appSocket.readyState === 1) {
+            appSocket.send(JSON.stringify({ type: 'last_response', session: reqKuerzel || '_system', success: false, error: 'Missing kuerzel' }));
+          }
+        } else {
+          try {
+            const output = execFileSync('npx', ['zellij-claude', 'last', `@${reqKuerzel}`, String(count)], {
+              encoding: 'utf8', timeout: 10000, stdio: ['pipe', 'pipe', 'pipe']
+            }).trim();
+            process.stderr.write(`[relay-server] get_last @${reqKuerzel}: ${output.length} chars\n`);
+            if (appSocket && appSocket.readyState === 1) {
+              appSocket.send(JSON.stringify({ type: 'last_response', session: reqKuerzel, message: output || '(no output)', success: true }));
+            }
+          } catch (err) {
+            process.stderr.write(`[relay-server] get_last error: ${err.message}\n`);
+            if (appSocket && appSocket.readyState === 1) {
+              appSocket.send(JSON.stringify({ type: 'last_response', session: reqKuerzel, success: false, error: err.message }));
+            }
+          }
+        }
       }
     } catch (e) {
       process.stderr.write(`[relay-server] message parse error: ${e.message}\n`);

@@ -68,6 +68,10 @@ class RelayRepositoryImpl(
     override suspend fun sendCreateSession(path: String, kuerzel: String, flags: String) {
         webSocketClient.sendCreateSession(path, kuerzel, flags)
     }
+
+    override suspend fun sendGetLast(kuerzel: String, count: Int) {
+        webSocketClient.sendGetLast(kuerzel, count)
+    }
 }
 
 /**

@@ -39,4 +39,10 @@ interface ChatRepository {
 
     /** Flow of session status updates for a specific kuerzel. */
     fun statusUpdates(kuerzel: String): Flow<SessionStatus>
+
+    /** Request the last N messages from a session via server. */
+    suspend fun sendGetLast(kuerzel: String, count: Int = 2)
+
+    /** Flow of all relay updates (for filtering transient message types). */
+    val relayUpdates: Flow<RelayUpdate>
 }

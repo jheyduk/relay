@@ -123,6 +123,12 @@ class ChatRepositoryImpl(
         .filter { it.type == RelayMessageType.STATUS && it.session == kuerzel && it.status != null }
         .map { it.status!! }
 
+    override suspend fun sendGetLast(kuerzel: String, count: Int) {
+        relayRepository.sendGetLast(kuerzel, count)
+    }
+
+    override val relayUpdates: Flow<RelayUpdate> = relayRepository.updates
+
     /** Cache question data from a live RelayUpdate for later retrieval by the UI. */
     fun cacheQuestionData(updateId: Long, data: QuestionData) {
         questionDataCache[updateId] = data

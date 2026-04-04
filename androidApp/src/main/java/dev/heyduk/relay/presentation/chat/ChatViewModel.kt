@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -147,11 +148,23 @@ class ChatViewModel(
         }
     }
 
-    /** Fetch the last 2 messages from the session via /last command. */
+    /** Fetch the last 2 messages from the session via server get_last action. */
     fun fetchLast() {
         viewModelScope.launch {
             try {
-                chatRepository.sendCommand(kuerzel, "/last @$kuerzel 2")
+                chatRepository.sendGetLast(kuerzel, 2)
+                val update = kotlinx.coroutines.withTimeoutOrNull(10_000L) {
+                    chatRepository.relayUpdates
+                        .filter { it.type == dev.heyduk.relay.domain.model.RelayMessageType.LAST_RESPONSE && it.session == kuerzel }
+                        .first()
+                }
+                if (update != null && update.sessionCreatedSuccess == true) {
+                    chatRepository.insertLocalMessage(kuerzel, update.message)
+                } else if (update != null) {
+                    _localState.update { it.copy(errorMessage = update.sessionCreatedError ?: "Failed to fetch") }
+                } else {
+                    _localState.update { it.copy(errorMessage = "Timeout fetching last messages") }
+                }
             } catch (e: Exception) {
                 _localState.update { it.copy(errorMessage = "Fetch failed: ${e.message}") }
             }

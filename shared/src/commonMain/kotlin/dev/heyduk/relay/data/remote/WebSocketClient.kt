@@ -241,6 +241,18 @@ class WebSocketClient(
     }
 
     /**
+     * Requests the last N messages from a session via the server.
+     */
+    suspend fun sendGetLast(kuerzel: String, count: Int = 2) {
+        val payload = buildJsonObject {
+            put("action", "get_last")
+            put("kuerzel", kuerzel)
+            put("count", count)
+        }
+        send(payload.toString())
+    }
+
+    /**
      * Gracefully closes the WebSocket connection.
      */
     suspend fun disconnect() {
