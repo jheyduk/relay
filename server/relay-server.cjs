@@ -428,6 +428,12 @@ function startStatusPolling() {
       return;
     }
 
+    // Skip polling during suppression (hooks handle status)
+    if (Date.now() < pollSuppressedUntil) {
+      statusPollTimer = setTimeout(poll, POLL_ACTIVE);
+      return;
+    }
+
     execFile('zellij', ['--session', zellijSession, 'action', 'list-panes', '--json', '--tab', '--state'], {
       timeout: 5000,
       encoding: 'utf8',
@@ -484,16 +490,14 @@ function stopStatusPolling() {
   anySessionWorking = false;
 }
 
+let pollSuppressedUntil = 0;
+
 /**
- * Trigger an immediate status poll (e.g. after receiving a command from the app).
+ * Suppress polling for a duration (ms). During suppression, hooks handle status updates.
+ * After suppression ends, resume with fast polling to catch the transition back to ready.
  */
-function triggerImmediatePoll() {
-  if (statusPollTimer) {
-    clearTimeout(statusPollTimer);
-    statusPollTimer = null;
-  }
-  // Short delay to let zellij process the input
-  setTimeout(() => startStatusPolling(), 500);
+function suppressPollingFor(ms) {
+  pollSuppressedUntil = Date.now() + ms;
 }
 
 // --- Attachments ---
@@ -666,8 +670,8 @@ wss.on('connection', (ws, req) => {
         }
         // Dispatch command directly via Zellij write-chars
         dispatchCommand(msg.kuerzel, msg.message);
-        // Switch to fast polling to catch when it's done
-        triggerImmediatePoll();
+        // Suppress polling for 10s — hooks handle the working→ready transition
+        suppressPollingFor(10000);
       } else if (msg.action === 'raw_command') {
         if (msg.command === 'ls') {
           // List sessions directly from Zellij tabs
