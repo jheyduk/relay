@@ -125,8 +125,11 @@ class WebSocketService : Service() {
                 webSocketClient.connectionState.collect { state ->
                     when (state) {
                         ConnectionState.CONNECTED -> {
+                            // Reset warning notification if it was shown
+                            if (disconnectedSince > 0L) {
+                                updateNotification("Relay", warn = false)
+                            }
                             disconnectedSince = 0L
-                            updateNotification("Connected", warn = false)
                         }
                         ConnectionState.CONNECTING -> {
                             if (disconnectedSince == 0L) disconnectedSince = System.currentTimeMillis()
