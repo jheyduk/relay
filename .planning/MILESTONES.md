@@ -1,5 +1,19 @@
 # Milestones
 
+## v1.3 Session Management (Shipped: 2026-04-04)
+
+**Phases completed:** 3 phases, 4 plans, 10 tasks
+
+**Key accomplishments:**
+
+- Project roots config reading and directory scanning via list_directories WebSocket action
+- create_session WebSocket handler with path validation, kuerzel deduplication via zellij list-tabs, and new-tab creation
+- WebSocket protocol layer for directory_list and create_session actions with DTO, parser, domain models, send methods, and 4 new tests
+- Fullscreen session creation dialog with FZF-style fuzzy directory search, 4-phase flow (loading, directory selection, custom path, confirmation), and (+) FAB entry point replacing Refresh FAB
+- Replace legacy truncate(2000) with tiered size-aware response logic
+
+---
+
 ## v1.1 Standalone Server (Shipped: 2026-04-03)
 
 **Phases completed:** 3 phases, 7 plans, 11 tasks

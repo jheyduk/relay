@@ -35,23 +35,19 @@ Remote session control with per-session separation — see all Claude Code sessi
 - ✓ Notification tap opens app — v1.2
 - ✓ README with architecture diagram — v1.2
 
+- ✓ Create new sessions from the app with FZF-style fuzzy directory search — v1.3
+- ✓ Server-side config for project roots, default flags, scan depth — v1.3
+- ✓ Confirmation dialog with editable kuerzel, path, and flags toggle — v1.3
+- ✓ Custom path input for directories not under configured roots — v1.3
+- ✓ Smart response handling (replace legacy Telegram truncation) — v1.3
+
 ### Active
 
-- [ ] Create new sessions from the app with FZF-style fuzzy directory search
-- [ ] Server-side config for project roots, default flags, scan depth
-- [ ] Confirmation dialog with editable kuerzel, path, and flags toggle
-- [ ] Custom path input for directories not under configured roots
-- [ ] Smart response handling (replace legacy Telegram truncation)
+(None — planning next milestone)
 
-## Current Milestone: v1.3 Session Management
+## Current State
 
-**Goal:** Create new Claude Code sessions from the app and improve response handling
-
-**Target features:**
-- FZF-style fuzzy directory search for session creation
-- Confirmation dialog with editable kuerzel and flags toggle
-- Server-side config (`~/.config/relay/project-roots.json`)
-- Smart response handling (size-aware, no hard truncation)
+**Shipped v1.3** — Session Management milestone complete
 
 ### Out of Scope
 
@@ -66,6 +62,7 @@ Remote session control with per-session separation — see all Claude Code sessi
 - **Shipped v1.0** — 6 phases, 18 plans, 96 commits in 2 days
 - **Shipped v1.1** — 3 phases (server migration, interactive controls, mac-side voice)
 - **Shipped v1.2** — Post-release polish: theme, attachments, status, bubbles, icon, adaptive polling, favorites
+- **Shipped v1.3** — Session creation from app (FZF fuzzy search, fullscreen dialog), server config, smart response handling
 - **Architecture**: KMP shared module (Ktor WebSocket, SQLDelight, Koin DI) + Android Compose UI + Node.js relay-server
 - **Transport**: Direct WebSocket to relay-server in `server/`
 - **Voice**: whisper.cpp medium model on Mac (~5s transcription, German default)
@@ -100,4 +97,4 @@ Remote session control with per-session separation — see all Claude Code sessi
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-04-04 after v1.3 milestone start*
+*Last updated: 2026-04-04 after v1.3 milestone completion*
