@@ -749,6 +749,17 @@ wss.on('connection', (ws, req) => {
         dispatchAnswer(msg.kuerzel, msg);
       } else if (msg.action === 'attachment') {
         handleAttachment(msg.kuerzel, msg.filename, msg.data);
+      } else if (msg.action === 'list_directories') {
+        const projectConfig = loadProjectRootsConfig();
+        const directories = scanDirectories(projectConfig.roots, projectConfig.scanDepth);
+        process.stderr.write(`[relay-server] list_directories: scanned ${directories.length} directories from ${projectConfig.roots.length} root(s)\n`);
+        if (appSocket && appSocket.readyState === 1) {
+          appSocket.send(JSON.stringify({
+            type: 'directory_list',
+            directories,
+            defaultFlags: projectConfig.defaultFlags,
+          }));
+        }
       }
     } catch (e) {
       process.stderr.write(`[relay-server] message parse error: ${e.message}\n`);
