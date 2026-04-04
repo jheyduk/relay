@@ -169,6 +169,46 @@ function findSessionForKuerzel(kuerzel) {
 }
 
 /**
+ * Deduplicate a kuerzel by checking existing @-tabs in the Zellij session.
+ * If @{kuerzel} is already taken, tries kuerzel-2, kuerzel-3, ... up to -99.
+ * Returns the first available kuerzel, or null if all are taken (extremely unlikely).
+ */
+function deduplicateKuerzel(sessionId, kuerzel) {
+  return new Promise((resolve) => {
+    execFile('zellij', ['--session', sessionId, 'action', 'list-tabs', '--json', '--state'], {
+      timeout: 5000,
+      encoding: 'utf8',
+    }, (err, stdout) => {
+      if (err) {
+        // Cannot list tabs — return kuerzel as-is (best effort)
+        resolve(kuerzel);
+        return;
+      }
+      try {
+        const tabs = JSON.parse(stdout);
+        const existing = new Set(
+          tabs.filter(t => t.name && t.name.startsWith('@')).map(t => t.name.slice(1))
+        );
+        if (!existing.has(kuerzel)) {
+          resolve(kuerzel);
+          return;
+        }
+        for (let i = 2; i <= 99; i++) {
+          const candidate = `${kuerzel}-${i}`;
+          if (!existing.has(candidate)) {
+            resolve(candidate);
+            return;
+          }
+        }
+        resolve(null); // All taken (extremely unlikely)
+      } catch {
+        resolve(kuerzel);
+      }
+    });
+  });
+}
+
+/**
  * Find the pane ID for the tab named @{kuerzel} in the given Zellij session.
  * Uses `zellij action list-panes --json --tab` to get pane/tab mapping.
  * Returns a promise that resolves to the pane ID string or null.
@@ -760,6 +800,102 @@ wss.on('connection', (ws, req) => {
             defaultFlags: projectConfig.defaultFlags,
           }));
         }
+      } else if (msg.action === 'create_session') {
+        const reqPath = msg.path;
+        const reqKuerzel = msg.kuerzel || path.basename(reqPath || '');
+        const flags = msg.flags || '';
+        const zellijSession = process.env.ZELLIJ_SESSION_NAME;
+
+        if (!zellijSession) {
+          if (appSocket && appSocket.readyState === 1) {
+            appSocket.send(JSON.stringify({
+              type: 'session_created',
+              success: false,
+              error: 'ZELLIJ_SESSION_NAME not set — relay-server must run inside a zellij session',
+            }));
+          }
+          return;
+        }
+
+        if (!reqPath) {
+          if (appSocket && appSocket.readyState === 1) {
+            appSocket.send(JSON.stringify({
+              type: 'session_created',
+              success: false,
+              error: 'Missing path',
+            }));
+          }
+          return;
+        }
+
+        // Validate or create directory
+        try {
+          if (!fs.existsSync(reqPath)) {
+            fs.mkdirSync(reqPath, { recursive: true });
+            process.stderr.write(`[relay-server] Created directory: ${reqPath}\n`);
+          }
+          const stat = fs.statSync(reqPath);
+          if (!stat.isDirectory()) {
+            throw new Error('Path is not a directory');
+          }
+        } catch (err) {
+          if (appSocket && appSocket.readyState === 1) {
+            appSocket.send(JSON.stringify({
+              type: 'session_created',
+              success: false,
+              error: `Invalid path: ${err.message}`,
+            }));
+          }
+          return;
+        }
+
+        // Deduplicate kuerzel
+        const finalKuerzel = await deduplicateKuerzel(zellijSession, reqKuerzel);
+        if (!finalKuerzel) {
+          if (appSocket && appSocket.readyState === 1) {
+            appSocket.send(JSON.stringify({
+              type: 'session_created',
+              success: false,
+              error: 'Could not find unique kuerzel (all suffixes taken)',
+            }));
+          }
+          return;
+        }
+
+        process.stderr.write(`[relay-server] Creating session @${finalKuerzel} in ${reqPath} with flags: ${flags}\n`);
+
+        // Build zellij new-tab command
+        const args = ['--session', zellijSession, 'action', 'new-tab', '--name', `@${finalKuerzel}`, '--cwd', reqPath, '--'];
+        const claudeArgs = ['claude'];
+        if (flags) {
+          claudeArgs.push(...flags.split(/\s+/).filter(Boolean));
+        }
+        args.push(...claudeArgs);
+
+        execFile('zellij', args, { timeout: 10000 }, (err) => {
+          if (err) {
+            process.stderr.write(`[relay-server] create_session error: ${err.message}\n`);
+            if (appSocket && appSocket.readyState === 1) {
+              appSocket.send(JSON.stringify({
+                type: 'session_created',
+                success: false,
+                error: `Failed to create tab: ${err.message}`,
+              }));
+            }
+            return;
+          }
+
+          process.stderr.write(`[relay-server] Session @${finalKuerzel} created successfully\n`);
+          if (appSocket && appSocket.readyState === 1) {
+            appSocket.send(JSON.stringify({
+              type: 'session_created',
+              kuerzel: finalKuerzel,
+              path: reqPath,
+              success: true,
+            }));
+          }
+          // session-start hook fires automatically when claude starts in the new tab
+        });
       }
     } catch (e) {
       process.stderr.write(`[relay-server] message parse error: ${e.message}\n`);
