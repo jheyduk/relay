@@ -86,9 +86,10 @@ class WebSocketService : Service() {
             // Collect updates and insert into the database
             launch {
                 webSocketClient.updates.collect { update ->
-                    // Skip DB persistence for transcript messages -- they flow
-                    // through the SharedFlow directly to the ChatViewModel's preview
-                    if (update.type == RelayMessageType.TRANSCRIPT) return@collect
+                    // Skip DB persistence for non-chat message types
+                    if (update.type == RelayMessageType.TRANSCRIPT ||
+                        update.type == RelayMessageType.DIRECTORY_LIST ||
+                        update.type == RelayMessageType.SESSION_CREATED) return@collect
 
                     database.messagesQueries.insertOrIgnore(
                         update_id = update.updateId,
