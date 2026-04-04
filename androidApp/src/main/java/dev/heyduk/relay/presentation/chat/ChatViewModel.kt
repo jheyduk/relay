@@ -117,6 +117,8 @@ class ChatViewModel(
     fun sendMessage(text: String) {
         val attachment = _localState.value.pendingAttachment
         if (text.isBlank() && attachment == null) return
+        // Optimistic: show working immediately
+        _sessionStatus.value = SessionStatus.WORKING
         viewModelScope.launch {
             _localState.update { it.copy(isSending = true, errorMessage = null, pendingAttachment = null) }
             try {
