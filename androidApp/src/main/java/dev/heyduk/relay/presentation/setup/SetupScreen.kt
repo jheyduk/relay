@@ -66,8 +66,8 @@ fun SetupScreen(
         OutlinedTextField(
             value = uiState.wireguardIp,
             onValueChange = viewModel::updateWireguardIp,
-            label = { Text("WireGuard IP (optional)") },
-            placeholder = { Text("e.g., fd00::1") },
+            label = { Text("Server IP (optional)") },
+            placeholder = { Text("e.g., 192.168.1.100") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
