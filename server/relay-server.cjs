@@ -731,7 +731,7 @@ wss.on('connection', (ws, req) => {
   setTimeout(() => sendReconnectSync(), 500);
   startStatusPolling();
 
-  ws.on('message', (data, isBinary) => {
+  ws.on('message', async (data, isBinary) => {
     process.stderr.write(`[relay-server] on('message') isBinary=${isBinary}, len=${data.length}\n`);
     // Binary frame: audio data with kuerzel prefix
     if (isBinary && data.length > 2) {
