@@ -35,17 +35,33 @@ function getLastResponse(kuerzel, count = 2) {
   } catch { return null; }
 }
 
-function truncate(text, max) {
-  if (text.length <= max) return text;
-  return text.slice(0, max) + '\n…(truncated)';
+/**
+ * Smart response sizing: tiered logic replacing legacy truncate(2000).
+ * - ≤4KB: both responses included (untruncated)
+ * - ≤16KB: single response only (untruncated)
+ * - >16KB: single response truncated with visible marker
+ */
+function getSmartResponse(kuerzel) {
+  const full = getLastResponse(kuerzel, 2);
+  if (!full) return 'Task complete';
+
+  const bytes = Buffer.byteLength(full, 'utf8');
+  if (bytes <= 4096) return full;
+
+  // Too large with 2 responses, try just the last one
+  const single = getLastResponse(kuerzel, 1);
+  if (!single) return 'Task complete';
+
+  const singleBytes = Buffer.byteLength(single, 'utf8');
+  if (singleBytes <= 16384) return single;
+
+  // Even single response is huge, truncate
+  return single.slice(0, 16384) + '\n…(truncated)';
 }
 
 async function notify(kuerzel, data) {
   if (!kuerzel) return;
-  const lastResponse = getLastResponse(kuerzel, 2);
-  const message = lastResponse
-    ? truncate(lastResponse, 2000)
-    : 'Task complete';
+  const message = getSmartResponse(kuerzel);
   // Send status back to ready
   await sendRelay({
     type: 'status',
