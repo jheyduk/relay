@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Terminal cursor prompt -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M4,17 L10,12 L4,7 L4,17Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,17 L20,17 L20,15 L12,15 Z" />
+</vector>

@@ -203,7 +203,7 @@ class WebSocketService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Relay")
             .setContentText(text)
-            .setSmallIcon(android.R.drawable.ic_menu_send)
+            .setSmallIcon(dev.heyduk.relay.R.drawable.ic_notification)
             .setOngoing(true)
             .build()
     }

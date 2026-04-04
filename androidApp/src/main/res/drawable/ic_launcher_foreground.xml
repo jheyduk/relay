@@ -1,0 +1,52 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Smartphone outline -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#E0E0E0"
+        android:strokeWidth="2.5"
+        android:pathData="M38,22 L70,22 C72.2,22 74,23.8 74,26 L74,82 C74,84.2 72.2,86 70,86 L38,86 C35.8,86 34,84.2 34,82 L34,26 C34,23.8 35.8,22 38,22 Z" />
+
+    <!-- Screen area -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M37,28 L71,28 L71,78 L37,78 Z" />
+
+    <!-- Terminal prompt: > _ -->
+    <path
+        android:fillColor="#4ADE80"
+        android:pathData="M42,48 L48,54 L42,60"
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Blinking cursor -->
+    <path
+        android:fillColor="#4ADE80"
+        android:pathData="M52,57 L62,57 L62,61 L52,61 Z" />
+
+    <!-- Signal waves (relay) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M78,44 C82,44 84,48 84,54 C84,60 82,64 78,64" />
+
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#4ADE80"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M82,38 C88,38 92,44 92,54 C92,64 88,70 82,70" />
+
+    <!-- Home button / notch indicator -->
+    <path
+        android:fillColor="#444444"
+        android:pathData="M50,82 L58,82 L58,84 L50,84 Z" />
+</vector>
