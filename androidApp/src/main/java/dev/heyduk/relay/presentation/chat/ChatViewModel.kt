@@ -106,8 +106,10 @@ class ChatViewModel(
                 // Send attachment first if staged
                 if (attachment != null) {
                     chatRepository.sendAttachment(kuerzel, attachment.filename, attachment.base64Data)
+                    // Wait for server to dispatch the file path + Enter before sending text
+                    if (text.isNotBlank()) kotlinx.coroutines.delay(500)
                 }
-                // Then send the text message (or just the attachment path if no text)
+                // Then send the text message
                 if (text.isNotBlank()) {
                     chatRepository.sendMessage(kuerzel, text)
                 }
