@@ -56,7 +56,12 @@ fun RelayNavGraph(navController: NavHostController, isConfigured: Boolean) {
             val kuerzel = backStackEntry.arguments?.getString("kuerzel") ?: return@composable
             ChatScreen(
                 kuerzel = kuerzel,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToChat = { targetKuerzel ->
+                    navController.navigate("chat/$targetKuerzel") {
+                        popUpTo("sessions")
+                    }
+                }
             )
         }
         composable("status") {

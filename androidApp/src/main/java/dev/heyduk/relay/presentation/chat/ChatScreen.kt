@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,10 +52,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.heyduk.relay.domain.model.RelayMessageType
 import dev.heyduk.relay.presentation.components.CommandInput
+import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 /**
@@ -64,11 +73,18 @@ import org.koin.core.parameter.parametersOf
 fun ChatScreen(
     kuerzel: String,
     onNavigateBack: () -> Unit,
+    onNavigateToChat: (String) -> Unit = {},
     viewModel: ChatViewModel = koinViewModel { parametersOf(kuerzel) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+
+    // Read favorites from DataStore for quick-access chips
+    val dataStore: DataStore<Preferences> = koinInject()
+    val favorites by dataStore.data
+        .map { prefs -> prefs[stringSetPreferencesKey("favorite_sessions")] ?: emptySet() }
+        .collectAsStateWithLifecycle(initialValue = emptySet())
 
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -173,6 +189,19 @@ fun ChatScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back"
+                            )
+                        }
+                    },
+                    actions = {
+                        favorites.filter { it != kuerzel }.forEach { fav ->
+                            AssistChip(
+                                onClick = { onNavigateToChat(fav) },
+                                label = { Text("@$fav", style = MaterialTheme.typography.labelSmall) },
+                                leadingIcon = {
+                                    Icon(Icons.Filled.Star, contentDescription = null, modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.primary)
+                                },
+                                modifier = Modifier.height(28.dp).padding(end = 4.dp),
+                                colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                             )
                         }
                     }
