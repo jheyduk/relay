@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: Session Management
-status: active
-stopped_at: null
-last_updated: "2026-04-04T15:00:00.000Z"
-last_activity: 2026-04-04
+milestone: v1.1
+milestone_name: Standalone Server
+status: executing
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-04-04T13:58:12.665Z"
+last_activity: 2026-04-04 -- Plan 10-01 complete
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 7
+  percent: 50
 ---
 
 # Project State
@@ -21,50 +21,52 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-04)
 
 **Core value:** Remote session control with per-session separation -- see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
-**Current focus:** Phase 10 -- Server Config & Protocol
+**Current focus:** Phase 10 — Server Config & Protocol (plan 01 complete)
 
 ## Current Position
 
-Phase: 10 of 12 (Server Config & Protocol)
-Plan: --
-Status: Ready to plan
-Last activity: 2026-04-04 -- Roadmap created for v1.3
+Phase: 10 (Server Config & Protocol) — EXECUTING
+Plan: 2 of 2 (plan 01 complete)
+Status: Executing Phase 10
+Last activity: 2026-04-04 -- Plan 10-01 complete
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
-## Performance Metrics
+## v1.2 Changes (direct fixes, no GSD phases)
 
-**Velocity:**
-- Total plans completed: 0 (v1.3)
-- Average duration: --
-- Total execution time: --
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
+- Theme settings (System/Light/Dark) with settings screen
+- File attachment support (staged send with preview chip)
+- Chat auto-scroll to latest messages
+- STATUS messages filtered from chat
+- Session-stop hook includes last 2 responses
+- Message bubble redesign (better shapes, spacing, elevation)
+- App icon (terminal + phone + signal waves)
+- Notification icon (terminal cursor)
+- README with architecture diagram
+- Server IP field renamed from WireGuard IP
+- Whisper language set to German (configurable)
+- mDNS references removed
+- Live session status in chat (working/waiting/ready colored bar)
+- Animated progress bar when session is working
+- Adaptive status polling (3s active, 30s idle)
+- Optimistic working status on command send
+- Minimal notification (only warns after 30s disconnect)
+- Notification tap opens app
+- Original filenames for attachments via ContentResolver DISPLAY_NAME
+- Multiple AskUserQuestion keystroke fixes
+- zellij write 13 for Enter
+- isBinary check for ws 8.x
+- usesCleartextTraffic for ws:// connections
 
 ## Accumulated Context
 
 ### Decisions
 
-- Design spec approved: `docs/superpowers/specs/2026-04-04-session-creation-design.md`
-- Architecture: Server delivers full directory list, app filters locally (FZF-style)
-- Two new WebSocket actions: `list_directories`, `create_session`
-- Server config: `~/.config/relay/project-roots.json`
-- Smart response: Replace truncate(2000) with tiered size logic (4KB/16KB thresholds)
-
-### Pending Todos
-
-None yet.
-
-### Blockers/Concerns
-
-None yet.
+- Project roots config: separate file (project-roots.json) from server.json, read-only (no auto-write), fresh read per request
+- Default fallback: roots=["~/prj"], defaultFlags="--dangerously-skip-permissions", scanDepth=2
 
 ## Session Continuity
 
-Last session: 2026-04-04
-Stopped at: Roadmap created for v1.3 milestone
+Last session: 2026-04-04T13:58:12.662Z
+Stopped at: Completed 10-01-PLAN.md
 Resume file: None

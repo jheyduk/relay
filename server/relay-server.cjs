@@ -65,6 +65,62 @@ function loadOrCreateConfig() {
 
 const config = loadOrCreateConfig();
 
+// --- Project Roots Config ---
+const PROJECT_ROOTS_CONFIG = path.join(os.homedir(), '.config', 'relay', 'project-roots.json');
+
+function loadProjectRootsConfig() {
+  const defaults = {
+    roots: ['~/prj'],
+    defaultFlags: '--dangerously-skip-permissions',
+    scanDepth: 2,
+  };
+  try {
+    const raw = JSON.parse(fs.readFileSync(PROJECT_ROOTS_CONFIG, 'utf8'));
+    return {
+      roots: Array.isArray(raw.roots) ? raw.roots : defaults.roots,
+      defaultFlags: raw.defaultFlags ?? defaults.defaultFlags,
+      scanDepth: typeof raw.scanDepth === 'number' ? raw.scanDepth : defaults.scanDepth,
+    };
+  } catch {
+    return defaults;
+  }
+}
+
+function scanDirectories(roots, maxDepth) {
+  const SKIP = new Set(['node_modules', '__pycache__']);
+  const results = [];
+
+  function scan(dir, depth) {
+    if (depth > maxDepth) return;
+    let entries;
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      if (entry.name.startsWith('.')) continue;
+      if (SKIP.has(entry.name)) continue;
+      const fullPath = path.join(dir, entry.name);
+      results.push({ path: fullPath, name: entry.name });
+      if (depth < maxDepth) scan(fullPath, depth + 1);
+    }
+  }
+
+  for (const root of roots) {
+    const expanded = root.replace(/^~/, os.homedir());
+    if (!fs.existsSync(expanded)) {
+      process.stderr.write(`[relay-server] Warning: project root does not exist: ${expanded}\n`);
+      continue;
+    }
+    scan(expanded, 1);
+  }
+
+  results.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+  return results;
+}
+
 // --- Whisper availability check ---
 let whisperAvailable = false;
 try {
@@ -693,6 +749,17 @@ wss.on('connection', (ws, req) => {
         dispatchAnswer(msg.kuerzel, msg);
       } else if (msg.action === 'attachment') {
         handleAttachment(msg.kuerzel, msg.filename, msg.data);
+      } else if (msg.action === 'list_directories') {
+        const projectConfig = loadProjectRootsConfig();
+        const directories = scanDirectories(projectConfig.roots, projectConfig.scanDepth);
+        process.stderr.write(`[relay-server] list_directories: scanned ${directories.length} directories from ${projectConfig.roots.length} root(s)\n`);
+        if (appSocket && appSocket.readyState === 1) {
+          appSocket.send(JSON.stringify({
+            type: 'directory_list',
+            directories,
+            defaultFlags: projectConfig.defaultFlags,
+          }));
+        }
       }
     } catch (e) {
       process.stderr.write(`[relay-server] message parse error: ${e.message}\n`);
