@@ -218,10 +218,16 @@ class WebSocketService : Service() {
     }
 
     private fun buildNotification(text: String, warn: Boolean = false): Notification {
+        val intent = packageManager.getLaunchIntentForPackage(packageName)
+        val pendingIntent = android.app.PendingIntent.getActivity(
+            this, 0, intent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(if (warn) "Relay — Disconnected" else "Relay")
             .setContentText(text)
             .setSmallIcon(dev.heyduk.relay.R.drawable.ic_notification)
+            .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setPriority(if (warn) NotificationCompat.PRIORITY_LOW else NotificationCompat.PRIORITY_MIN)
             .setSilent(true)
