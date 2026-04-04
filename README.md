@@ -17,22 +17,23 @@ Relay connects your Android phone to Claude Code sessions running in [Zellij](ht
 ## Architecture
 
 ```
-┌─────────────┐         WebSocket          ┌──────────────────┐
-│  Android App │ ◄──────────────────────► │  relay-server    │
-│  (Kotlin/    │    mDNS discovery         │  (Node.js)       │
-│   Compose)   │                           │                  │
-└─────────────┘                           │  ┌────────────┐  │
-                                           │  │ whisper.cpp │  │
-                                           │  └────────────┘  │
-                                           │        │         │
-                                           │  zellij write    │
-                                           │        ▼         │
-                                           │  ┌────────────┐  │
-                                           │  │   Zellij    │  │
-                                           │  │  Sessions   │  │
-                                           │  └────────────┘  │
-                                           └──────────────────┘
-                                                   Mac
+┌────────────────┐                    ┌────────────────────┐
+│                │     WebSocket      │                    │
+│  Android App   │◄──────────────────►│   relay-server     │
+│                │   mDNS discovery   │   (Node.js)        │
+│  Kotlin/       │                    │                    │
+│  Compose       │                    │  ┌──────────────┐  │
+│                │                    │  │ whisper.cpp   │  │
+└────────────────┘                    │  └──────────────┘  │
+                                      │         │          │
+                                      │   zellij write     │
+                                      │         ▼          │
+                                      │  ┌──────────────┐  │
+                                      │  │    Zellij     │  │
+                                      │  │   Sessions    │  │
+                                      │  └──────────────┘  │
+                                      └────────────────────┘
+                                               Mac
 ```
 
 **App** (Kotlin Multiplatform + Jetpack Compose):
