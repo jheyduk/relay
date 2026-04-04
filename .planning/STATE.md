@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Polish & UX
-status: complete
-stopped_at: v1.2 released
-last_updated: "2026-04-04T13:00:00.000Z"
-last_activity: 2026-04-04
+milestone: v1.1
+milestone_name: Standalone Server
+status: executing
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-04-04T13:58:12.665Z"
+last_activity: 2026-04-04 -- Plan 10-01 complete
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 100
+  total_phases: 3
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 7
+  percent: 50
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-04)
 
 **Core value:** Remote session control with per-session separation -- see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
-**Current focus:** v1.2 shipped — ready for next milestone
+**Current focus:** Phase 10 — Server Config & Protocol (plan 01 complete)
 
 ## Current Position
 
-Phase: All complete
-Plan: —
-Status: Shipped
-Last activity: 2026-04-04
+Phase: 10 (Server Config & Protocol) — EXECUTING
+Plan: 2 of 2 (plan 01 complete)
+Status: Executing Phase 10
+Last activity: 2026-04-04 -- Plan 10-01 complete
 
-Progress: [██████████] 100%
+Progress: [█████░░░░░] 50%
 
 ## v1.2 Changes (direct fixes, no GSD phases)
 
@@ -58,8 +58,15 @@ Progress: [██████████] 100%
 - isBinary check for ws 8.x
 - usesCleartextTraffic for ws:// connections
 
+## Accumulated Context
+
+### Decisions
+
+- Project roots config: separate file (project-roots.json) from server.json, read-only (no auto-write), fresh read per request
+- Default fallback: roots=["~/prj"], defaultFlags="--dangerously-skip-permissions", scanDepth=2
+
 ## Session Continuity
 
-Last session: 2026-04-04
-Stopped at: v1.2 released
+Last session: 2026-04-04T13:58:12.662Z
+Stopped at: Completed 10-01-PLAN.md
 Resume file: None
