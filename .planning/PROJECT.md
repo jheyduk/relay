@@ -22,17 +22,23 @@ Remote session control with per-session separation — see all Claude Code sessi
 - ✓ AskUserQuestion keystroke mapping (single, multi, free text, multi-question auto-submit) — v1.1
 - ✓ Session sync on reconnect — v1.1
 - ✓ Mac-side Whisper transcription (medium model, German + English) — v1.1
-- ✓ Theme settings (System/Light/Dark) — post-v1.1
-- ✓ File attachment sharing (screenshots, files) — post-v1.1
-- ✓ Chat auto-scroll to latest messages — post-v1.1
-- ✓ STATUS messages filtered from chat view — post-v1.1
-- ✓ Session-stop hook includes last 2 responses — post-v1.1
+- ✓ Theme settings (System/Light/Dark) — v1.2
+- ✓ File attachment sharing (screenshots, files) with staged send UI — v1.2
+- ✓ Chat auto-scroll to latest messages — v1.2
+- ✓ STATUS messages filtered from chat view — v1.2
+- ✓ Session-stop hook includes last 2 responses — v1.2
+- ✓ Redesigned message bubbles with elevation and better spacing — v1.2
+- ✓ App icon (terminal + phone + signal waves) + notification icon — v1.2
+- ✓ Live session status in chat (working/waiting/ready) with animated progress bar — v1.2
+- ✓ Adaptive status polling (3s active, 30s idle) with optimistic working state — v1.2
+- ✓ Minimal notification (only warns after 30s disconnect) — v1.2
+- ✓ Notification tap opens app — v1.2
+- ✓ README with architecture diagram — v1.2
 
 ### Active
 
 - [ ] iOS UI (SwiftUI frontend using KMP shared module)
 - [ ] Session commands via relay-server (/open, /goto, /rename, /last)
-- [ ] App icon for notification (custom drawable instead of system default)
 
 ### Out of Scope
 
@@ -46,18 +52,18 @@ Remote session control with per-session separation — see all Claude Code sessi
 
 - **Shipped v1.0** — 6 phases, 18 plans, 96 commits in 2 days
 - **Shipped v1.1** — 3 phases (server migration, interactive controls, mac-side voice)
-- **Post-v1.1 fixes** — theme settings, file attachments, auto-scroll, status filtering, message bubbles redesign
+- **Shipped v1.2** — Post-release polish: theme, attachments, status, bubbles, icon, adaptive polling
 - **Architecture**: KMP shared module (Ktor WebSocket, SQLDelight, Koin DI) + Android Compose UI + Node.js relay-server
 - **Transport**: Direct WebSocket to relay-server in `server/`
 - **Voice**: whisper.cpp medium model on Mac (~5s transcription, German default)
-- **Single repo**: App + Server both in relay repo, published on GitHub (public)
+- **Single repo**: App + Server both in relay repo
 - **GitHub**: https://github.com/jheyduk/relay
 
 ## Constraints
 
 - **Transport**: Direct WebSocket to relay-server on Mac
 - **Platform**: Kotlin Multiplatform (KMP) — shared business logic, Compose for Android UI
-- **Voice**: Mac-side whisper.cpp transcription only (on-device Whisper removed in v1.1)
+- **Voice**: Mac-side whisper.cpp transcription only
 - **Protocol**: JSON message format (`{type, session, message, status, tool_details, timestamp}`)
 - **Single user**: App is for the developer only, shared secret auth
 
@@ -65,20 +71,20 @@ Remote session control with per-session separation — see all Claude Code sessi
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Telegram Bot API as transport | Reuses existing infrastructure | ⚠️ Replaced in v1.0 Phase 6 |
 | Direct WebSocket transport | Telegram fundamentally broken for relay | ✓ Working |
 | Kotlin Multiplatform (KMP) | Shared business logic across platforms | ✓ Good |
 | Koin over Hilt for DI | Hilt is Android-only, Koin supports KMP | ✓ Good |
 | SQLDelight over Room | Room not KMP-compatible | ✓ Good |
-| On-device Whisper | No server dependency for voice | ⚠️ Replaced in v1.1 — too slow on device |
 | Mac-side Whisper | Fast transcription, medium model | ✓ Good — ~5s, German support |
-| relay-server in relay repo | Independent from zellij-claude | ✓ Good — moved in v1.1 |
-| mDNS discovery | Zero-config local network | ✗ Removed — unreliable, IP-based instead |
-| zellij write-chars + write 13 | Direct pane input for commands | ✓ Working — never use \n in write-chars |
+| relay-server in relay repo | Independent from zellij-claude | ✓ Good |
+| mDNS discovery | Zero-config local network | ✗ Removed — unreliable |
+| zellij write-chars + write 13 | Direct pane input for commands | ✓ Working |
+| Adaptive status polling | 3s when active, 30s when idle | ✓ Good — low overhead, fast feedback |
+| Staged attachments | Pick file → preview → send with message | ✓ Good UX |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-04-04 after v1.1 post-release fixes*
+*Last updated: 2026-04-04 after v1.2 release*
