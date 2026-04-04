@@ -118,7 +118,7 @@ Plans:
 
 - [x] **Phase 10: Server Config & Protocol** - Server-side config, directory listing, and session creation handlers (completed 2026-04-04)
 - [x] **Phase 11: Session Creation UI** - Fullscreen dialog with fuzzy search, confirmation, and session launch (completed 2026-04-04)
-- [ ] **Phase 12: Smart Response Handling** - Size-aware response logic replacing legacy truncation
+- [x] **Phase 12: Smart Response Handling** - Size-aware response logic replacing legacy truncation (completed 2026-04-04)
 
 ## Phase Details
 
@@ -181,4 +181,4 @@ Phases execute in numeric order: 10 -> 11 -> 12
 | 9. Mac-Side Voice | v1.1 | 2/2 | Complete | 2026-04-03 |
 | 10. Server Config & Protocol | v1.3 | 2/2 | Complete    | 2026-04-04 |
 | 11. Session Creation UI | v1.3 | 2/2 | Complete    | 2026-04-04 |
-| 12. Smart Response Handling | v1.3 | 0/0 | Not started | - |
+| 12. Smart Response Handling | v1.3 | 0/0 | Complete    | 2026-04-04 |
