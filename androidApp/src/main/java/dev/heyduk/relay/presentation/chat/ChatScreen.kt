@@ -66,11 +66,39 @@ fun ChatScreen(
     ) { uri ->
         if (uri != null) {
             try {
-                val input = context.contentResolver.openInputStream(uri)
-                    ?: return@rememberLauncherForActivityResult
-                val bytes = input.readBytes()
-                input.close()
+                val mimeType = context.contentResolver.getType(uri)
                 val filename = uri.lastPathSegment?.substringAfterLast('/') ?: "attachment"
+                val bytes: ByteArray
+
+                // Resize images to fit Claude Code's 2000x2000 Read tool limit
+                if (mimeType?.startsWith("image/") == true) {
+                    val input = context.contentResolver.openInputStream(uri)
+                        ?: return@rememberLauncherForActivityResult
+                    val original = android.graphics.BitmapFactory.decodeStream(input)
+                    input.close()
+                    val maxDim = 1920
+                    val scaled = if (original.width > maxDim || original.height > maxDim) {
+                        val ratio = minOf(maxDim.toFloat() / original.width, maxDim.toFloat() / original.height)
+                        android.graphics.Bitmap.createScaledBitmap(
+                            original, (original.width * ratio).toInt(), (original.height * ratio).toInt(), true
+                        )
+                    } else original
+                    val stream = java.io.ByteArrayOutputStream()
+                    val format = if (mimeType == "image/png")
+                        android.graphics.Bitmap.CompressFormat.PNG
+                    else
+                        android.graphics.Bitmap.CompressFormat.JPEG
+                    scaled.compress(format, 95, stream)
+                    bytes = stream.toByteArray()
+                    if (scaled !== original) scaled.recycle()
+                    original.recycle()
+                } else {
+                    val input = context.contentResolver.openInputStream(uri)
+                        ?: return@rememberLauncherForActivityResult
+                    bytes = input.readBytes()
+                    input.close()
+                }
+
                 val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
                 viewModel.sendAttachment(filename, base64)
                 viewModel.showMessage("Attachment sent")
