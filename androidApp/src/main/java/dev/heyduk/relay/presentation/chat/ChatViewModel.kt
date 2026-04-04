@@ -27,6 +27,8 @@ class ChatViewModel(
     private val kuerzel: String
 ) : ViewModel() {
 
+    data class PendingAttachment(val filename: String, val base64Data: String)
+
     data class ChatUiState(
         val messages: List<ChatMessage> = emptyList(),
         val kuerzel: String = "",
@@ -36,7 +38,8 @@ class ChatViewModel(
         val ttsPlayingMessageId: Long? = null,
         val isRecording: Boolean = false,
         val isTranscribing: Boolean = false,
-        val transcriptPreview: String? = null
+        val transcriptPreview: String? = null,
+        val pendingAttachment: PendingAttachment? = null
     )
 
     private data class LocalState(
@@ -44,7 +47,8 @@ class ChatViewModel(
         val errorMessage: String? = null,
         val isRecording: Boolean = false,
         val isTranscribing: Boolean = false,
-        val transcriptPreview: String? = null
+        val transcriptPreview: String? = null,
+        val pendingAttachment: PendingAttachment? = null
     )
 
     private val _localState = MutableStateFlow(LocalState())
@@ -67,7 +71,8 @@ class ChatViewModel(
             ttsPlayingMessageId = ttsId,
             isRecording = local.isRecording,
             isTranscribing = local.isTranscribing,
-            transcriptPreview = local.transcriptPreview
+            transcriptPreview = local.transcriptPreview,
+            pendingAttachment = local.pendingAttachment
         )
     }.stateIn(
         scope = viewModelScope,
@@ -91,13 +96,21 @@ class ChatViewModel(
         }
     }
 
-    /** Send a text message to the current session. */
+    /** Send a text message (and pending attachment if any) to the current session. */
     fun sendMessage(text: String) {
-        if (text.isBlank()) return
+        val attachment = _localState.value.pendingAttachment
+        if (text.isBlank() && attachment == null) return
         viewModelScope.launch {
-            _localState.update { it.copy(isSending = true, errorMessage = null) }
+            _localState.update { it.copy(isSending = true, errorMessage = null, pendingAttachment = null) }
             try {
-                chatRepository.sendMessage(kuerzel, text)
+                // Send attachment first if staged
+                if (attachment != null) {
+                    chatRepository.sendAttachment(kuerzel, attachment.filename, attachment.base64Data)
+                }
+                // Then send the text message (or just the attachment path if no text)
+                if (text.isNotBlank()) {
+                    chatRepository.sendMessage(kuerzel, text)
+                }
             } catch (e: Exception) {
                 _localState.update { it.copy(errorMessage = "Send failed: ${e.message}") }
             } finally {
@@ -111,15 +124,14 @@ class ChatViewModel(
         _localState.update { it.copy(errorMessage = text) }
     }
 
-    /** Send a file attachment to the current session. */
-    fun sendAttachment(filename: String, base64Data: String) {
-        viewModelScope.launch {
-            try {
-                chatRepository.sendAttachment(kuerzel, filename, base64Data)
-            } catch (e: Exception) {
-                _localState.update { it.copy(errorMessage = "Attachment failed: ${e.message}") }
-            }
-        }
+    /** Stage a file for sending with the next message. */
+    fun stageAttachment(filename: String, base64Data: String) {
+        _localState.update { it.copy(pendingAttachment = PendingAttachment(filename, base64Data)) }
+    }
+
+    /** Remove the staged attachment. */
+    fun clearAttachment() {
+        _localState.update { it.copy(pendingAttachment = null) }
     }
 
     /** Answer a permission callback (Allow/Deny). */

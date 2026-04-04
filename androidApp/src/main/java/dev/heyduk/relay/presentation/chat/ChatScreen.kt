@@ -100,10 +100,9 @@ fun ChatScreen(
                 }
 
                 val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
-                viewModel.sendAttachment(filename, base64)
-                viewModel.showMessage("Attachment sent")
+                viewModel.stageAttachment(filename, base64)
             } catch (_: Exception) {
-                viewModel.showMessage("Failed to send attachment")
+                viewModel.showMessage("Failed to load file")
             }
         }
     }
@@ -169,6 +168,8 @@ fun ChatScreen(
                         onMicPressed = { handleMicPress() },
                         onMicReleased = { viewModel.stopRecording() },
                         onAttach = { filePickerLauncher.launch("*/*") },
+                        pendingAttachmentName = uiState.pendingAttachment?.filename,
+                        onClearAttachment = viewModel::clearAttachment,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
