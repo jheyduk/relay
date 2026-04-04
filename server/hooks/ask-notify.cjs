@@ -2,7 +2,25 @@
 // PreToolUse(AskUserQuestion) hook: sends question notifications to relay via IPC.
 // Includes structured question_data for interactive UI rendering in Phase 8.
 
+const { execFileSync } = require('child_process');
 const { sendRelay, getKuerzel } = require('./send-relay.cjs');
+
+/**
+ * Get the last response from a session via zellij-claude CLI.
+ * Provides context for why a question is being asked.
+ */
+function getLastResponse(kuerzel, count = 1) {
+  try {
+    return execFileSync('npx', ['zellij-claude', 'last', `@${kuerzel}`, String(count)], {
+      encoding: 'utf8', timeout: 10000, stdio: ['pipe', 'pipe', 'pipe']
+    }).trim() || null;
+  } catch { return null; }
+}
+
+function truncate(text, max) {
+  if (text.length <= max) return text;
+  return text.slice(0, max) + '\n…(truncated)';
+}
 
 function formatQuestion(kuerzel, q) {
   const header = q.header ? `[${q.header}] ` : '';
@@ -31,6 +49,10 @@ process.stdin.on('end', async () => {
     const kuerzel = getKuerzel(data.session_id);
     if (!kuerzel) { process.exit(0); } // Not a zellij-claude session
 
+    // Fetch last assistant output as context for the question
+    const lastOutput = getLastResponse(kuerzel, 1);
+    const context = lastOutput ? truncate(lastOutput, 1500) : null;
+
     const questions = data.tool_input?.questions;
     if (questions && questions.length > 0) {
       for (const q of questions) {
@@ -39,6 +61,7 @@ process.stdin.on('end', async () => {
           type: 'question',
           session: kuerzel,
           message: text,
+          context,
           question_data: {
             question: q.question,
             header: q.header || null,
@@ -56,6 +79,7 @@ process.stdin.on('end', async () => {
         type: 'question',
         session: kuerzel,
         message: fallbackText,
+        context,
         question_data: {
           question: question,
           header: null,

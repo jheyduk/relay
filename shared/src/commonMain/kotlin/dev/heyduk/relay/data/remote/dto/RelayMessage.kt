@@ -11,6 +11,7 @@ data class RelayMessage(
     val message: String = "",
     val text: String? = null,
     @SerialName("tool_details") val toolDetails: ToolDetails? = null,
+    val context: String? = null,
     @SerialName("question_data") val questionData: QuestionDataDto? = null,
     val timestamp: Long = 0,
     @SerialName("__relay") val relayMarker: Boolean? = null

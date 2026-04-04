@@ -40,7 +40,8 @@ object RelayMessageParser {
                         question = qd.question,
                         header = qd.header,
                         multiSelect = qd.multiSelect,
-                        options = qd.options.map { QuestionOption(it.label, it.description) }
+                        options = qd.options.map { QuestionOption(it.label, it.description) },
+                        context = relay.context
                     )
                 },
                 timestamp = if (relay.timestamp > 0) relay.timestamp else timestamp

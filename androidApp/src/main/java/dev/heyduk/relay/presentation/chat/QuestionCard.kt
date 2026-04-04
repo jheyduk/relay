@@ -91,6 +91,19 @@ fun QuestionCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+            // Context from last assistant output (if available)
+            val contextText = questionData?.context
+            if (!contextText.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = contextText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 8,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+            }
+
             Spacer(modifier = Modifier.height(4.dp))
 
             // Question text

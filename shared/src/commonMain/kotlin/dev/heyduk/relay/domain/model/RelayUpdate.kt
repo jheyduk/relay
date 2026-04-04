@@ -6,7 +6,8 @@ data class QuestionData(
     val question: String,
     val header: String? = null,
     val multiSelect: Boolean = false,
-    val options: List<QuestionOption> = emptyList()
+    val options: List<QuestionOption> = emptyList(),
+    val context: String? = null
 )
 
 data class RelayUpdate(
