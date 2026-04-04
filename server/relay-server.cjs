@@ -406,28 +406,38 @@ function deriveStatus(title) {
   return 'ready';
 }
 
-let statusPollInterval = null;
+let statusPollTimer = null;
 let lastStatusMap = new Map(); // kuerzel -> status
+let anySessionWorking = false;
+
+const POLL_IDLE = 30000;  // 30s when all sessions are ready
+const POLL_ACTIVE = 3000; // 3s when any session is working
 
 /**
- * Poll Zellij pane titles every 10s and send status updates for changed sessions.
+ * Adaptive status polling — fast when sessions are working, slow when idle.
+ * Only sends updates for changed statuses to minimize traffic.
  */
 function startStatusPolling() {
-  if (statusPollInterval) return;
+  if (statusPollTimer) return;
   const zellijSession = process.env.ZELLIJ_SESSION_NAME;
   if (!zellijSession) return;
 
-  statusPollInterval = setInterval(() => {
-    if (!appSocket || appSocket.readyState !== 1) return;
+  function poll() {
+    if (!appSocket || appSocket.readyState !== 1) {
+      statusPollTimer = setTimeout(poll, POLL_IDLE);
+      return;
+    }
 
     execFile('zellij', ['--session', zellijSession, 'action', 'list-panes', '--json', '--tab', '--state'], {
       timeout: 5000,
       encoding: 'utf8',
     }, (err, stdout) => {
-      if (err) return;
+      if (err) {
+        statusPollTimer = setTimeout(poll, POLL_IDLE);
+        return;
+      }
       try {
         const panes = JSON.parse(stdout);
-        // Group by tab, pick the focused non-plugin pane per tab
         const tabStatus = new Map();
         for (const p of panes) {
           if (!p.tab_name || !p.tab_name.startsWith('@') || p.is_plugin) continue;
@@ -438,7 +448,9 @@ function startStatusPolling() {
         }
 
         // Send updates only for changed statuses
+        anySessionWorking = false;
         for (const [kuerzel, status] of tabStatus) {
+          if (status === 'working' || status === 'waiting') anySessionWorking = true;
           if (lastStatusMap.get(kuerzel) !== status) {
             lastStatusMap.set(kuerzel, status);
             appSocket.send(JSON.stringify({
@@ -452,16 +464,36 @@ function startStatusPolling() {
           }
         }
       } catch {}
+
+      // Schedule next poll — fast if active, slow if idle
+      const nextInterval = anySessionWorking ? POLL_ACTIVE : POLL_IDLE;
+      statusPollTimer = setTimeout(poll, nextInterval);
     });
-  }, 10000);
+  }
+
+  // Start first poll immediately
+  poll();
 }
 
 function stopStatusPolling() {
-  if (statusPollInterval) {
-    clearInterval(statusPollInterval);
-    statusPollInterval = null;
+  if (statusPollTimer) {
+    clearTimeout(statusPollTimer);
+    statusPollTimer = null;
   }
   lastStatusMap.clear();
+  anySessionWorking = false;
+}
+
+/**
+ * Trigger an immediate status poll (e.g. after receiving a command from the app).
+ */
+function triggerImmediatePoll() {
+  if (statusPollTimer) {
+    clearTimeout(statusPollTimer);
+    statusPollTimer = null;
+  }
+  // Short delay to let zellij process the input
+  setTimeout(() => startStatusPolling(), 500);
 }
 
 // --- Attachments ---
@@ -620,8 +652,22 @@ wss.on('connection', (ws, req) => {
       process.stderr.write(`[relay-server] Received: ${JSON.stringify(msg).slice(0,200)}\n`);
 
       if (msg.action === 'command') {
+        // Optimistic status: set session to working immediately
+        if (msg.kuerzel && lastStatusMap.get(msg.kuerzel) !== 'working') {
+          lastStatusMap.set(msg.kuerzel, 'working');
+          appSocket.send(JSON.stringify({
+            type: 'status',
+            session: msg.kuerzel,
+            status: 'working',
+            message: `Session ${msg.kuerzel} working`,
+            timestamp: Date.now(),
+            __relay: true,
+          }));
+        }
         // Dispatch command directly via Zellij write-chars
         dispatchCommand(msg.kuerzel, msg.message);
+        // Switch to fast polling to catch when it's done
+        triggerImmediatePoll();
       } else if (msg.action === 'raw_command') {
         if (msg.command === 'ls') {
           // List sessions directly from Zellij tabs
