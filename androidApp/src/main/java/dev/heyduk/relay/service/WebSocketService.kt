@@ -58,7 +58,7 @@ class WebSocketService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
-        val notification = buildNotification("Connecting...")
+        val notification = buildNotification("Connected")
         startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
 
         // Guard against multiple connection loops from repeated startService() calls
@@ -125,9 +125,8 @@ class WebSocketService : Service() {
                 webSocketClient.connectionState.collect { state ->
                     when (state) {
                         ConnectionState.CONNECTED -> {
-                            // Reset warning notification if it was shown
                             if (disconnectedSince > 0L) {
-                                updateNotification("Relay", warn = false)
+                                updateNotification("Connected", warn = false)
                             }
                             disconnectedSince = 0L
                         }
