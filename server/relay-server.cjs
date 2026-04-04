@@ -418,7 +418,7 @@ async function transcribeAudio(kuerzel, audioBuffer) {
     fs.writeFileSync(tmpFile, audioBuffer);
 
     const transcript = await new Promise((resolve, reject) => {
-      execFile(config.whisper_cli, ['-m', config.whisper_model, '--no-timestamps', '-nt', tmpFile], {
+      execFile(config.whisper_cli, ['-m', config.whisper_model, '--no-timestamps', '-nt', '-l', config.whisper_language || 'de', tmpFile], {
         timeout: 30000,
         encoding: 'utf8',
         maxBuffer: 1024 * 1024,
