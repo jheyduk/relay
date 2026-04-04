@@ -12,29 +12,29 @@ Relay connects your Android phone to Claude Code sessions running in [Zellij](ht
 - **Interactive prompts** — Answer single-choice, multi-choice, and free-text questions
 - **Voice input** — Record audio, transcribed on your Mac via whisper.cpp
 - **Notifications** — Permission requests (high priority) and completions with deep links
-- **Auto-discovery** — Finds your Mac automatically via mDNS on the local network
+- **File sharing** — Send screenshots and files to Claude Code from your phone
 
 ## Architecture
 
 ```
-                       WebSocket
-+-----------------+  <----------->  +---------------------+
-|                 |  mDNS discovery |                     |
-|  Android App    |                 |  relay-server       |
-|                 |                 |  (Node.js)          |
-|  Kotlin/        |                 |                     |
-|  Compose        |                 |  +---------------+  |
-|                 |                 |  | whisper.cpp   |  |
-+-----------------+                 |  +---------------+  |
-                                    |        |            |
-                                    |  zellij write       |
-                                    |        v            |
-                                    |  +---------------+  |
-                                    |  | Zellij        |  |
-                                    |  | Sessions      |  |
-                                    |  +---------------+  |
-                                    +---------------------+
-                                             Mac
+                      WebSocket
+┌────────────────┐  ◄──────────►  ┌────────────────────┐
+│                │                │                    │
+│  Android App   │                │  relay-server      │
+│                │                │  (Node.js)         │
+│  Kotlin/       │                │                    │
+│  Compose       │                │  ┌──────────────┐  │
+│                │                │  │ whisper.cpp  │  │
+└────────────────┘                │  └──────────────┘  │
+                                  │        │           │
+                                  │  zellij write      │
+                                  │        ▼           │
+                                  │  ┌──────────────┐  │
+                                  │  │ Zellij       │  │
+                                  │  │ Sessions     │  │
+                                  │  └──────────────┘  │
+                                  └────────────────────┘
+                                           Mac
 ```
 
 **App** (Kotlin Multiplatform + Jetpack Compose):
@@ -42,7 +42,7 @@ Relay connects your Android phone to Claude Code sessions running in [Zellij](ht
 - Android UI in `androidApp/` (Material 3, Dynamic Color)
 
 **Server** (Node.js):
-- `server/relay-server.cjs` — WebSocket server with mDNS, auth, command dispatch
+- `server/relay-server.cjs` — WebSocket server with auth, command dispatch, voice transcription
 - `server/hooks/` — Claude Code hooks for session lifecycle and notifications
 - `server/install.cjs` — Registers hooks in Claude Code settings
 
@@ -56,7 +56,7 @@ Relay connects your Android phone to Claude Code sessions running in [Zellij](ht
 
 **Android:**
 - Android 9+ (API 28)
-- Same WiFi network as your Mac (or WireGuard VPN)
+- Same network as your Mac (WiFi, VPN, etc.)
 
 ## Setup
 
@@ -98,8 +98,8 @@ Build from source:
 
 1. Open the Relay app
 2. Enter the shared secret from `~/.config/relay/server.json`
-3. The app discovers your Mac automatically via mDNS
-4. Optional: Enter your Mac's WireGuard IPv6 for remote access
+3. Enter your Mac's IP address (e.g., `192.168.1.100`)
+4. Tap Save — the app connects via WebSocket
 
 ## Voice Transcription
 
@@ -148,7 +148,6 @@ Server config at `~/.config/relay/server.json`:
 | Database | SQLDelight |
 | DI | Koin |
 | Server | Node.js, ws |
-| Discovery | mDNS/Bonjour |
 | Voice | whisper.cpp |
 
 ## License
