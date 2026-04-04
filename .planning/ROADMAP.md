@@ -3,7 +3,8 @@
 ## Milestones
 
 - ✅ **v1.0 MVP** - Phases 1-6 (shipped 2026-04-03)
-- 🚧 **v1.1 Standalone Server** - Phases 7-9 (in progress)
+- ✅ **v1.1 Standalone Server** - Phases 7-9 (shipped 2026-04-03)
+- 🚧 **v1.3 Session Management** - Phases 10-12 (in progress)
 
 ## Phases
 
@@ -14,7 +15,7 @@
 Decimal phases appear between their surrounding integers in numeric order.
 
 <details>
-<summary>✅ v1.0 MVP (Phases 1-6) - SHIPPED 2026-04-03</summary>
+<summary>v1.0 MVP (Phases 1-6) - SHIPPED 2026-04-03</summary>
 
 ### Phase 1: Transport & Foundation
 **Goal**: The app can connect to the Telegram Bot API, receive messages reliably, and survive network transitions -- with the 409 single-consumer conflict fully resolved
@@ -78,66 +79,87 @@ Plans:
 
 </details>
 
-### 🚧 v1.1 Standalone Server (In Progress)
-
-**Milestone Goal:** Make relay-server a standalone component in the relay repo, eliminate zellij-claude dependency, add interactive AskUserQuestion controls, and move voice transcription to the Mac for speed.
-
-- [ ] **Phase 7: Server Migration** - Move relay-server and hooks to relay repo with direct Zellij dispatching
-- [ ] **Phase 8: Interactive Controls & Reconnect** - AskUserQuestion keystroke mapping and session sync on reconnect
-- [ ] **Phase 9: Mac-Side Voice** - Server-side Whisper transcription replacing on-device processing
-
-## Phase Details
+<details>
+<summary>v1.1 Standalone Server (Phases 7-9) - SHIPPED 2026-04-03</summary>
 
 ### Phase 7: Server Migration
 **Goal**: relay-server is a standalone Node.js component in the relay repo that dispatches directly to Zellij -- no dependency on zellij-claude for anything except Claude Code itself
-**Depends on**: Phase 6 (WebSocket transport)
 **Requirements**: SERV-01, SERV-02, SERV-03, SERV-05
-**Success Criteria** (what must be TRUE):
-  1. relay-server.cjs runs from `server/` in the relay repo with its own package.json and dependencies
-  2. Hooks (session-start, session-stop, permission-notify, ask-notify) live in `server/hooks/` and reference relay-server directly (not zellij-claude)
-  3. Server dispatches user responses to sessions via `zellij action write-chars` instead of `npx zellij-claude send`
-  4. zellij-claude hooks directory no longer contains relay-server or relay-specific hooks
 **Plans**: 3 plans
 
 Plans:
 - [x] 07-01-PLAN.md -- Standalone relay-server.cjs with package.json and direct Zellij dispatch
 - [x] 07-02-PLAN.md -- Migrate hooks to server/hooks/ with standalone sendRelay (no Telegram)
-- [ ] 07-03-PLAN.md -- Hook installer and zellij-claude cleanup
+- [x] 07-03-PLAN.md -- Hook installer and zellij-claude cleanup
 
 ### Phase 8: Interactive Controls & Reconnect
 **Goal**: Users can fully answer AskUserQuestion prompts from the app (single choice, multiple choice, free text) and see existing sessions after reconnecting
-**Depends on**: Phase 7 (direct Zellij dispatch needed for keystroke sequences)
 **Requirements**: CTRL-01, CTRL-02, CTRL-03, SERV-04
-**Success Criteria** (what must be TRUE):
-  1. User can answer a single-choice AskUserQuestion by tapping an option, which sends the correct number key + Enter as keystrokes to the session
-  2. User can answer a multiple-choice AskUserQuestion by toggling options (number keys), navigating to Submit (Down arrow), and confirming (Enter)
-  3. User can answer a free-text AskUserQuestion by selecting Other (Down + Enter), typing text, and confirming (Enter)
-  4. User sees all active sessions immediately after the app reconnects to relay-server (no manual /ls needed)
 **Plans**: 2 plans
 
 Plans:
 - [x] 08-01-PLAN.md -- Server answer action handler with keystroke computation + reconnect sync
 - [x] 08-02-PLAN.md -- App answer protocol (DTOs, transport, repository) + QuestionCard UI overhaul
-**UI hint**: yes
 
 ### Phase 9: Mac-Side Voice
 **Goal**: Voice transcription happens on the Mac (fast, high quality) instead of the phone -- the app streams audio to the server and receives text back
-**Depends on**: Phase 7 (server must be in relay repo to add Whisper capability)
 **Requirements**: VOIC-10, VOIC-11, VOIC-12
-**Success Criteria** (what must be TRUE):
-  1. User can hold-to-record and audio data is sent over WebSocket to relay-server (not transcribed on device)
-  2. Server transcribes received audio locally via whisper.cpp and sends the transcript back to the app
-  3. APK no longer bundles the 141 MB Whisper model -- on-device transcription code is removed
 **Plans**: 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md -- Server-side audio receive and whisper-cli transcription
+- [x] 09-01-PLAN.md -- Server-side audio receive and whisper-cli transcription
 - [x] 09-02-PLAN.md -- App sends audio to server, removes on-device Whisper (141 MB savings)
+
+</details>
+
+### v1.3 Session Management (In Progress)
+
+**Milestone Goal:** Create new Claude Code sessions from the app with FZF-style fuzzy directory search and improve response handling in session-stop hooks.
+
+- [ ] **Phase 10: Server Config & Protocol** - Server-side config, directory listing, and session creation handlers
+- [ ] **Phase 11: Session Creation UI** - Fullscreen dialog with fuzzy search, confirmation, and session launch
+- [ ] **Phase 12: Smart Response Handling** - Size-aware response logic replacing legacy truncation
+
+## Phase Details
+
+### Phase 10: Server Config & Protocol
+**Goal**: Server can read project root configuration, scan directories, and create new Claude Code sessions on request from the app
+**Depends on**: Phase 9 (relay-server in relay repo)
+**Requirements**: CONF-01, CONF-02, CONF-03
+**Success Criteria** (what must be TRUE):
+  1. Server reads project roots from `~/.config/relay/project-roots.json` on each `list_directories` request (with sensible defaults if file is missing)
+  2. Server returns a flat list of directories scanned 2 levels deep from configured roots via the `directory_list` WebSocket message
+  3. Server handles `create_session` action: validates path, deduplicates kuerzel against existing zellij tabs, and creates a new `@kuerzel` tab with `claude` running in it
+  4. Newly created session triggers existing session-start hook automatically, making it appear in the app's session list
+**Plans**: TBD
+
+### Phase 11: Session Creation UI
+**Goal**: Users can create a new Claude Code session from the app by selecting a project directory and confirming session parameters
+**Depends on**: Phase 10 (server protocol must exist)
+**Requirements**: SESS-01, SESS-02, SESS-03, SESS-04, SESS-05, SESS-06, SESS-07
+**Success Criteria** (what must be TRUE):
+  1. User can open the session creation dialog from a FAB (+) on the session list screen or from the navigation drawer
+  2. User can fuzzy-search project directories with instant filtering as they type (no network roundtrip per keystroke)
+  3. User sees a confirmation dialog with editable kuerzel, the selected path, and a toggle for `--dangerously-skip-permissions`
+  4. User can enter a custom path not in the directory list and proceed to confirmation
+  5. User taps "Create" and the app navigates to the new session after successful creation (or shows an error on failure)
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 12: Smart Response Handling
+**Goal**: Session-stop notifications include complete or intelligently sized responses instead of hard-truncated text
+**Depends on**: Nothing (independent of session creation)
+**Requirements**: RESP-01
+**Success Criteria** (what must be TRUE):
+  1. When a session stops and the last response is 4 KB or less, both last responses are included in the notification (untruncated)
+  2. When a session stops and the combined responses exceed 4 KB, only the last response is sent (untruncated up to 16 KB)
+  3. Responses exceeding 16 KB are truncated with a visible marker instead of silently cutting off at 2000 characters
+**Plans**: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 7 -> 8 -> 9
+Phases execute in numeric order: 10 -> 11 -> 12
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -147,6 +169,9 @@ Phases execute in numeric order: 7 -> 8 -> 9
 | 4. Permissions & Notifications | v1.0 | 3/3 | Complete | 2026-04-02 |
 | 5. Voice Pipeline | v1.0 | 3/3 | Complete | 2026-04-02 |
 | 6. Direct WebSocket Transport | v1.0 | 4/4 | Complete | 2026-04-03 |
-| 7. Server Migration | v1.1 | 0/3 | Planning | - |
+| 7. Server Migration | v1.1 | 3/3 | Complete | 2026-04-03 |
 | 8. Interactive Controls & Reconnect | v1.1 | 2/2 | Complete | 2026-04-03 |
-| 9. Mac-Side Voice | v1.1 | 0/2 | Planning | - |
+| 9. Mac-Side Voice | v1.1 | 2/2 | Complete | 2026-04-03 |
+| 10. Server Config & Protocol | v1.3 | 0/0 | Not started | - |
+| 11. Session Creation UI | v1.3 | 0/0 | Not started | - |
+| 12. Smart Response Handling | v1.3 | 0/0 | Not started | - |

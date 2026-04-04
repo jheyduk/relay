@@ -48,23 +48,23 @@ Requirements for Session Management milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SESS-01 | — | Pending |
-| SESS-02 | — | Pending |
-| SESS-03 | — | Pending |
-| SESS-04 | — | Pending |
-| SESS-05 | — | Pending |
-| SESS-06 | — | Pending |
-| SESS-07 | — | Pending |
-| CONF-01 | — | Pending |
-| CONF-02 | — | Pending |
-| CONF-03 | — | Pending |
-| RESP-01 | — | Pending |
+| SESS-01 | Phase 11 | Pending |
+| SESS-02 | Phase 11 | Pending |
+| SESS-03 | Phase 11 | Pending |
+| SESS-04 | Phase 11 | Pending |
+| SESS-05 | Phase 11 | Pending |
+| SESS-06 | Phase 11 | Pending |
+| SESS-07 | Phase 11 | Pending |
+| CONF-01 | Phase 10 | Pending |
+| CONF-02 | Phase 10 | Pending |
+| CONF-03 | Phase 10 | Pending |
+| RESP-01 | Phase 12 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-04*
-*Last updated: 2026-04-04 after initial definition*
+*Last updated: 2026-04-04 after roadmap creation*
