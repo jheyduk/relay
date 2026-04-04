@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.heyduk.relay.data.repository.ChatRepository
 import dev.heyduk.relay.domain.model.ChatMessage
+import dev.heyduk.relay.domain.model.RelayMessageType
 import dev.heyduk.relay.voice.AudioRecorder
 import dev.heyduk.relay.voice.TtsManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,8 +56,10 @@ class ChatViewModel(
         _sendingCallbacks,
         ttsManager.speakingMessageId
     ) { messages, local, sendingIds, ttsId ->
+        // Filter out STATUS messages — they're for the session list, not the conversation
+        val filtered = messages.filter { it.type != RelayMessageType.STATUS }
         ChatUiState(
-            messages = messages,
+            messages = filtered,
             kuerzel = kuerzel,
             isSending = local.isSending,
             errorMessage = local.errorMessage,
