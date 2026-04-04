@@ -142,7 +142,7 @@ Plans:
 **Depends on**: Phase 10 (server protocol must exist)
 **Requirements**: SESS-01, SESS-02, SESS-03, SESS-04, SESS-05, SESS-06, SESS-07
 **Success Criteria** (what must be TRUE):
-  1. User can open the session creation dialog from a FAB (+) on the session list screen or from the navigation drawer
+  1. User can open the session creation dialog from a FAB (+) on the session list screen (SESS-02 superseded — drawer removed)
   2. User can fuzzy-search project directories with instant filtering as they type (no network roundtrip per keystroke)
   3. User sees a confirmation dialog with editable kuerzel, the selected path, and a toggle for `--dangerously-skip-permissions`
   4. User can enter a custom path not in the directory list and proceed to confirmation
@@ -150,9 +150,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [x] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
-- [x] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
-**UI hint**: yes
+- [ ] 11-01-PLAN.md — Protocol DTOs, parser, domain models, WebSocket send methods (SESS-01, SESS-02, SESS-03, SESS-07)
+- [ ] 11-02-PLAN.md — FuzzyMatch, CreateSessionViewModel, CreateSessionDialog, FAB entry point (SESS-01, SESS-03, SESS-04, SESS-05, SESS-06, SESS-07)
 
 ### Phase 12: Smart Response Handling
 **Goal**: Session-stop notifications include complete or intelligently sized responses instead of hard-truncated text
@@ -162,11 +161,7 @@ Plans:
   1. When a session stops and the last response is 4 KB or less, both last responses are included in the notification (untruncated)
   2. When a session stops and the combined responses exceed 4 KB, only the last response is sent (untruncated up to 16 KB)
   3. Responses exceeding 16 KB are truncated with a visible marker instead of silently cutting off at 2000 characters
-**Plans**: 2 plans
-
-Plans:
-- [ ] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
-- [ ] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
+**Plans**: [To be planned]
 
 ## Progress
 
@@ -184,6 +179,6 @@ Phases execute in numeric order: 10 -> 11 -> 12
 | 7. Server Migration | v1.1 | 3/3 | Complete | 2026-04-03 |
 | 8. Interactive Controls & Reconnect | v1.1 | 2/2 | Complete | 2026-04-03 |
 | 9. Mac-Side Voice | v1.1 | 2/2 | Complete | 2026-04-03 |
-| 10. Server Config & Protocol | v1.3 | 0/0 | Complete    | 2026-04-04 |
-| 11. Session Creation UI | v1.3 | 0/0 | Not started | - |
+| 10. Server Config & Protocol | v1.3 | 2/2 | Complete    | 2026-04-04 |
+| 11. Session Creation UI | v1.3 | 0/2 | Not started | - |
 | 12. Smart Response Handling | v1.3 | 0/0 | Not started | - |
