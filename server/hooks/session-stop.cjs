@@ -46,6 +46,15 @@ async function notify(kuerzel, data) {
   const message = lastResponse
     ? truncate(lastResponse, 2000)
     : 'Task complete';
+  // Send status back to ready
+  await sendRelay({
+    type: 'status',
+    session: kuerzel,
+    status: 'ready',
+    message: `Session ${kuerzel} ready`,
+    timestamp: Date.now(),
+  });
+  // Send completion with last responses
   await sendRelay({
     type: 'completion',
     session: kuerzel,

@@ -60,7 +60,7 @@ process.stdin.on('end', async () => {
         await sendRelay({
           type: 'status',
           session: kuerzel,
-          status: 'ready',
+          status: 'working',
           message: `Session ${kuerzel} started`,
           timestamp: Date.now(),
         });
