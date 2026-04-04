@@ -180,5 +180,5 @@ Phases execute in numeric order: 10 -> 11 -> 12
 | 8. Interactive Controls & Reconnect | v1.1 | 2/2 | Complete | 2026-04-03 |
 | 9. Mac-Side Voice | v1.1 | 2/2 | Complete | 2026-04-03 |
 | 10. Server Config & Protocol | v1.3 | 2/2 | Complete    | 2026-04-04 |
-| 11. Session Creation UI | v1.3 | 2/2 | Complete   | 2026-04-04 |
+| 11. Session Creation UI | v1.3 | 2/2 | Complete    | 2026-04-04 |
 | 12. Smart Response Handling | v1.3 | 0/0 | Not started | - |
