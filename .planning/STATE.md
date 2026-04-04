@@ -2,88 +2,91 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Standalone Server
-status: verifying
-stopped_at: Completed 09-02-PLAN.md
-last_updated: "2026-04-03T23:32:35.122Z"
-last_activity: 2026-04-03
+status: complete
+stopped_at: v1.1 complete + post-release fixes
+last_updated: "2026-04-04T09:45:00.000Z"
+last_activity: 2026-04-04
 progress:
   total_phases: 3
   completed_phases: 3
   total_plans: 7
   completed_plans: 7
-  percent: 0
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-03)
+See: .planning/PROJECT.md (updated 2026-04-04)
 
 **Core value:** Remote session control with per-session separation -- see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
-**Current focus:** Phase 08 — interactive-controls-reconnect
+**Current focus:** Post-v1.1 polish and bug fixes
 
 ## Current Position
 
-Phase: 09
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-03
+Phase: All v1.1 phases complete
+Plan: Post-release fixes applied directly
+Status: Shipping
+Last activity: 2026-04-04 -- Theme settings, file attachments, auto-scroll, status filtering, README, app icon
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity (v1.0):**
-
 - Total plans completed: 18
 - Average duration: ~3.5 min
 - Total execution time: ~1.1 hours
 
-**By Phase (v1.1):**
+**Velocity (v1.1):**
+- Total plans completed: 7
+- Phases: 3 (server migration, interactive controls, mac-side voice)
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
-
-**Recent Trend (v1.0):**
-
-- Last 5 plans: 3min, 5min, 2min, 5min, 3min
-- Trend: Stable
-
-*Updated after each plan completion*
-| Phase 08 P01 | 2min | 2 tasks | 1 files |
-| Phase 08 P02 | 6min | 3 tasks | 14 files |
-| Phase 09 P02 | 4min | 2 tasks | 12 files |
+**Post-v1.1 direct fixes:**
+- Theme settings (System/Light/Dark)
+- File attachment support (Büroklammer → file picker → server → Claude Code Read)
+- Chat auto-scroll to latest messages
+- STATUS messages filtered from chat
+- Session-stop includes last 2 responses
+- Message bubble redesign
+- App icon (terminal + phone + signal waves)
+- Notification icon (terminal cursor)
+- README with architecture diagram
+- Server IP field renamed from WireGuard IP
+- Whisper language set to German
+- mDNS references removed
+- Multiple AskUserQuestion keystroke fixes (Down+Space, auto-submit, no extra Enter)
+- zellij write 13 for Enter (not \n)
+- isBinary check for ws 8.x
+- usesCleartextTraffic for ws:// connections
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- [v1.1 Roadmap]: Server migration (Phase 7) before interactive controls -- direct Zellij dispatch is prerequisite for keystroke mapping
-- [v1.1 Roadmap]: SERV-04 (reconnect sync) grouped with CTRL-* not SERV-* -- reconnect sync is a UX feature, not server infrastructure
-- [v1.1 Roadmap]: Mac-side voice (Phase 9) last -- independent feature, can ship v1.1 without it if needed
-- [Phase 08]: 50ms delay between multi-select toggle keystrokes for TUI processing
-- [Phase 08]: In-memory questionDataCache for transient live question data (not DB-persisted)
-- [Phase 08]: Dual Koin registration (concrete + interface) for ChatRepositoryImpl cache access
-- [Phase 08]: buildJsonObject for sendAnswer payload (kotlinx.serialization cannot encode Map<String, Any>)
-- [Phase 09]: Transcript messages skip DB persistence, flow directly to ViewModel via SharedFlow
-- [Phase 09]: Binary frame protocol: 2-byte big-endian kuerzel length + UTF-8 kuerzel + WAV payload
+- [v1.1]: relay-server moved to server/ in relay repo -- independent from zellij-claude
+- [v1.1]: Hooks dispatch via zellij action write-chars + write 13 (never \n in write-chars)
+- [v1.1]: ws 8.x isBinary parameter to distinguish text from binary frames
+- [v1.1]: Multi-select: Down+Space to toggle, not number keys
+- [v1.1]: Single-choice: number key only, no Enter (auto-confirms)
+- [v1.1]: Multi-question: server counts questions per session, auto-submits after last answer
+- [v1.1]: Mac-side Whisper with medium model, language configurable (default: de)
+- [Post-v1.1]: mDNS removed -- unreliable, IP-based connection instead
+- [Post-v1.1]: Images resized to max 1920px for Claude Code Read tool limit
+- [Post-v1.1]: File attachments saved to /tmp/relay-attachments/ with auto-detected extension
+- [Post-v1.1]: Published on GitHub: https://github.com/jheyduk/relay
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- [Phase 7]: relay-server.cjs currently in zellij-claude repo -- need to understand hook registration mechanism for migration
-- [Phase 9]: whisper.cpp must be compiled/available on Mac -- need to verify installation path
+None -- all v1.0 and v1.1 blockers resolved.
 
 ## Session Continuity
 
-Last session: 2026-04-03T17:17:36.232Z
-Stopped at: Completed 09-02-PLAN.md
+Last session: 2026-04-04T09:45:00.000Z
+Stopped at: Post-v1.1 polish complete
 Resume file: None
