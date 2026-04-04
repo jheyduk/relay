@@ -24,6 +24,9 @@ interface ChatRepository {
     /** Send audio data to the server for transcription. */
     suspend fun sendAudio(kuerzel: String, audioData: ByteArray)
 
+    /** Send a file attachment. Server saves and types path into the session. */
+    suspend fun sendAttachment(kuerzel: String, filename: String, base64Data: String)
+
     /** Flow of incoming transcript updates from the server (type=TRANSCRIPT). */
     val transcripts: Flow<RelayUpdate>
 }

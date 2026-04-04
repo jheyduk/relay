@@ -52,6 +52,7 @@ class WebSocketClient(
      * @param secret Authentication token appended as query parameter
      */
     suspend fun connectWithRetry(serverUrl: String, secret: String) {
+        println("WebSocketClient@${hashCode()}: connectWithRetry starting")
         var backoffMs = 0L
 
         while (currentCoroutineContext().isActive) {
@@ -107,10 +108,17 @@ class WebSocketClient(
      * Silently fails if the session is not connected or closing.
      */
     suspend fun send(message: String) {
+        val s = session
+        println("WebSocketClient@${hashCode()}: send() called, session=${s != null}, state=${_connectionState.value}, msg=${message.take(80)}")
+        if (s == null) {
+            println("WebSocketClient: send DROPPED (no session)")
+            return
+        }
         try {
-            session?.send(Frame.Text(message))
-        } catch (_: Exception) {
-            // WebSocket may be closing — ignore send failures
+            s.send(Frame.Text(message))
+            println("WebSocketClient: send OK")
+        } catch (e: Exception) {
+            println("WebSocketClient: send ERROR: ${e.message}")
         }
     }
 
@@ -132,6 +140,20 @@ class WebSocketClient(
      *
      * @param command The raw command to send
      */
+    /**
+     * Sends a file attachment as base64-encoded data.
+     * Server saves it and types the path into the session.
+     */
+    suspend fun sendAttachment(kuerzel: String, filename: String, base64Data: String) {
+        val payload = buildJsonObject {
+            put("action", "attachment")
+            put("kuerzel", kuerzel)
+            put("filename", filename)
+            put("data", base64Data)
+        }
+        send(payload.toString())
+    }
+
     suspend fun sendRawCommand(command: String) {
         val payload = json.encodeToString(
             mapOf("action" to "raw_command", "command" to command)

@@ -56,6 +56,10 @@ class RelayRepositoryImpl(
     override suspend fun sendAudio(kuerzel: String, audioData: ByteArray) {
         webSocketClient.sendAudio(kuerzel, audioData)
     }
+
+    override suspend fun sendAttachment(kuerzel: String, filename: String, base64Data: String) {
+        webSocketClient.sendAttachment(kuerzel, filename, base64Data)
+    }
 }
 
 /**

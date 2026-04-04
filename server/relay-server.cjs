@@ -393,6 +393,38 @@ function sendReconnectSync() {
   }
 }
 
+// --- Attachments ---
+
+/**
+ * Save an attachment from the app and dispatch the file path to the session.
+ * The file is saved to /tmp/relay-attachments/ and the path is typed into the terminal
+ * so Claude Code can read it with the Read tool.
+ */
+async function handleAttachment(kuerzel, filename, base64Data) {
+  if (!kuerzel || !filename || !base64Data) {
+    process.stderr.write('[relay-server] attachment: missing kuerzel, filename, or data\n');
+    return;
+  }
+
+  const dir = '/tmp/relay-attachments';
+  try { fs.mkdirSync(dir, { recursive: true }); } catch {}
+
+  // Sanitize filename and add timestamp to avoid collisions
+  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const destPath = `${dir}/${Date.now()}-${safeName}`;
+
+  try {
+    const buffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(destPath, buffer);
+    process.stderr.write(`[relay-server] Attachment saved: ${destPath} (${buffer.length} bytes)\n`);
+
+    // Type the file path into the session so Claude Code can read it
+    await dispatchCommand(kuerzel, destPath);
+  } catch (err) {
+    process.stderr.write(`[relay-server] attachment error: ${err.message}\n`);
+  }
+}
+
 // --- Audio Transcription ---
 
 /**
@@ -524,6 +556,8 @@ wss.on('connection', (ws, req) => {
         }
 
         dispatchAnswer(msg.kuerzel, msg);
+      } else if (msg.action === 'attachment') {
+        handleAttachment(msg.kuerzel, msg.filename, msg.data);
       }
     } catch {
       // Malformed message — ignore

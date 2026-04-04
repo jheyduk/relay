@@ -106,6 +106,17 @@ class ChatViewModel(
         }
     }
 
+    /** Send a file attachment to the current session. */
+    fun sendAttachment(filename: String, base64Data: String) {
+        viewModelScope.launch {
+            try {
+                chatRepository.sendAttachment(kuerzel, filename, base64Data)
+            } catch (e: Exception) {
+                _localState.update { it.copy(errorMessage = "Attachment failed: ${e.message}") }
+            }
+        }
+    }
+
     /** Answer a permission callback (Allow/Deny). */
     fun answerCallback(messageId: Long, response: String) {
         viewModelScope.launch {

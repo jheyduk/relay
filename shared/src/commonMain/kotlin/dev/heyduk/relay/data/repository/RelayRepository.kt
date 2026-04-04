@@ -33,4 +33,7 @@ interface RelayRepository {
 
     /** Send audio data to the server for transcription via binary WebSocket frame. */
     suspend fun sendAudio(kuerzel: String, audioData: ByteArray)
+
+    /** Send a file attachment. Server saves it and types the path into the session. */
+    suspend fun sendAttachment(kuerzel: String, filename: String, base64Data: String)
 }

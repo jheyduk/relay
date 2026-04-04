@@ -61,6 +61,23 @@ fun ChatScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val bytes = inputStream?.readBytes() ?: return@rememberLauncherForActivityResult
+                inputStream.close()
+                val filename = uri.lastPathSegment?.substringAfterLast('/') ?: "attachment"
+                val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                viewModel.sendAttachment(filename, base64)
+            } catch (e: Exception) {
+                // Ignore file read errors
+            }
+        }
+    }
+
     val audioPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -121,6 +138,7 @@ fun ChatScreen(
                         isRecording = uiState.isRecording,
                         onMicPressed = { handleMicPress() },
                         onMicReleased = { viewModel.stopRecording() },
+                        onAttach = { filePickerLauncher.launch("*/*") },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

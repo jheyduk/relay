@@ -97,6 +97,10 @@ class ChatRepositoryImpl(
         relayRepository.sendAudio(kuerzel, audioData)
     }
 
+    override suspend fun sendAttachment(kuerzel: String, filename: String, base64Data: String) {
+        relayRepository.sendAttachment(kuerzel, filename, base64Data)
+    }
+
     override val transcripts: Flow<RelayUpdate> = relayRepository.updates
         .filter { it.type == RelayMessageType.TRANSCRIPT }
 

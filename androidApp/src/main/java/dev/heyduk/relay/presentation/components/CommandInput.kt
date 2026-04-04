@@ -1,13 +1,10 @@
 package dev.heyduk.relay.presentation.components
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,10 +22,7 @@ import androidx.compose.ui.unit.dp
 import dev.heyduk.relay.presentation.chat.VoiceRecordButton
 
 /**
- * Persistent bottom bar command input.
- *
- * Shows @kuerzel prefix when a session is selected.
- * The ViewModel handles command routing -- this composable does NOT add the @prefix to the text.
+ * Persistent bottom bar command input with send, attach, and voice buttons.
  */
 @Composable
 fun CommandInput(
@@ -37,6 +31,7 @@ fun CommandInput(
     isRecording: Boolean = false,
     onMicPressed: (() -> Unit)? = null,
     onMicReleased: (() -> Unit)? = null,
+    onAttach: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var text by rememberSaveable { mutableStateOf("") }
@@ -47,15 +42,25 @@ fun CommandInput(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
         ) {
+            // Attach button
+            if (onAttach != null) {
+                IconButton(onClick = onAttach) {
+                    Icon(
+                        imageVector = Icons.Filled.AttachFile,
+                        contentDescription = "Attach file",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
             // Non-editable session prefix
             if (selectedKuerzel != null) {
                 Text(
                     text = "@$selectedKuerzel ",
                     color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 4.dp)
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
