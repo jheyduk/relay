@@ -147,6 +147,17 @@ class ChatViewModel(
         }
     }
 
+    /** Fetch the last 2 messages from the session via /last command. */
+    fun fetchLast() {
+        viewModelScope.launch {
+            try {
+                chatRepository.sendCommand(kuerzel, "/last @$kuerzel 2")
+            } catch (e: Exception) {
+                _localState.update { it.copy(errorMessage = "Fetch failed: ${e.message}") }
+            }
+        }
+    }
+
     /** Show a transient message (snackbar). */
     fun showMessage(text: String) {
         _localState.update { it.copy(errorMessage = text) }

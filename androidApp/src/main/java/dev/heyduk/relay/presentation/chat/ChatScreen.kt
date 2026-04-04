@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -193,6 +194,9 @@ fun ChatScreen(
                         }
                     },
                     actions = {
+                        IconButton(onClick = { viewModel.fetchLast() }) {
+                            Icon(Icons.Default.Refresh, contentDescription = "Fetch last messages")
+                        }
                         favorites.filter { it != kuerzel }.forEach { fav ->
                             AssistChip(
                                 onClick = { onNavigateToChat(fav) },
