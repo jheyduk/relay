@@ -109,7 +109,7 @@ class ChatViewModel(
                     val attachLabel = "\uD83D\uDCCE ${attachment.filename}"
                     val displayText = if (text.isNotBlank()) "$attachLabel\n$text" else attachLabel
                     chatRepository.insertLocalMessage(kuerzel, displayText)
-                    // Send attachment to server (saves file, types path into terminal)
+                    // Send attachment to server (saves file, types path into terminal + Enter)
                     chatRepository.sendAttachment(kuerzel, attachment.filename, attachment.base64Data)
                     // Wait for server to dispatch the file path + Enter before sending text
                     if (text.isNotBlank()) kotlinx.coroutines.delay(1500)

@@ -427,8 +427,12 @@ async function handleAttachment(kuerzel, filename, base64Data) {
     fs.writeFileSync(destPath, buffer);
     process.stderr.write(`[relay-server] Attachment saved: ${destPath} (${buffer.length} bytes)\n`);
 
-    // Type the file path into the session so Claude Code can read it
+    // Type the file path into the session and send an extra Enter so Claude Code processes it
     await dispatchCommand(kuerzel, destPath);
+    await delay(500);
+    const sessionId = findSessionForKuerzel(kuerzel);
+    const paneId = sessionId ? await findPaneForTab(sessionId, kuerzel) : null;
+    if (sessionId && paneId) await sendEnter(sessionId, paneId);
   } catch (err) {
     process.stderr.write(`[relay-server] attachment error: ${err.message}\n`);
   }
