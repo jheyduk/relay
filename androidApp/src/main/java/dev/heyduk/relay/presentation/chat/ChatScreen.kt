@@ -67,7 +67,10 @@ fun ChatScreen(
         if (uri != null) {
             try {
                 val mimeType = context.contentResolver.getType(uri)
-                val filename = uri.lastPathSegment?.substringAfterLast('/') ?: "attachment"
+                val filename = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    val idx = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                    if (idx >= 0 && cursor.moveToFirst()) cursor.getString(idx) else null
+                } ?: uri.lastPathSegment?.substringAfterLast('/') ?: "attachment"
                 val bytes: ByteArray
 
                 // Resize images to fit Claude Code's 2000x2000 Read tool limit
