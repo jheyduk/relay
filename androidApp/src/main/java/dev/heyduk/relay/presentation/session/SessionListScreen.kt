@@ -142,6 +142,7 @@ fun SessionListScreen(
                             isFavorite = session.kuerzel in uiState.favorites,
                             onToggleExpand = { viewModel.toggleCardExpanded(session.kuerzel) },
                             onToggleFavorite = { viewModel.toggleFavorite(session.kuerzel) },
+                            onFetchLast = { viewModel.fetchLastResponse(session.kuerzel) },
                             onSelect = {
                                 viewModel.selectSession(session.kuerzel)
                                 onNavigateToChat(session.kuerzel)

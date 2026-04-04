@@ -40,6 +40,7 @@ fun SessionCard(
     isFavorite: Boolean = false,
     onToggleExpand: () -> Unit,
     onToggleFavorite: () -> Unit = {},
+    onFetchLast: () -> Unit = {},
     onSelect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -84,28 +85,29 @@ fun SessionCard(
             }
 
             // Expandable /last response section
-            if (lastResponse != null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                TextButton(onClick = onToggleExpand) {
-                    Icon(
-                        imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (isExpanded) "Hide last response" else "Show last response"
-                    )
-                    Text(if (isExpanded) "Hide last response" else "Show last response")
-                }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = {
+                if (lastResponse == null) onFetchLast()
+                onToggleExpand()
+            }) {
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (isExpanded) "Hide" else "Last response"
+                )
+                Text(if (isExpanded) "Hide" else "Last")
+            }
 
-                AnimatedVisibility(visible = isExpanded) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.small,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = lastResponse,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(12.dp)
-                        )
-                    }
+            AnimatedVisibility(visible = isExpanded) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = lastResponse ?: "Loading…",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(12.dp)
+                    )
                 }
             }
         }
