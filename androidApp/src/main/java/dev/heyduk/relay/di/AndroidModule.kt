@@ -7,6 +7,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import dev.heyduk.relay.db.RelayDatabase
 import dev.heyduk.relay.presentation.chat.ChatViewModel
+import dev.heyduk.relay.presentation.session.CreateSessionViewModel
 import dev.heyduk.relay.presentation.session.SessionListViewModel
 import dev.heyduk.relay.presentation.setup.SetupViewModel
 import dev.heyduk.relay.presentation.status.StatusViewModel
@@ -51,5 +52,6 @@ val androidModule = module {
     viewModel { SetupViewModel(get()) }
     viewModel { StatusViewModel(get(), get()) }
     viewModel { SessionListViewModel(get(), get(), get(), get()) }
+    viewModel { CreateSessionViewModel(get()) }
     viewModel { params -> ChatViewModel(get(), get(), get(), params.get<String>()) }
 }
