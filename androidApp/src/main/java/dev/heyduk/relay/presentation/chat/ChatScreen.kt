@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -143,8 +144,17 @@ fun ChatScreen(
             }
         }
 
+        val listState = rememberLazyListState()
+
+        // Auto-scroll to bottom when new messages arrive
+        LaunchedEffect(uiState.messages.size) {
+            if (uiState.messages.isNotEmpty()) {
+                listState.animateScrollToItem(uiState.messages.size - 1)
+            }
+        }
+
         LazyColumn(
-            reverseLayout = true,
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
