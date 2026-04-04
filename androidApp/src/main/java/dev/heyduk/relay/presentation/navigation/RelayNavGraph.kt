@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import dev.heyduk.relay.presentation.chat.ChatScreen
 import dev.heyduk.relay.presentation.session.SessionListScreen
+import dev.heyduk.relay.presentation.settings.SettingsScreen
 import dev.heyduk.relay.presentation.setup.SetupScreen
 import dev.heyduk.relay.presentation.status.StatusScreen
 import dev.heyduk.relay.util.startWebSocketService
@@ -36,11 +37,16 @@ fun RelayNavGraph(navController: NavHostController, isConfigured: Boolean) {
         composable("sessions") {
             SessionListScreen(
                 onNavigateToSetup = {
-                    navController.navigate("setup")
+                    navController.navigate("settings")
                 },
                 onNavigateToChat = { kuerzel ->
                     navController.navigate("chat/$kuerzel")
                 }
+            )
+        }
+        composable("settings") {
+            SettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
         composable(

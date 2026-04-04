@@ -11,16 +11,22 @@ import androidx.compose.ui.platform.LocalContext
 /**
  * Relay app theme with Material 3 Dynamic Color support.
  *
- * - Follows system dark mode via [isSystemInDarkTheme] (no manual toggle).
- * - Uses Dynamic Color on Android 12+ (derives palette from wallpaper).
- * - Falls back to [LightColorScheme] / [DarkColorScheme] on older devices.
+ * Supports three modes: System (follows device), Light, Dark.
+ * Uses Dynamic Color on Android 12+ (derives palette from wallpaper).
+ * Falls back to default Material 3 schemes on older devices.
  */
 @Composable
 fun RelayTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val darkTheme = when (themeMode) {
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && darkTheme ->
             dynamicDarkColorScheme(LocalContext.current)

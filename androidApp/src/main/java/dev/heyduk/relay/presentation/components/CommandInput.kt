@@ -45,7 +45,6 @@ fun CommandInput(
         tonalElevation = 3.dp,
         modifier = modifier
     ) {
-        Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -89,7 +88,6 @@ fun CommandInput(
                     onStopRecording = onMicReleased
                 )
             }
-        }
         }
     }
 }

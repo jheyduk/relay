@@ -2,9 +2,13 @@ package dev.heyduk.relay.presentation.session
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -107,11 +111,13 @@ fun SessionListScreen(
                 )
             },
             bottomBar = {
-                CommandInput(
-                    selectedKuerzel = uiState.selectedKuerzel,
-                    onSendCommand = viewModel::handleCommandInput,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
+                    CommandInput(
+                        selectedKuerzel = uiState.selectedKuerzel,
+                        onSendCommand = viewModel::handleCommandInput,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             },
             floatingActionButton = {
                 FloatingActionButton(onClick = viewModel::refreshSessions) {

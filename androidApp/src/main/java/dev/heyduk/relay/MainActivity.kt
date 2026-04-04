@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import dev.heyduk.relay.presentation.navigation.RelayNavGraph
 import dev.heyduk.relay.presentation.theme.RelayTheme
+import dev.heyduk.relay.presentation.theme.ThemeMode
 import dev.heyduk.relay.util.RequestNotificationPermissionAndStartConnection
 import kotlinx.coroutines.flow.map
 import org.koin.android.ext.android.inject
@@ -38,7 +39,11 @@ class MainActivity : ComponentActivity() {
         pendingDeepLinkKuerzel = extractKuerzelFromIntent(intent)
 
         setContent {
-            RelayTheme {
+                val themeMode by dataStore.data
+                    .map { prefs -> ThemeMode.fromString(prefs[stringPreferencesKey("theme_mode")]) }
+                    .collectAsStateWithLifecycle(initialValue = ThemeMode.SYSTEM)
+
+            RelayTheme(themeMode = themeMode) {
                 val navController = rememberNavController()
 
                 // Determine if tokens are already configured
