@@ -137,12 +137,8 @@ fun SessionListScreen(
                     items(uiState.sessions, key = { it.kuerzel }) { session ->
                         SessionCard(
                             session = session,
-                            lastResponse = uiState.lastResponses[session.kuerzel],
-                            isExpanded = session.kuerzel in uiState.expandedCards,
                             isFavorite = session.kuerzel in uiState.favorites,
-                            onToggleExpand = { viewModel.toggleCardExpanded(session.kuerzel) },
                             onToggleFavorite = { viewModel.toggleFavorite(session.kuerzel) },
-                            onFetchLast = { viewModel.fetchLastResponse(session.kuerzel) },
                             onSelect = {
                                 viewModel.selectSession(session.kuerzel)
                                 onNavigateToChat(session.kuerzel)
