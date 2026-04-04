@@ -409,12 +409,21 @@ async function handleAttachment(kuerzel, filename, base64Data) {
   const dir = '/tmp/relay-attachments';
   try { fs.mkdirSync(dir, { recursive: true }); } catch {}
 
-  // Sanitize filename and add timestamp to avoid collisions
-  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const destPath = `${dir}/${Date.now()}-${safeName}`;
-
   try {
     const buffer = Buffer.from(base64Data, 'base64');
+
+    // Detect file extension from magic bytes if not in filename
+    let ext = '';
+    const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+    if (!safeName.includes('.')) {
+      if (buffer[0] === 0x89 && buffer[1] === 0x50) ext = '.png';
+      else if (buffer[0] === 0xFF && buffer[1] === 0xD8) ext = '.jpg';
+      else if (buffer[0] === 0x47 && buffer[1] === 0x49) ext = '.gif';
+      else if (buffer[0] === 0x25 && buffer[1] === 0x50) ext = '.pdf';
+      else ext = '.bin';
+    }
+    const destPath = `${dir}/${Date.now()}-${safeName}${ext}`;
+
     fs.writeFileSync(destPath, buffer);
     process.stderr.write(`[relay-server] Attachment saved: ${destPath} (${buffer.length} bytes)\n`);
 
@@ -559,8 +568,8 @@ wss.on('connection', (ws, req) => {
       } else if (msg.action === 'attachment') {
         handleAttachment(msg.kuerzel, msg.filename, msg.data);
       }
-    } catch {
-      // Malformed message — ignore
+    } catch (e) {
+      process.stderr.write(`[relay-server] message parse error: ${e.message}\n`);
     }
   });
 

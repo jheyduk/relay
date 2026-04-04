@@ -66,13 +66,38 @@ fun ChatScreen(
     ) { uri ->
         if (uri != null) {
             try {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val bytes = inputStream?.readBytes() ?: return@rememberLauncherForActivityResult
-                inputStream.close()
+                val mimeType = context.contentResolver.getType(uri)
                 val filename = uri.lastPathSegment?.substringAfterLast('/') ?: "attachment"
+                val bytes: ByteArray
+
+                // Compress images to max 1600px width for Claude Code's Read tool
+                if (mimeType?.startsWith("image/") == true) {
+                    val input = context.contentResolver.openInputStream(uri)
+                        ?: return@rememberLauncherForActivityResult
+                    val original = android.graphics.BitmapFactory.decodeStream(input)
+                    input.close()
+                    val maxWidth = 1600
+                    val scaled = if (original.width > maxWidth) {
+                        val ratio = maxWidth.toFloat() / original.width
+                        android.graphics.Bitmap.createScaledBitmap(
+                            original, maxWidth, (original.height * ratio).toInt(), true
+                        )
+                    } else original
+                    val stream = java.io.ByteArrayOutputStream()
+                    scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, stream)
+                    bytes = stream.toByteArray()
+                    if (scaled !== original) scaled.recycle()
+                    original.recycle()
+                } else {
+                    val input = context.contentResolver.openInputStream(uri)
+                        ?: return@rememberLauncherForActivityResult
+                    bytes = input.readBytes()
+                    input.close()
+                }
+
                 val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
                 viewModel.sendAttachment(filename, base64)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Ignore file read errors
             }
         }
