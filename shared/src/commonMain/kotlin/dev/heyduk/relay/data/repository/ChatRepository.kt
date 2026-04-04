@@ -2,6 +2,7 @@ package dev.heyduk.relay.data.repository
 
 import dev.heyduk.relay.domain.model.ChatMessage
 import dev.heyduk.relay.domain.model.RelayUpdate
+import dev.heyduk.relay.domain.model.SessionStatus
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -35,4 +36,7 @@ interface ChatRepository {
 
     /** Flow of incoming transcript updates from the server (type=TRANSCRIPT). */
     val transcripts: Flow<RelayUpdate>
+
+    /** Flow of session status updates for a specific kuerzel. */
+    fun statusUpdates(kuerzel: String): Flow<SessionStatus>
 }

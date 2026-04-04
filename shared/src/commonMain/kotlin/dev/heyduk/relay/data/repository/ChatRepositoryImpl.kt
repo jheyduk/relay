@@ -119,6 +119,10 @@ class ChatRepositoryImpl(
     override val transcripts: Flow<RelayUpdate> = relayRepository.updates
         .filter { it.type == RelayMessageType.TRANSCRIPT }
 
+    override fun statusUpdates(kuerzel: String): Flow<SessionStatus> = relayRepository.updates
+        .filter { it.type == RelayMessageType.STATUS && it.session == kuerzel && it.status != null }
+        .map { it.status!! }
+
     /** Cache question data from a live RelayUpdate for later retrieval by the UI. */
     fun cacheQuestionData(updateId: Long, data: QuestionData) {
         questionDataCache[updateId] = data

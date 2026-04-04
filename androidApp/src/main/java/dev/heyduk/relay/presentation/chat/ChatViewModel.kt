@@ -55,15 +55,27 @@ class ChatViewModel(
 
     private val _localState = MutableStateFlow(LocalState())
     private val _sendingCallbacks = MutableStateFlow<Set<Long>>(emptySet())
+    private val _sessionStatus = MutableStateFlow<SessionStatus?>(null)
+
+    init {
+        // Observe WebSocket updates directly for real-time session status
+        viewModelScope.launch {
+            chatRepository.statusUpdates(kuerzel).collect { status ->
+                _sessionStatus.value = status
+            }
+        }
+    }
 
     val uiState: StateFlow<ChatUiState> = combine(
         chatRepository.messagesForSession(kuerzel),
         _localState,
         _sendingCallbacks,
-        ttsManager.speakingMessageId
-    ) { messages, local, sendingIds, ttsId ->
-        // Derive current session status from the latest STATUS message
-        val currentStatus = messages.lastOrNull { it.type == RelayMessageType.STATUS }?.status
+        ttsManager.speakingMessageId,
+        _sessionStatus
+    ) { messages, local, sendingIds, ttsId, liveStatus ->
+        // Use live status from WebSocket stream, fall back to DB
+        val dbStatus = messages.lastOrNull { it.type == RelayMessageType.STATUS }?.status
+        val currentStatus = liveStatus ?: dbStatus
         // Filter out STATUS messages — they're for the session list, not the conversation
         val filtered = messages.filter { it.type != RelayMessageType.STATUS }
         ChatUiState(
