@@ -116,7 +116,7 @@ Plans:
 
 **Milestone Goal:** Create new Claude Code sessions from the app with FZF-style fuzzy directory search and improve response handling in session-stop hooks.
 
-- [ ] **Phase 10: Server Config & Protocol** - Server-side config, directory listing, and session creation handlers
+- [x] **Phase 10: Server Config & Protocol** - Server-side config, directory listing, and session creation handlers (completed 2026-04-04)
 - [ ] **Phase 11: Session Creation UI** - Fullscreen dialog with fuzzy search, confirmation, and session launch
 - [ ] **Phase 12: Smart Response Handling** - Size-aware response logic replacing legacy truncation
 
@@ -134,8 +134,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
-- [ ] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
+- [x] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
+- [x] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
 
 ### Phase 11: Session Creation UI
 **Goal**: Users can create a new Claude Code session from the app by selecting a project directory and confirming session parameters
@@ -150,8 +150,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
-- [ ] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
+- [x] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
+- [x] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
 **UI hint**: yes
 
 ### Phase 12: Smart Response Handling
@@ -184,6 +184,6 @@ Phases execute in numeric order: 10 -> 11 -> 12
 | 7. Server Migration | v1.1 | 3/3 | Complete | 2026-04-03 |
 | 8. Interactive Controls & Reconnect | v1.1 | 2/2 | Complete | 2026-04-03 |
 | 9. Mac-Side Voice | v1.1 | 2/2 | Complete | 2026-04-03 |
-| 10. Server Config & Protocol | v1.3 | 0/0 | Not started | - |
+| 10. Server Config & Protocol | v1.3 | 0/0 | Complete    | 2026-04-04 |
 | 11. Session Creation UI | v1.3 | 0/0 | Not started | - |
 | 12. Smart Response Handling | v1.3 | 0/0 | Not started | - |
