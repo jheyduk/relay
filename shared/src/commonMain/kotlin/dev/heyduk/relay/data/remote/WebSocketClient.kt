@@ -217,6 +217,30 @@ class WebSocketClient(
     }
 
     /**
+     * Requests the directory list from the server for session creation.
+     */
+    suspend fun sendListDirectories() {
+        val payload = json.encodeToString(mapOf("action" to "list_directories"))
+        send(payload)
+    }
+
+    /**
+     * Requests creation of a new Claude Code session.
+     * @param path Absolute path to the project directory
+     * @param kuerzel Short session name (e.g. "relay")
+     * @param flags CLI flags (e.g. "--dangerously-skip-permissions"), empty string for none
+     */
+    suspend fun sendCreateSession(path: String, kuerzel: String, flags: String) {
+        val payload = buildJsonObject {
+            put("action", "create_session")
+            put("path", path)
+            put("kuerzel", kuerzel)
+            put("flags", flags)
+        }
+        send(payload.toString())
+    }
+
+    /**
      * Gracefully closes the WebSocket connection.
      */
     suspend fun disconnect() {

@@ -36,4 +36,10 @@ interface RelayRepository {
 
     /** Send a file attachment. Server saves it and types the path into the session. */
     suspend fun sendAttachment(kuerzel: String, filename: String, base64Data: String)
+
+    /** Request the list of project directories from the server. */
+    suspend fun sendListDirectories()
+
+    /** Request creation of a new Claude Code session. */
+    suspend fun sendCreateSession(path: String, kuerzel: String, flags: String)
 }

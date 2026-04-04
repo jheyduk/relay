@@ -21,5 +21,11 @@ data class RelayUpdate(
     val filePath: String? = null,
     val questionData: QuestionData? = null,
     val timestamp: Long,
-    val isFromRelay: Boolean = false  // true = sent by the Relay app
+    val isFromRelay: Boolean = false,  // true = sent by the Relay app
+    val directoryList: List<DirectoryEntry>? = null,
+    val defaultFlags: String? = null,
+    val sessionCreatedKuerzel: String? = null,
+    val sessionCreatedPath: String? = null,
+    val sessionCreatedSuccess: Boolean? = null,
+    val sessionCreatedError: String? = null
 )

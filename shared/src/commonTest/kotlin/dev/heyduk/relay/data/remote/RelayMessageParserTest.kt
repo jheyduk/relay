@@ -2,6 +2,7 @@ package dev.heyduk.relay.data.remote
 
 import dev.heyduk.relay.domain.model.RelayMessageType
 import dev.heyduk.relay.domain.model.SessionStatus
+import dev.heyduk.relay.domain.model.DirectoryEntry
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -79,6 +80,78 @@ class RelayMessageParserTest {
         val result = RelayMessageParser.parse(updateId = 5L, messageText = json, timestamp = 9999L)
         assertNotNull(result)
         assertEquals(RelayMessageType.RESPONSE, result.type)
+    }
+
+    @Test
+    fun directoryListParsesToRelayUpdateWithDirectoryEntries() {
+        val json = """
+            {
+                "type": "directory_list",
+                "session": "_system",
+                "directories": [{"path": "/Users/jheyduk/prj/relay", "name": "relay"}],
+                "defaultFlags": "--dangerously-skip-permissions"
+            }
+        """.trimIndent()
+        val result = RelayMessageParser.parse(updateId = 10L, messageText = json, timestamp = 9999L)
+        assertNotNull(result)
+        assertEquals(RelayMessageType.DIRECTORY_LIST, result.type)
+        assertEquals("_system", result.session)
+        assertEquals(1, result.directoryList?.size)
+        assertEquals(DirectoryEntry("/Users/jheyduk/prj/relay", "relay"), result.directoryList?.first())
+        assertEquals("--dangerously-skip-permissions", result.defaultFlags)
+    }
+
+    @Test
+    fun sessionCreatedSuccessParsesToRelayUpdate() {
+        val json = """
+            {
+                "type": "session_created",
+                "session": "_system",
+                "kuerzel": "relay",
+                "path": "/Users/jheyduk/prj/relay",
+                "success": true
+            }
+        """.trimIndent()
+        val result = RelayMessageParser.parse(updateId = 11L, messageText = json, timestamp = 9999L)
+        assertNotNull(result)
+        assertEquals(RelayMessageType.SESSION_CREATED, result.type)
+        assertEquals("relay", result.sessionCreatedKuerzel)
+        assertEquals(true, result.sessionCreatedSuccess)
+        assertNull(result.sessionCreatedError)
+    }
+
+    @Test
+    fun sessionCreatedFailureParsesErrorMessage() {
+        val json = """
+            {
+                "type": "session_created",
+                "session": "_system",
+                "success": false,
+                "error": "Directory does not exist"
+            }
+        """.trimIndent()
+        val result = RelayMessageParser.parse(updateId = 12L, messageText = json, timestamp = 9999L)
+        assertNotNull(result)
+        assertEquals(RelayMessageType.SESSION_CREATED, result.type)
+        assertEquals(false, result.sessionCreatedSuccess)
+        assertEquals("Directory does not exist", result.sessionCreatedError)
+    }
+
+    @Test
+    fun emptyDirectoryListParsesToEmptyList() {
+        val json = """
+            {
+                "type": "directory_list",
+                "session": "_system",
+                "directories": []
+            }
+        """.trimIndent()
+        val result = RelayMessageParser.parse(updateId = 13L, messageText = json, timestamp = 9999L)
+        assertNotNull(result)
+        assertEquals(RelayMessageType.DIRECTORY_LIST, result.type)
+        val dirs = result.directoryList
+        assertNotNull(dirs)
+        assertTrue(dirs.isEmpty())
     }
 
     @Test
