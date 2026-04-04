@@ -131,7 +131,11 @@ Plans:
   2. Server returns a flat list of directories scanned 2 levels deep from configured roots via the `directory_list` WebSocket message
   3. Server handles `create_session` action: validates path, deduplicates kuerzel against existing zellij tabs, and creates a new `@kuerzel` tab with `claude` running in it
   4. Newly created session triggers existing session-start hook automatically, making it appear in the app's session list
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
+- [ ] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
 
 ### Phase 11: Session Creation UI
 **Goal**: Users can create a new Claude Code session from the app by selecting a project directory and confirming session parameters
@@ -143,7 +147,11 @@ Plans:
   3. User sees a confirmation dialog with editable kuerzel, the selected path, and a toggle for `--dangerously-skip-permissions`
   4. User can enter a custom path not in the directory list and proceed to confirmation
   5. User taps "Create" and the app navigates to the new session after successful creation (or shows an error on failure)
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
+- [ ] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
 **UI hint**: yes
 
 ### Phase 12: Smart Response Handling
@@ -154,7 +162,11 @@ Plans:
   1. When a session stops and the last response is 4 KB or less, both last responses are included in the notification (untruncated)
   2. When a session stops and the combined responses exceed 4 KB, only the last response is sent (untruncated up to 16 KB)
   3. Responses exceeding 16 KB are truncated with a visible marker instead of silently cutting off at 2000 characters
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
+- [ ] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
 
 ## Progress
 
