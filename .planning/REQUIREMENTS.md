@@ -9,13 +9,13 @@ Requirements for Session Management milestone. Each maps to roadmap phases.
 
 ### Session Creation
 
-- [ ] **SESS-01**: User can open a session creation dialog via FAB (+) on SessionListScreen
-- [ ] **SESS-02**: User can open a session creation dialog via NavigationDrawer menu entry
-- [ ] **SESS-03**: User can fuzzy-search project directories with instant local filtering
-- [ ] **SESS-04**: User can select a directory and see a confirmation dialog with editable kuerzel
-- [ ] **SESS-05**: User can toggle `--dangerously-skip-permissions` flag before creating
-- [ ] **SESS-06**: User can enter a custom path not under configured roots
-- [ ] **SESS-07**: User can create a new Claude Code session from the confirmation dialog
+- [x] **SESS-01**: User can open a session creation dialog via FAB (+) on SessionListScreen
+- [x] **SESS-02**: User can open a session creation dialog via NavigationDrawer menu entry
+- [x] **SESS-03**: User can fuzzy-search project directories with instant local filtering
+- [x] **SESS-04**: User can select a directory and see a confirmation dialog with editable kuerzel
+- [x] **SESS-05**: User can toggle `--dangerously-skip-permissions` flag before creating
+- [x] **SESS-06**: User can enter a custom path not under configured roots
+- [x] **SESS-07**: User can create a new Claude Code session from the confirmation dialog
 
 ### Server Config
 
@@ -48,13 +48,13 @@ Requirements for Session Management milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SESS-01 | Phase 11 | Pending |
-| SESS-02 | Phase 11 | Pending |
-| SESS-03 | Phase 11 | Pending |
-| SESS-04 | Phase 11 | Pending |
-| SESS-05 | Phase 11 | Pending |
-| SESS-06 | Phase 11 | Pending |
-| SESS-07 | Phase 11 | Pending |
+| SESS-01 | Phase 11 | Complete |
+| SESS-02 | Phase 11 | Complete |
+| SESS-03 | Phase 11 | Complete |
+| SESS-04 | Phase 11 | Complete |
+| SESS-05 | Phase 11 | Complete |
+| SESS-06 | Phase 11 | Complete |
+| SESS-07 | Phase 11 | Complete |
 | CONF-01 | Phase 10 | Pending |
 | CONF-02 | Phase 10 | Pending |
 | CONF-03 | Phase 10 | Pending |

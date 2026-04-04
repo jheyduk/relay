@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.foundation.layout.height
@@ -33,7 +33,9 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +57,7 @@ fun SessionListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showCreateDialog by remember { mutableStateOf(false) }
 
     // Show error messages via snackbar
     LaunchedEffect(uiState.errorMessage) {
@@ -99,8 +102,8 @@ fun SessionListScreen(
                 }
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = viewModel::refreshSessions) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Refresh sessions")
+                FloatingActionButton(onClick = { showCreateDialog = true }) {
+                    Icon(Icons.Default.Add, contentDescription = "New session")
                 }
             },
             snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -149,5 +152,14 @@ fun SessionListScreen(
                 }
             }
         }
-    }
 
+        if (showCreateDialog) {
+            CreateSessionDialog(
+                onDismiss = { showCreateDialog = false },
+                onSessionCreated = { kuerzel ->
+                    showCreateDialog = false
+                    onNavigateToChat(kuerzel)
+                }
+            )
+        }
+    }

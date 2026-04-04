@@ -117,7 +117,7 @@ Plans:
 **Milestone Goal:** Create new Claude Code sessions from the app with FZF-style fuzzy directory search and improve response handling in session-stop hooks.
 
 - [x] **Phase 10: Server Config & Protocol** - Server-side config, directory listing, and session creation handlers (completed 2026-04-04)
-- [ ] **Phase 11: Session Creation UI** - Fullscreen dialog with fuzzy search, confirmation, and session launch
+- [x] **Phase 11: Session Creation UI** - Fullscreen dialog with fuzzy search, confirmation, and session launch (completed 2026-04-04)
 - [ ] **Phase 12: Smart Response Handling** - Size-aware response logic replacing legacy truncation
 
 ## Phase Details
@@ -150,8 +150,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 11-01-PLAN.md — Protocol DTOs, parser, domain models, WebSocket send methods (SESS-01, SESS-02, SESS-03, SESS-07)
-- [ ] 11-02-PLAN.md — FuzzyMatch, CreateSessionViewModel, CreateSessionDialog, FAB entry point (SESS-01, SESS-03, SESS-04, SESS-05, SESS-06, SESS-07)
+- [x] 11-01-PLAN.md — Protocol DTOs, parser, domain models, WebSocket send methods (SESS-01, SESS-02, SESS-03, SESS-07)
+- [x] 11-02-PLAN.md — FuzzyMatch, CreateSessionViewModel, CreateSessionDialog, FAB entry point (SESS-01, SESS-03, SESS-04, SESS-05, SESS-06, SESS-07)
 
 ### Phase 12: Smart Response Handling
 **Goal**: Session-stop notifications include complete or intelligently sized responses instead of hard-truncated text
@@ -180,5 +180,5 @@ Phases execute in numeric order: 10 -> 11 -> 12
 | 8. Interactive Controls & Reconnect | v1.1 | 2/2 | Complete | 2026-04-03 |
 | 9. Mac-Side Voice | v1.1 | 2/2 | Complete | 2026-04-03 |
 | 10. Server Config & Protocol | v1.3 | 2/2 | Complete    | 2026-04-04 |
-| 11. Session Creation UI | v1.3 | 0/2 | Not started | - |
+| 11. Session Creation UI | v1.3 | 2/2 | Complete   | 2026-04-04 |
 | 12. Smart Response Handling | v1.3 | 0/0 | Not started | - |
