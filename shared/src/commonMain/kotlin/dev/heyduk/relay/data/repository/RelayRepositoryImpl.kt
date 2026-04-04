@@ -60,6 +60,14 @@ class RelayRepositoryImpl(
     override suspend fun sendAttachment(kuerzel: String, filename: String, base64Data: String) {
         webSocketClient.sendAttachment(kuerzel, filename, base64Data)
     }
+
+    override suspend fun sendListDirectories() {
+        webSocketClient.sendListDirectories()
+    }
+
+    override suspend fun sendCreateSession(path: String, kuerzel: String, flags: String) {
+        webSocketClient.sendCreateSession(path, kuerzel, flags)
+    }
 }
 
 /**
