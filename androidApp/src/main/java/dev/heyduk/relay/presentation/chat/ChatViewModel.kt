@@ -105,12 +105,19 @@ class ChatViewModel(
             try {
                 // Send attachment first if staged
                 if (attachment != null) {
+                    // Insert a local chat bubble showing the attachment
+                    val attachLabel = "\uD83D\uDCCE ${attachment.filename}"
+                    val displayText = if (text.isNotBlank()) "$attachLabel\n$text" else attachLabel
+                    chatRepository.insertLocalMessage(kuerzel, displayText)
+                    // Send attachment to server (saves file, types path into terminal)
                     chatRepository.sendAttachment(kuerzel, attachment.filename, attachment.base64Data)
                     // Wait for server to dispatch the file path + Enter before sending text
                     if (text.isNotBlank()) kotlinx.coroutines.delay(1500)
                 }
-                // Then send the text message
-                if (text.isNotBlank()) {
+                // Send text via terminal
+                if (text.isNotBlank() && attachment != null) {
+                    chatRepository.sendCommand(kuerzel, text)
+                } else if (text.isNotBlank()) {
                     chatRepository.sendMessage(kuerzel, text)
                 }
             } catch (e: Exception) {

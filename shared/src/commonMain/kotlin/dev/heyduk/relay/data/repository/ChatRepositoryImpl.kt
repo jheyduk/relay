@@ -63,6 +63,20 @@ class ChatRepositoryImpl(
         relayRepository.sendCommand(kuerzel, text)
     }
 
+    override suspend fun insertLocalMessage(kuerzel: String, text: String) {
+        val now = currentTimeMillis()
+        database.messagesQueries.insertOutgoing(
+            update_id = -now,
+            session = kuerzel,
+            message = text,
+            timestamp = now
+        )
+    }
+
+    override suspend fun sendCommand(kuerzel: String, text: String) {
+        relayRepository.sendCommand(kuerzel, text)
+    }
+
     override suspend fun answerCallback(messageId: Long, kuerzel: String, response: String) {
         // Persist the decision locally so the UI reflects the answered state immediately
         database.messagesQueries.markAnswered(response, messageId)
