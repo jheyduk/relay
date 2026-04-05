@@ -147,7 +147,7 @@ let mdnsChild = null;
 
 // --- Zellij Session Detection ---
 
-let _cachedZellijSession = process.env.ZELLIJ_SESSION_NAME || null;
+let _cachedZellijSession = null;
 
 /**
  * Get the active Zellij session name.
