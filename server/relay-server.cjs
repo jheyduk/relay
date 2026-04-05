@@ -152,7 +152,9 @@ let mdnsChild = null;
  * Looks up /tmp/zellij-claude-tab-{sessionId} files whose content matches the kuerzel.
  */
 function findSessionForKuerzel(kuerzel) {
-  // Verify the kuerzel exists in tab files (session is active)
+  // Find the Zellij session that owns a tab named @{kuerzel}.
+  // Tab files: /tmp/zellij-claude-tab-{claude-session-uuid} containing the kuerzel.
+  // Returns the Zellij session name (e.g. "claude") by querying zellij list-sessions.
   try {
     const tabFiles = fs.readdirSync('/tmp').filter(f => f.startsWith('zellij-claude-tab-'));
     const found = tabFiles.some(f => {
@@ -163,9 +165,25 @@ function findSessionForKuerzel(kuerzel) {
     if (!found) return null;
   } catch { return null; }
 
-  // Return the Zellij session name (not the Claude session UUID)
-  // The relay-server inherits ZELLIJ_SESSION_NAME from the hook that started it
-  return process.env.ZELLIJ_SESSION_NAME || null;
+  // Use ZELLIJ_SESSION_NAME if available (hook-started server), otherwise detect it
+  if (process.env.ZELLIJ_SESSION_NAME) return process.env.ZELLIJ_SESSION_NAME;
+
+  // Detect active zellij session by parsing list-sessions output
+  try {
+    const output = execFileSync('zellij', ['list-sessions'], {
+      encoding: 'utf8', timeout: 5000, stdio: ['pipe', 'pipe', 'pipe']
+    });
+    // Find the active (non-EXITED) session line and extract the name (first word)
+    const activeLine = output.split('\n').find(l => l.length > 0 && !l.includes('EXITED'));
+    if (activeLine) {
+      // Strip ANSI escape codes and extract first word
+      const clean = activeLine.replace(/\x1b\[[0-9;]*m/g, '').trim();
+      const name = clean.split(/\s+/)[0];
+      if (name) return name;
+    }
+  } catch {}
+
+  return null;
 }
 
 /**
