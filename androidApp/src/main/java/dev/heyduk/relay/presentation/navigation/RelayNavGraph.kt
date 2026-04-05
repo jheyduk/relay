@@ -46,7 +46,12 @@ fun RelayNavGraph(navController: NavHostController, isConfigured: Boolean) {
         }
         composable("settings") {
             SettingsScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToSetup = {
+                    navController.navigate("setup") {
+                        popUpTo("settings") { inclusive = true }
+                    }
+                }
             )
         }
         composable(

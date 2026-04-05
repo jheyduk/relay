@@ -41,6 +41,7 @@ import org.koin.compose.koinInject
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToSetup: () -> Unit = {},
     dataStore: DataStore<Preferences> = koinInject()
 ) {
     val currentTheme by dataStore.data
@@ -106,7 +107,7 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onNavigateBack() } // TODO: navigate to setup
+                    .clickable { onNavigateToSetup() }
                     .padding(horizontal = 16.dp, vertical = 12.dp)
             )
         }
