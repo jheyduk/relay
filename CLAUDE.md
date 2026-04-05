@@ -3,17 +3,39 @@
 
 **Relay**
 
-A mobile companion app for Claude Code sessions that replaces the current Telegram-based workflow. Relay provides a session-aware UI where each zellij-claude session gets its own visual space, with text and voice input unified in a single conversation stream. Built with Kotlin Multiplatform (KMP) for shared business logic across Android and iOS. Communicates directly via the Telegram Bot API — no custom backend required.
+A mobile companion app for Claude Code sessions. Relay provides a session-aware UI where each zellij-claude session gets its own visual space, with text and voice input unified in a single conversation stream. Built with Kotlin Multiplatform (KMP) for shared business logic. Communicates directly via WebSocket to a lightweight relay-server on the Mac.
 
 **Core Value:** Remote session control with per-session separation — see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
 
 ### Constraints
 
-- **Transport**: Telegram Bot API only — no custom server, no WebSocket, no direct connection to the Mac
-- **Platform**: Kotlin Multiplatform (KMP) — shared business logic, Compose for Android UI, SwiftUI for future iOS UI
-- **Voice**: On-device Whisper model for transcription — must work offline
-- **Protocol**: Must speak the existing zellij-claude message format — the Mac-side should need zero changes
-- **Single user**: App is for the developer only, no auth/account system needed
+- **Transport**: Direct WebSocket to relay-server on Mac (no Telegram, no cloud backend)
+- **Platform**: Kotlin Multiplatform (KMP) — shared business logic, Compose for Android UI
+- **Voice**: Mac-side whisper.cpp transcription (medium model, German + English)
+- **Protocol**: JSON message format over WebSocket (`{type, session, message, status, ...}`)
+- **Single user**: App is for the developer only, shared secret auth
+
+### Server (relay-server)
+
+The relay-server (`server/relay-server.cjs`) is the critical bridge between the Mac and the app. It runs as a **macOS launchd service** with automatic restart on crash.
+
+**Lifecycle management:**
+```bash
+server/install-service.sh install   # Install + start launchd service
+server/install-service.sh restart   # Restart after code changes
+server/install-service.sh status    # Check if running
+server/install-service.sh logs      # View stdout/stderr logs
+server/install-service.sh uninstall # Remove service
+```
+
+**After editing `server/relay-server.cjs` or hooks, always restart:**
+```bash
+server/install-service.sh restart
+```
+
+**Config:** `~/.config/relay/server.json` (auto-created), `~/.config/relay/project-roots.json` (optional)
+**Logs:** `/tmp/relay-server.stdout.log`, `/tmp/relay-server.stderr.log`
+**Plist:** `server/dev.heyduk.relay-server.plist` → `~/Library/LaunchAgents/`
 <!-- GSD:project-end -->
 
 <!-- GSD:stack-start source:research/STACK.md -->
@@ -113,7 +135,11 @@ A mobile companion app for Claude Code sessions that replaces the current Telegr
 <!-- GSD:conventions-start source:CONVENTIONS.md -->
 ## Conventions
 
-Conventions not yet established. Will populate as patterns emerge during development.
+- **Server restart required** after any edit to `server/relay-server.cjs` or `server/hooks/*.cjs` — run `server/install-service.sh restart`
+- **New WebSocket message types** need changes in 4 places: server handler, `RelayMessageTypeDto` enum, `RelayMessageType` enum, `RelayMessageParser` mapping, and `WebSocketService` DB-skip list for non-chat types
+- **Non-chat message types** (DIRECTORY_LIST, SESSION_CREATED, LAST_RESPONSE) must be skipped in `WebSocketService.kt` DB persistence
+- **Git commits** in English, no Co-Author line
+- **Code comments** in English, explanations in German
 <!-- GSD:conventions-end -->
 
 <!-- GSD:architecture-start source:ARCHITECTURE.md -->
