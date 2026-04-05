@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>dev.heyduk.relay-server</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/jheyduk/.nvm/versions/node/v22.17.1/bin/node</string>
+        <string>/Users/jheyduk/prj/relay/server/relay-server.cjs</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/jheyduk/prj/relay/server</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/jheyduk/.nvm/versions/node/v22.17.1/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/jheyduk</string>
+    </dict>
+
+    <!-- Auto-start on login -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Watchdog: restart if process dies -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <!-- Throttle restarts (wait 5s between crashes) -->
+    <key>ThrottleInterval</key>
+    <integer>5</integer>
+
+    <!-- Logging -->
+    <key>StandardOutPath</key>
+    <string>/tmp/relay-server.stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/relay-server.stderr.log</string>
+</dict>
+</plist>

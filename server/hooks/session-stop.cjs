@@ -2,26 +2,9 @@
 // SessionStop hook: notify relay of completion, stop relay-server if last session.
 // Input (stdin): { session_id, ... }
 
-const { readFileSync, readdirSync, unlinkSync } = require('fs');
 const { execFileSync } = require('child_process');
 const { sendRelay, getKuerzel } = require('./send-relay.cjs');
-
-const RELAY_PIDFILE = '/tmp/zellij-claude-relay.pid';
-
-// Stop relay-server if no zellij-claude sessions remain
-function stopRelayServerIfEmpty() {
-  try {
-    const remaining = readdirSync('/tmp').filter(f => f.startsWith('zellij-claude-tab-'));
-    if (remaining.length > 0) return; // Sessions still active
-
-    // No sessions left — stop the relay server
-    try {
-      const pid = parseInt(readFileSync(RELAY_PIDFILE, 'utf8').trim());
-      process.kill(pid, 'SIGTERM');
-    } catch {}
-    try { unlinkSync(RELAY_PIDFILE); } catch {}
-  } catch {}
-}
+// relay-server lifecycle managed by launchd — no hook-based stop needed
 
 /**
  * Get the last response(s) from a session via zellij-claude CLI.
@@ -97,7 +80,5 @@ process.stdin.on('end', async () => {
   } catch (e) {
     process.stderr.write('session-stop error: ' + e.message + '\n');
   }
-  // Stop relay server if this was the last session
-  stopRelayServerIfEmpty();
   process.exit(0);
 });
