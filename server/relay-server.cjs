@@ -145,16 +145,50 @@ let appConnected = false;
 let disconnectedAt = null;
 let mdnsChild = null;
 
+// --- Zellij Session Detection ---
+
+let _cachedZellijSession = null;
+let _cachedZellijSessionAt = 0;
+const ZELLIJ_CACHE_TTL = 30_000; // re-detect every 30s
+
+/**
+ * Get the active Zellij session name. Uses env var if available,
+ * otherwise detects via `zellij list-sessions`. Cached for 30s.
+ */
+function getZellijSession() {
+  if (process.env.ZELLIJ_SESSION_NAME) return process.env.ZELLIJ_SESSION_NAME;
+
+  const now = Date.now();
+  if (_cachedZellijSession && (now - _cachedZellijSessionAt) < ZELLIJ_CACHE_TTL) {
+    return _cachedZellijSession;
+  }
+
+  try {
+    const output = execFileSync('zellij', ['list-sessions'], {
+      encoding: 'utf8', timeout: 5000, stdio: ['pipe', 'pipe', 'pipe']
+    });
+    const activeLine = output.split('\n').find(l => l.length > 0 && !l.includes('EXITED'));
+    if (activeLine) {
+      const clean = activeLine.replace(/\x1b\[[0-9;]*m/g, '').trim();
+      const name = clean.split(/\s+/)[0];
+      if (name) {
+        _cachedZellijSession = name;
+        _cachedZellijSessionAt = now;
+        return name;
+      }
+    }
+  } catch {}
+
+  return null;
+}
+
 // --- Zellij Dispatch Helpers ---
 
 /**
- * Find the Zellij session ID that has a tab named @{kuerzel}.
- * Looks up /tmp/zellij-claude-tab-{sessionId} files whose content matches the kuerzel.
+ * Find the Zellij session that has a tab named @{kuerzel}.
+ * Looks up /tmp/zellij-claude-tab-* files, returns Zellij session name.
  */
 function findSessionForKuerzel(kuerzel) {
-  // Find the Zellij session that owns a tab named @{kuerzel}.
-  // Tab files: /tmp/zellij-claude-tab-{claude-session-uuid} containing the kuerzel.
-  // Returns the Zellij session name (e.g. "claude") by querying zellij list-sessions.
   try {
     const tabFiles = fs.readdirSync('/tmp').filter(f => f.startsWith('zellij-claude-tab-'));
     const found = tabFiles.some(f => {
@@ -165,25 +199,7 @@ function findSessionForKuerzel(kuerzel) {
     if (!found) return null;
   } catch { return null; }
 
-  // Use ZELLIJ_SESSION_NAME if available (hook-started server), otherwise detect it
-  if (process.env.ZELLIJ_SESSION_NAME) return process.env.ZELLIJ_SESSION_NAME;
-
-  // Detect active zellij session by parsing list-sessions output
-  try {
-    const output = execFileSync('zellij', ['list-sessions'], {
-      encoding: 'utf8', timeout: 5000, stdio: ['pipe', 'pipe', 'pipe']
-    });
-    // Find the active (non-EXITED) session line and extract the name (first word)
-    const activeLine = output.split('\n').find(l => l.length > 0 && !l.includes('EXITED'));
-    if (activeLine) {
-      // Strip ANSI escape codes and extract first word
-      const clean = activeLine.replace(/\x1b\[[0-9;]*m/g, '').trim();
-      const name = clean.split(/\s+/)[0];
-      if (name) return name;
-    }
-  } catch {}
-
-  return null;
+  return getZellijSession();
 }
 
 /**
@@ -533,7 +549,7 @@ const POLL_ACTIVE = 3000; // 3s when any session is working
  */
 function startStatusPolling() {
   if (statusPollTimer) return;
-  const zellijSession = process.env.ZELLIJ_SESSION_NAME;
+  const zellijSession = getZellijSession();
   if (!zellijSession) return;
 
   function poll() {
@@ -789,11 +805,11 @@ wss.on('connection', (ws, req) => {
       } else if (msg.action === 'raw_command') {
         if (msg.command === 'ls') {
           // List sessions directly from Zellij tabs
-          const zellijSession = process.env.ZELLIJ_SESSION_NAME;
+          const zellijSession = getZellijSession();
           if (zellijSession) {
             listSessions(zellijSession);
           } else {
-            process.stderr.write('[relay-server] ZELLIJ_SESSION_NAME not set for ls command\n');
+            process.stderr.write('[relay-server] No active zellij session found for ls command\n');
           }
         }
         // Other raw_command types are Telegram-era relics — ignored
@@ -822,14 +838,14 @@ wss.on('connection', (ws, req) => {
         const reqPath = msg.path;
         const reqKuerzel = msg.kuerzel || path.basename(reqPath || '');
         const flags = msg.flags || '';
-        const zellijSession = process.env.ZELLIJ_SESSION_NAME;
+        const zellijSession = getZellijSession();
 
         if (!zellijSession) {
           if (appSocket && appSocket.readyState === 1) {
             appSocket.send(JSON.stringify({
               type: 'session_created',
               success: false,
-              error: 'ZELLIJ_SESSION_NAME not set — relay-server must run inside a zellij session',
+              error: 'No active zellij session found',
             }));
           }
           return;
