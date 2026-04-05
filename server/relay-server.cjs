@@ -147,22 +147,23 @@ let mdnsChild = null;
 
 // --- Zellij Session Detection ---
 
-let _cachedZellijSession = null;
-let _cachedZellijSessionAt = 0;
-const ZELLIJ_CACHE_TTL = 30_000; // re-detect every 30s
+let _cachedZellijSession = process.env.ZELLIJ_SESSION_NAME || null;
 
 /**
- * Get the active Zellij session name. Uses env var if available,
- * otherwise detects via `zellij list-sessions`. Cached for 30s.
+ * Get the active Zellij session name.
+ * Cached indefinitely — only re-detected when invalidateZellijSession() is called
+ * (i.e. when a zellij command fails).
  */
 function getZellijSession() {
-  if (process.env.ZELLIJ_SESSION_NAME) return process.env.ZELLIJ_SESSION_NAME;
+  if (_cachedZellijSession) return _cachedZellijSession;
+  return detectZellijSession();
+}
 
-  const now = Date.now();
-  if (_cachedZellijSession && (now - _cachedZellijSessionAt) < ZELLIJ_CACHE_TTL) {
-    return _cachedZellijSession;
-  }
-
+/**
+ * Detect the active Zellij session via `zellij list-sessions`.
+ * Called on first use and after cache invalidation.
+ */
+function detectZellijSession() {
   try {
     const output = execFileSync('zellij', ['list-sessions'], {
       encoding: 'utf8', timeout: 5000, stdio: ['pipe', 'pipe', 'pipe']
@@ -173,13 +174,20 @@ function getZellijSession() {
       const name = clean.split(/\s+/)[0];
       if (name) {
         _cachedZellijSession = name;
-        _cachedZellijSessionAt = now;
+        process.stderr.write(`[relay-server] Detected zellij session: ${name}\n`);
         return name;
       }
     }
   } catch {}
-
   return null;
+}
+
+/**
+ * Invalidate cached session — next getZellijSession() call will re-detect.
+ * Call this when a zellij command fails with session-not-found.
+ */
+function invalidateZellijSession() {
+  _cachedZellijSession = null;
 }
 
 // --- Zellij Dispatch Helpers ---
@@ -318,13 +326,19 @@ function writeToPane(sessionId, paneId, ...bytes) {
  * Writes the message text followed by Enter to the focused pane in the matching tab.
  */
 async function dispatchCommand(kuerzel, message) {
-  const sessionId = findSessionForKuerzel(kuerzel);
+  let sessionId = findSessionForKuerzel(kuerzel);
   if (!sessionId) {
     process.stderr.write(`[relay-server] No session found for @${kuerzel}\n`);
     return;
   }
 
-  const paneId = await findPaneForTab(sessionId, kuerzel);
+  let paneId = await findPaneForTab(sessionId, kuerzel);
+  if (!paneId) {
+    // Session name may be stale — re-detect and retry once
+    invalidateZellijSession();
+    sessionId = findSessionForKuerzel(kuerzel);
+    if (sessionId) paneId = await findPaneForTab(sessionId, kuerzel);
+  }
   if (!paneId) {
     process.stderr.write(`[relay-server] No pane found for @${kuerzel} in session ${sessionId}\n`);
     // Fallback: switch to tab and write to focused pane
@@ -377,12 +391,17 @@ const pendingQuestions = new Map();
  * Resolves pane once, then sends the appropriate keystroke sequence.
  */
 async function dispatchAnswer(kuerzel, msg) {
-  const sessionId = findSessionForKuerzel(kuerzel);
+  let sessionId = findSessionForKuerzel(kuerzel);
   if (!sessionId) {
     process.stderr.write(`[relay-server] answer: no session for @${kuerzel}\n`);
     return;
   }
-  const paneId = await findPaneForTab(sessionId, kuerzel);
+  let paneId = await findPaneForTab(sessionId, kuerzel);
+  if (!paneId) {
+    invalidateZellijSession();
+    sessionId = findSessionForKuerzel(kuerzel);
+    if (sessionId) paneId = await findPaneForTab(sessionId, kuerzel);
+  }
   if (!paneId) {
     process.stderr.write(`[relay-server] answer: no pane for @${kuerzel}\n`);
     return;
