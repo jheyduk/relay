@@ -46,12 +46,14 @@ class MainActivity : ComponentActivity() {
             RelayTheme(themeMode = themeMode) {
                 val navController = rememberNavController()
 
-                // Determine if tokens are already configured
+                // Determine if tokens are already configured.
+                // On recreation (rotation), default to true to prevent
+                // NavHost resetting to setup screen before DataStore emits.
                 val isConfigured by dataStore.data
                     .map { prefs ->
                         !prefs[stringPreferencesKey("server_secret")].isNullOrBlank()
                     }
-                    .collectAsStateWithLifecycle(initialValue = false)
+                    .collectAsStateWithLifecycle(initialValue = savedInstanceState != null)
 
                 // Navigate to deep-link target after NavHost is composed
                 val kuerzel = pendingDeepLinkKuerzel
