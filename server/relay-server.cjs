@@ -192,21 +192,54 @@ function invalidateZellijSession() {
 
 // --- Zellij Dispatch Helpers ---
 
+// --- Zellij Tab Cache ---
+
+let _cachedTabs = null; // Map<tabName, true> e.g. { "@relay": true, "@notes": true }
+let _cachedTabsAt = 0;
+const TAB_CACHE_TTL = 5_000; // refresh at most every 5s
+
+/**
+ * Get active @-tabs from Zellij. Cached for 5s.
+ * Returns a Set of kuerzel names (without @).
+ */
+function getActiveKuerzels() {
+  const now = Date.now();
+  if (_cachedTabs && (now - _cachedTabsAt) < TAB_CACHE_TTL) return _cachedTabs;
+
+  const sessionId = getZellijSession();
+  if (!sessionId) return new Set();
+
+  try {
+    const raw = execFileSync('zellij', ['--session', sessionId, 'action', 'list-tabs', '--json', '--state'], {
+      encoding: 'utf8', timeout: 5000, stdio: ['pipe', 'pipe', 'pipe']
+    });
+    const tabs = JSON.parse(raw);
+    const kuerzels = new Set();
+    for (const tab of tabs) {
+      const name = tab.name || '';
+      if (name.startsWith('@')) kuerzels.add(name.slice(1));
+    }
+    _cachedTabs = kuerzels;
+    _cachedTabsAt = now;
+    return kuerzels;
+  } catch {
+    return _cachedTabs || new Set();
+  }
+}
+
+/** Invalidate tab cache — called after session creation or on dispatch failure. */
+function invalidateTabCache() {
+  _cachedTabs = null;
+  _cachedTabsAt = 0;
+}
+
 /**
  * Find the Zellij session that has a tab named @{kuerzel}.
- * Looks up /tmp/zellij-claude-tab-* files, returns Zellij session name.
+ * Queries Zellij directly — no dependency on tab files.
  */
 function findSessionForKuerzel(kuerzel) {
-  try {
-    const tabFiles = fs.readdirSync('/tmp').filter(f => f.startsWith('zellij-claude-tab-'));
-    const found = tabFiles.some(f => {
-      try {
-        return fs.readFileSync(`/tmp/${f}`, 'utf8').trim() === kuerzel;
-      } catch { return false; }
-    });
-    if (!found) return null;
-  } catch { return null; }
-
+  const kuerzels = getActiveKuerzels();
+  if (!kuerzels.has(kuerzel)) return null;
   return getZellijSession();
 }
 
@@ -334,8 +367,9 @@ async function dispatchCommand(kuerzel, message) {
 
   let paneId = await findPaneForTab(sessionId, kuerzel);
   if (!paneId) {
-    // Session name may be stale — re-detect and retry once
+    // Session or tabs may be stale — re-detect and retry once
     invalidateZellijSession();
+    invalidateTabCache();
     sessionId = findSessionForKuerzel(kuerzel);
     if (sessionId) paneId = await findPaneForTab(sessionId, kuerzel);
   }
@@ -399,6 +433,7 @@ async function dispatchAnswer(kuerzel, msg) {
   let paneId = await findPaneForTab(sessionId, kuerzel);
   if (!paneId) {
     invalidateZellijSession();
+    invalidateTabCache();
     sessionId = findSessionForKuerzel(kuerzel);
     if (sessionId) paneId = await findPaneForTab(sessionId, kuerzel);
   }
@@ -510,24 +545,14 @@ function listSessions(sessionId) {
 
 /**
  * Send all active sessions to the app on reconnect.
- * Reads /tmp/zellij-claude-tab-* files to build the session list,
- * then sends a session_list message so the app doesn't need to /ls manually.
+ * Queries Zellij directly for @-tabs — no tab file dependency.
  */
 function sendReconnectSync() {
   try {
     if (!appSocket || appSocket.readyState !== 1) return;
 
-    const tabFiles = fs.readdirSync('/tmp').filter(f => f.startsWith('zellij-claude-tab-'));
-    const sessions = [];
-
-    for (const f of tabFiles) {
-      try {
-        const kuerzel = fs.readFileSync(`/tmp/${f}`, 'utf8').trim();
-        if (kuerzel) {
-          sessions.push({ name: kuerzel, active: true });
-        }
-      } catch {}
-    }
+    const kuerzels = getActiveKuerzels();
+    const sessions = [...kuerzels].map(k => ({ name: k, active: true }));
 
     if (sessions.length > 0) {
       appSocket.send(JSON.stringify({
@@ -939,6 +964,7 @@ wss.on('connection', (ws, req) => {
           }
 
           process.stderr.write(`[relay-server] Session @${finalKuerzel} created successfully\n`);
+          invalidateTabCache(); // New tab — refresh on next dispatch
           if (appSocket && appSocket.readyState === 1) {
             appSocket.send(JSON.stringify({
               type: 'session_created',
