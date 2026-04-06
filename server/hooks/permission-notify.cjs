@@ -8,6 +8,7 @@ const { sendRelay, getKuerzel } = require('./send-relay.cjs');
 function loadToolDetails(sessionId) {
   if (!sessionId) return null;
   try {
+    // Tool cache written by zellij-claude's pretool-cache hook (optional dependency)
     const raw = readFileSync(`/tmp/zellij-claude-pending-tool-${sessionId}.json`, 'utf8');
     const info = JSON.parse(raw);
     if (Date.now() - info.ts > 10000) return null;
@@ -42,7 +43,7 @@ process.stdin.on('end', async () => {
   try {
     const data = JSON.parse(input || '{}');
     const kuerzel = getKuerzel(data.session_id);
-    if (!kuerzel) { process.exit(0); } // Not a zellij-claude session
+    if (!kuerzel) { process.exit(0); }
     const message = data.message || 'Permission required';
     const toolInfo = loadToolDetails(data.session_id);
     // Skip AskUserQuestion — already handled by ask-notify hook

@@ -56,7 +56,7 @@ process.stdin.on('end', async () => {
   try {
     const data = JSON.parse(input || '{}');
     const kuerzel = getKuerzel(data.session_id);
-    if (!kuerzel) { process.exit(0); } // Not a zellij-claude session
+    if (!kuerzel) { process.exit(0); }
 
     // Fetch last assistant output as context for the question
     const lastOutput = getLastResponse(kuerzel, 1);

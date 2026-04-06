@@ -2,7 +2,7 @@
 // Relay WebSocket server — standalone process for the relay repo.
 // Accepts authenticated WebSocket connections from the Relay Android app,
 // receives hook messages via Unix domain socket IPC, and advertises via mDNS.
-// Dispatches commands directly via `zellij action write-chars` — no zellij-claude dependency.
+// Dispatches commands directly via `zellij action write-chars`.
 
 const { WebSocketServer } = require('ws');
 const net = require('net');
