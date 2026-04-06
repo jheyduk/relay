@@ -1,5 +1,6 @@
 package dev.heyduk.relay.presentation.chat
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Stop
@@ -92,12 +94,21 @@ fun MessageBubble(
             modifier = Modifier.widthIn(max = screenWidth * 0.85f)
         ) {
             Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                val hasWideContent = message.content.lines().any { it.length > 60 }
+                val scrollModifier = if (hasWideContent) {
+                    Modifier.horizontalScroll(rememberScrollState())
+                } else {
+                    Modifier
+                }
                 Text(
                     text = message.content,
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        lineHeight = 22.sp
+                        lineHeight = 22.sp,
+                        fontFamily = if (!isOutgoing) FontFamily.Monospace else FontFamily.Default
                     ),
-                    color = contentColor
+                    color = contentColor,
+                    softWrap = !hasWideContent,
+                    modifier = scrollModifier
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
