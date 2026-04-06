@@ -984,7 +984,7 @@ wss.on('connection', (ws, req) => {
           }
         } else {
           try {
-            const output = execFileSync('npx', ['zellij-claude', 'last', `@${reqKuerzel}`, String(count)], {
+            const output = execFileSync('zellij-claude', ['last', `@${reqKuerzel}`, String(count)], {
               encoding: 'utf8', timeout: 10000, stdio: ['pipe', 'pipe', 'pipe']
             }).trim();
             process.stderr.write(`[relay-server] get_last @${reqKuerzel}: ${output.length} chars\n`);

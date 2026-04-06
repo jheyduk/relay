@@ -1,12 +1,9 @@
 #!/usr/bin/env node
-// SessionStart hook: cache the zellij tab name for other hooks
-// and reconcile stale tab files.
-// relay-server lifecycle is managed by launchd (dev.heyduk.relay-server).
+// SessionStart hook: notify relay-server that a session started working.
+// Tab/session discovery is handled by the server via direct Zellij queries.
 // Input (stdin): { session_id, ... }
 
 const { execSync } = require('child_process');
-const { writeFileSync } = require('fs');
-const { reconcile } = require('./reconcile-tabs.cjs');
 const { sendRelay } = require('./send-relay.cjs');
 
 let input = '';
@@ -16,25 +13,21 @@ process.stdin.on('data', chunk => (input += chunk));
 process.stdin.on('end', async () => {
   clearTimeout(timeout);
   try {
-    const data = JSON.parse(input || '{}');
-    const sessionId = data.session_id ?? 'unknown';
     const zellijSession = process.env.ZELLIJ_SESSION_NAME;
     const paneId = process.env.ZELLIJ_PANE_ID;
 
     if (zellijSession) {
-      // Find our tab by matching pane ID from list-panes (not list-tabs)
+      // Find our tab by matching pane ID from list-panes
       const raw = execSync(
         `zellij --session ${zellijSession} action list-panes --json`,
         { encoding: 'utf8', timeout: 3000, stdio: ['pipe', 'pipe', 'pipe'] }
       );
       const panes = JSON.parse(raw);
-      // Match by ZELLIJ_PANE_ID if set, otherwise find the focused pane
       const pane = paneId !== undefined
         ? panes.find(p => String(p.id) === paneId && !p.is_plugin)
         : panes.find(p => p.is_focused && !p.is_plugin);
       if (pane && pane.tab_name && pane.tab_name.startsWith('@')) {
         const kuerzel = pane.tab_name.slice(1);
-        writeFileSync(`/tmp/zellij-claude-tab-${sessionId}`, kuerzel);
         await sendRelay({
           type: 'status',
           session: kuerzel,
@@ -44,11 +37,6 @@ process.stdin.on('end', async () => {
         });
       }
     }
-
-    // Clean up stale tab files from old/dead sessions
-    reconcile();
-
-    // relay-server lifecycle managed by launchd — no hook-based start needed
   } catch {
     // Never crash Claude Code
   }

@@ -11,7 +11,7 @@ const { sendRelay, getKuerzel } = require('./send-relay.cjs');
  */
 function getLastResponse(kuerzel, count = 1) {
   try {
-    return execFileSync('npx', ['zellij-claude', 'last', `@${kuerzel}`, String(count)], {
+    return execFileSync('zellij-claude', ['last', `@${kuerzel}`, String(count)], {
       encoding: 'utf8', timeout: 10000, stdio: ['pipe', 'pipe', 'pipe']
     }).trim() || null;
   } catch { return null; }
