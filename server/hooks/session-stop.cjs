@@ -1,25 +1,33 @@
 #!/usr/bin/env node
-// SessionStop hook: notify relay of completion, stop relay-server if last session.
+// SessionStop hook: notify relay of completion with smart response sizing.
 // Input (stdin): { session_id, ... }
 
 const { execFileSync } = require('child_process');
 const { sendRelay, getKuerzel } = require('./send-relay.cjs');
-// relay-server lifecycle managed by launchd — no hook-based stop needed
+const { extractResponses } = require('../screen-parse.cjs');
 
 /**
- * Get the last response(s) from a session via zellij-claude CLI.
- * Falls back to null if zellij-claude is not available.
+ * Get the last N responses by dumping the screen buffer directly via Zellij.
  */
 function getLastResponse(kuerzel, count = 2) {
+  const zellijSession = process.env.ZELLIJ_SESSION_NAME;
+  if (!zellijSession) return null;
   try {
-    return execFileSync('zellij-claude', ['last', `@${kuerzel}`, String(count)], {
+    const panesRaw = execFileSync('zellij', ['--session', zellijSession, 'action', 'list-panes', '--json', '--state'], {
+      encoding: 'utf8', timeout: 5000, stdio: ['pipe', 'pipe', 'pipe']
+    });
+    const panes = JSON.parse(panesRaw);
+    const pane = panes.find(p => p.tab_name === `@${kuerzel}` && !p.is_plugin);
+    if (!pane) return null;
+    const screen = execFileSync('zellij', ['--session', zellijSession, 'action', 'dump-screen', '--full', '--pane-id', String(pane.id)], {
       encoding: 'utf8', timeout: 10000, stdio: ['pipe', 'pipe', 'pipe']
-    }).trim() || null;
+    });
+    return extractResponses(screen, count);
   } catch { return null; }
 }
 
 /**
- * Smart response sizing: tiered logic replacing legacy truncate(2000).
+ * Smart response sizing: tiered logic.
  * - ≤4KB: both responses included (untruncated)
  * - ≤16KB: single response only (untruncated)
  * - >16KB: single response truncated with visible marker
@@ -31,21 +39,18 @@ function getSmartResponse(kuerzel) {
   const bytes = Buffer.byteLength(full, 'utf8');
   if (bytes <= 4096) return full;
 
-  // Too large with 2 responses, try just the last one
   const single = getLastResponse(kuerzel, 1);
   if (!single) return 'Task complete';
 
   const singleBytes = Buffer.byteLength(single, 'utf8');
   if (singleBytes <= 16384) return single;
 
-  // Even single response is huge, truncate
   return single.slice(0, 16384) + '\n…(truncated)';
 }
 
 async function notify(kuerzel, data) {
   if (!kuerzel) return;
   const message = getSmartResponse(kuerzel);
-  // Send status back to ready
   await sendRelay({
     type: 'status',
     session: kuerzel,
@@ -53,7 +58,6 @@ async function notify(kuerzel, data) {
     message: `Session ${kuerzel} ready`,
     timestamp: Date.now(),
   });
-  // Send completion with last responses
   await sendRelay({
     type: 'completion',
     session: kuerzel,
@@ -74,8 +78,6 @@ process.stdin.on('end', async () => {
   clearTimeout(timeout);
   try {
     const data = JSON.parse(input || '{}');
-    // Log available fields for debugging
-    process.stderr.write('session-stop data keys: ' + Object.keys(data).join(', ') + '\n');
     await notify(getKuerzel(data.session_id), data);
   } catch (e) {
     process.stderr.write('session-stop error: ' + e.message + '\n');

@@ -233,6 +233,34 @@ function invalidateTabCache() {
   _cachedTabsAt = 0;
 }
 
+// --- Screen Parsing ---
+
+const { extractResponses } = require('./screen-parse.cjs');
+
+/**
+ * Get the last N responses from a session by dumping the screen buffer.
+ */
+function getLastResponses(kuerzel, count = 2) {
+  const sessionId = getZellijSession();
+  if (!sessionId) return null;
+  try {
+    // Find the pane for this tab
+    const panesRaw = execFileSync('zellij', ['--session', sessionId, 'action', 'list-panes', '--json', '--state'], {
+      encoding: 'utf8', timeout: 5000, stdio: ['pipe', 'pipe', 'pipe']
+    });
+    const panes = JSON.parse(panesRaw);
+    const pane = panes.find(p => p.tab_name === `@${kuerzel}` && !p.is_plugin);
+    if (!pane) return null;
+    // Dump full screen buffer for that pane
+    const screen = execFileSync('zellij', ['--session', sessionId, 'action', 'dump-screen', '--full', '--pane-id', String(pane.id)], {
+      encoding: 'utf8', timeout: 10000, stdio: ['pipe', 'pipe', 'pipe']
+    });
+    return extractResponses(screen, count);
+  } catch { return null; }
+}
+
+// --- Zellij Dispatch Helpers ---
+
 /**
  * Find the Zellij session that has a tab named @{kuerzel}.
  * Queries Zellij directly — no dependency on tab files.
@@ -983,19 +1011,16 @@ wss.on('connection', (ws, req) => {
             appSocket.send(JSON.stringify({ type: 'last_response', session: reqKuerzel || '_system', success: false, error: 'Missing kuerzel' }));
           }
         } else {
-          try {
-            const output = execFileSync('zellij-claude', ['last', `@${reqKuerzel}`, String(count)], {
-              encoding: 'utf8', timeout: 10000, stdio: ['pipe', 'pipe', 'pipe']
-            }).trim();
-            process.stderr.write(`[relay-server] get_last @${reqKuerzel}: ${output.length} chars\n`);
-            if (appSocket && appSocket.readyState === 1) {
-              appSocket.send(JSON.stringify({ type: 'last_response', session: reqKuerzel, message: output || '(no output)', success: true }));
-            }
-          } catch (err) {
-            process.stderr.write(`[relay-server] get_last error: ${err.message}\n`);
-            if (appSocket && appSocket.readyState === 1) {
-              appSocket.send(JSON.stringify({ type: 'last_response', session: reqKuerzel, success: false, error: err.message }));
-            }
+          const output = getLastResponses(reqKuerzel, count);
+          process.stderr.write(`[relay-server] get_last @${reqKuerzel}: ${output ? output.length : 0} chars\n`);
+          if (appSocket && appSocket.readyState === 1) {
+            appSocket.send(JSON.stringify({
+              type: 'last_response',
+              session: reqKuerzel,
+              message: output || '(no output)',
+              success: !!output,
+              error: output ? undefined : 'No output available',
+            }));
           }
         }
       }

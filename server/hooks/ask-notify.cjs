@@ -4,16 +4,25 @@
 
 const { execFileSync } = require('child_process');
 const { sendRelay, getKuerzel } = require('./send-relay.cjs');
+const { extractResponses } = require('../screen-parse.cjs');
 
 /**
- * Get the last response from a session via zellij-claude CLI.
- * Provides context for why a question is being asked.
+ * Get the last response from a session by dumping the screen buffer.
  */
 function getLastResponse(kuerzel, count = 1) {
+  const zellijSession = process.env.ZELLIJ_SESSION_NAME;
+  if (!zellijSession) return null;
   try {
-    return execFileSync('zellij-claude', ['last', `@${kuerzel}`, String(count)], {
+    const panesRaw = execFileSync('zellij', ['--session', zellijSession, 'action', 'list-panes', '--json', '--state'], {
+      encoding: 'utf8', timeout: 5000, stdio: ['pipe', 'pipe', 'pipe']
+    });
+    const panes = JSON.parse(panesRaw);
+    const pane = panes.find(p => p.tab_name === `@${kuerzel}` && !p.is_plugin);
+    if (!pane) return null;
+    const screen = execFileSync('zellij', ['--session', zellijSession, 'action', 'dump-screen', '--full', '--pane-id', String(pane.id)], {
       encoding: 'utf8', timeout: 10000, stdio: ['pipe', 'pipe', 'pipe']
-    }).trim() || null;
+    });
+    return extractResponses(screen, count);
   } catch { return null; }
 }
 
