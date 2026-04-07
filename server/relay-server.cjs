@@ -612,6 +612,57 @@ let statusPollTimer = null;
 let lastStatusMap = new Map(); // kuerzel -> status
 let anySessionWorking = false;
 
+// --- Auth Recovery State ---
+const authRecoveryState = new Map(); // kuerzel -> { state: 'detected'|'login_sent'|'waiting_url'|'recovered', detectedAt: number }
+const AUTH_SCAN_COOLDOWN = 30000; // 30s per session
+const AUTH_RECOVERY_TIMEOUT = 300000; // 5 minutes
+const lastAuthScanMap = new Map(); // kuerzel -> timestamp of last scan
+
+const AUTH_ERROR_PATTERN = /(session has expired|oauth token (has expired|revoked)|not logged in|please run \/login|API Error: 401|authentication_error)/i;
+
+/**
+ * Scan terminal output for auth errors after a session transitions from working to ready.
+ * If an auth error is detected, dispatches /login and notifies the app.
+ */
+async function scanForAuthError(kuerzel) {
+  // Cooldown: max one scan per 30s per session
+  const lastScan = lastAuthScanMap.get(kuerzel) || 0;
+  if (Date.now() - lastScan < AUTH_SCAN_COOLDOWN) return;
+
+  // Already in recovery — don't re-scan
+  if (authRecoveryState.has(kuerzel)) return;
+
+  lastAuthScanMap.set(kuerzel, Date.now());
+
+  const responses = getLastResponses(kuerzel, 1);
+  if (!responses || responses.length === 0) return;
+
+  const responseText = responses.map(r => r.text || r).join('\n');
+  const match = AUTH_ERROR_PATTERN.exec(responseText);
+  if (!match) return;
+
+  // Auth error detected — enter recovery
+  authRecoveryState.set(kuerzel, { state: 'detected', detectedAt: Date.now() });
+  process.stderr.write(`[relay-server] Auth error detected for @${kuerzel}: ${match[0]}\n`);
+
+  // Notify app
+  if (appSocket && appSocket.readyState === 1) {
+    appSocket.send(JSON.stringify({
+      type: 'auth_required',
+      session: kuerzel,
+      error: match[0],
+      timestamp: Date.now(),
+      __relay: true,
+    }));
+  }
+
+  // Dispatch /login to the session
+  await dispatchCommand(kuerzel, '/login');
+  const recovery = authRecoveryState.get(kuerzel);
+  if (recovery) recovery.state = 'login_sent';
+  process.stderr.write(`[relay-server] Dispatched /login to @${kuerzel}\n`);
+}
+
 const POLL_IDLE = 30000;  // 30s when all sessions are ready
 const POLL_ACTIVE = 3000; // 3s when any session is working
 
@@ -655,11 +706,20 @@ function startStatusPolling() {
           }
         }
 
+        // Check for auth recovery timeouts
+        for (const [kuerzel, recovery] of authRecoveryState) {
+          if (Date.now() - recovery.detectedAt > AUTH_RECOVERY_TIMEOUT) {
+            process.stderr.write(`[relay-server] Auth recovery timeout for @${kuerzel}, resetting\n`);
+            authRecoveryState.delete(kuerzel);
+          }
+        }
+
         // Send updates only for changed statuses
         anySessionWorking = false;
         for (const [kuerzel, status] of tabStatus) {
           if (status === 'working' || status === 'waiting') anySessionWorking = true;
-          if (lastStatusMap.get(kuerzel) !== status) {
+          const previousStatus = lastStatusMap.get(kuerzel);
+          if (previousStatus !== status) {
             lastStatusMap.set(kuerzel, status);
             appSocket.send(JSON.stringify({
               type: 'status',
@@ -669,6 +729,17 @@ function startStatusPolling() {
               timestamp: Date.now(),
               __relay: true,
             }));
+
+            // Auth recovery: successful if session transitions back to working
+            if (authRecoveryState.has(kuerzel) && status === 'working') {
+              process.stderr.write(`[relay-server] Auth recovery successful for @${kuerzel}\n`);
+              authRecoveryState.delete(kuerzel);
+            }
+
+            // Auth error detection: scan when session transitions from working to ready
+            if (previousStatus === 'working' && status === 'ready') {
+              scanForAuthError(kuerzel);
+            }
           }
         }
       } catch {}
@@ -690,6 +761,8 @@ function stopStatusPolling() {
   }
   lastStatusMap.clear();
   anySessionWorking = false;
+  authRecoveryState.clear();
+  lastAuthScanMap.clear();
 }
 
 let pollSuppressedUntil = 0;
