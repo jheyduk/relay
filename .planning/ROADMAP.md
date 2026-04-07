@@ -178,7 +178,10 @@ Plans:
   1. When a Claude Code session outputs an auth error (401, session expired, token revoked), the server detects it within one polling cycle
   2. Server automatically dispatches `/login` into the affected session's Zellij pane after detecting an auth failure
   3. Server does not dispatch duplicate `/login` commands if the same session is already in a login recovery flow
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 13-01-PLAN.md -- Auth error detection, recovery state machine, login dispatch, AUTH_REQUIRED protocol
 
 ### Phase 14: OAuth URL Extraction & Forwarding
 **Goal**: Server captures the OAuth authorization URL that appears after `/login` and delivers it to the app so the user can authenticate from their phone
@@ -231,7 +234,7 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 10. Server Config & Protocol | v1.3 | 2/2 | Complete | 2026-04-04 |
 | 11. Session Creation UI | v1.3 | 2/2 | Complete | 2026-04-04 |
 | 12. Smart Response Handling | v1.3 | 0/0 | Complete | 2026-04-04 |
-| 13. Auth Error Detection & Login Dispatch | v1.4 | 0/0 | Not started | - |
+| 13. Auth Error Detection & Login Dispatch | v1.4 | 0/1 | In progress | - |
 | 14. OAuth URL Extraction & Forwarding | v1.4 | 0/0 | Not started | - |
 | 15. App-Side Auth Recovery UI | v1.4 | 0/0 | Not started | - |
 | 16. Last-Response Dedup | v1.4 | 0/0 | Not started | - |
