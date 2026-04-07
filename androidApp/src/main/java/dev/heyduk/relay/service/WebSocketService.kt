@@ -90,7 +90,8 @@ class WebSocketService : Service() {
                     if (update.type == RelayMessageType.TRANSCRIPT ||
                         update.type == RelayMessageType.DIRECTORY_LIST ||
                         update.type == RelayMessageType.SESSION_CREATED ||
-                        update.type == RelayMessageType.LAST_RESPONSE) return@collect
+                        update.type == RelayMessageType.LAST_RESPONSE ||
+                        update.type == RelayMessageType.AUTH_REQUIRED) return@collect
 
                     database.messagesQueries.insertOrIgnore(
                         update_id = update.updateId,
