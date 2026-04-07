@@ -163,7 +163,7 @@ Plans:
 
 **Milestone Goal:** Enable remote OAuth re-authentication from the app when Claude Code sessions hit auth errors, and eliminate duplicate `/last` responses via checksum-based deduplication.
 
-- [ ] **Phase 13: Auth Error Detection & Login Dispatch** - Server parses terminal output for auth failures and automatically dispatches /login
+- [x] **Phase 13: Auth Error Detection & Login Dispatch** - Server parses terminal output for auth failures and automatically dispatches /login (completed 2026-04-07)
 - [ ] **Phase 14: OAuth URL Extraction & Forwarding** - Server extracts OAuth URL from terminal and sends it to app via WebSocket
 - [ ] **Phase 15: App-Side Auth Recovery UI** - User opens OAuth URL on phone, pastes auth code back, sees recovery status
 - [ ] **Phase 16: Last-Response Dedup** - Checksum-based deduplication for /last responses on the server
@@ -181,7 +181,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 13-01-PLAN.md -- Auth error detection, recovery state machine, login dispatch, AUTH_REQUIRED protocol
+- [x] 13-01-PLAN.md -- Auth error detection, recovery state machine, login dispatch, AUTH_REQUIRED protocol
 
 ### Phase 14: OAuth URL Extraction & Forwarding
 **Goal**: Server captures the OAuth authorization URL that appears after `/login` and delivers it to the app so the user can authenticate from their phone
@@ -234,7 +234,7 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 10. Server Config & Protocol | v1.3 | 2/2 | Complete | 2026-04-04 |
 | 11. Session Creation UI | v1.3 | 2/2 | Complete | 2026-04-04 |
 | 12. Smart Response Handling | v1.3 | 0/0 | Complete | 2026-04-04 |
-| 13. Auth Error Detection & Login Dispatch | v1.4 | 0/1 | In progress | - |
+| 13. Auth Error Detection & Login Dispatch | v1.4 | 1/1 | Complete   | 2026-04-07 |
 | 14. OAuth URL Extraction & Forwarding | v1.4 | 0/0 | Not started | - |
 | 15. App-Side Auth Recovery UI | v1.4 | 0/0 | Not started | - |
 | 16. Last-Response Dedup | v1.4 | 0/0 | Not started | - |
