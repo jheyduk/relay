@@ -1,31 +1,27 @@
 # Requirements: Relay
 
-**Defined:** 2026-04-04
+**Defined:** 2026-04-07
 **Core Value:** Remote session control with per-session separation — see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
 
-## v1.3 Requirements
+## v1.4 Requirements
 
-Requirements for Session Management milestone. Each maps to roadmap phases.
+Requirements for Auth Recovery & Smart Responses milestone. Each maps to roadmap phases.
 
-### Session Creation
+### Auth Recovery
 
-- [x] **SESS-01**: User can open a session creation dialog via FAB (+) on SessionListScreen
-- [x] **SESS-02**: User can open a session creation dialog via NavigationDrawer menu entry
-- [x] **SESS-03**: User can fuzzy-search project directories with instant local filtering
-- [x] **SESS-04**: User can select a directory and see a confirmation dialog with editable kuerzel
-- [x] **SESS-05**: User can toggle `--dangerously-skip-permissions` flag before creating
-- [x] **SESS-06**: User can enter a custom path not under configured roots
-- [x] **SESS-07**: User can create a new Claude Code session from the confirmation dialog
+- [ ] **AUTH-01**: Server detects auth failure patterns (401, session expired, token revoked) in Claude Code terminal output
+- [ ] **AUTH-02**: Server automatically dispatches `/login` into affected session on auth failure detection
+- [ ] **AUTH-03**: Server extracts OAuth authorization URL from terminal output after login is triggered
+- [ ] **AUTH-04**: Server forwards OAuth URL to app as `AUTH_URL` WebSocket message type
+- [ ] **AUTH-05**: User can open the OAuth URL in their phone browser directly from the app
+- [ ] **AUTH-06**: User can paste the authorization code in the app and it gets dispatched to the Claude Code terminal
+- [ ] **AUTH-07**: App shows auth recovery status feedback (detected → login triggered → waiting for confirmation → recovered)
 
-### Server Config
+### Smart Responses
 
-- [ ] **CONF-01**: Server reads project roots from `~/.config/relay/project-roots.json`
-- [ ] **CONF-02**: Server scans configured roots 2 levels deep and returns directory list via WebSocket
-- [ ] **CONF-03**: Server handles `create_session` action (validate, deduplicate kuerzel, create zellij tab)
-
-### Response Handling
-
-- [ ] **RESP-01**: Session-stop hook uses smart size-aware response handling instead of hard truncation
+- [ ] **RESP-01**: Server stores a checksum of the last sent `/last` response per session
+- [ ] **RESP-02**: Server compares new `/last` response against stored checksum before sending
+- [ ] **RESP-03**: User receives "No updates" message when `/last` content is unchanged
 
 ## Future Requirements
 
@@ -39,32 +35,32 @@ Requirements for Session Management milestone. Each maps to roadmap phases.
 
 | Feature | Reason |
 |---------|--------|
+| Automatic token refresh without user interaction | OAuth grant requires user confirmation by design |
+| Proactive session expiry warning | Would need API token introspection, not available |
+| Server-side browser automation | Complexity, security — user confirms in their own browser |
 | LLM-based directory suggestions | Unnecessary complexity — FZF-style search is sufficient |
-| Directory caching on server | Scan on request is fast enough for <500 directories |
-| iOS session creation | iOS UI not yet built |
 | Session deletion from app | Session lifecycle managed by Claude Code |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SESS-01 | Phase 11 | Complete |
-| SESS-02 | Phase 11 | Complete |
-| SESS-03 | Phase 11 | Complete |
-| SESS-04 | Phase 11 | Complete |
-| SESS-05 | Phase 11 | Complete |
-| SESS-06 | Phase 11 | Complete |
-| SESS-07 | Phase 11 | Complete |
-| CONF-01 | Phase 10 | Pending |
-| CONF-02 | Phase 10 | Pending |
-| CONF-03 | Phase 10 | Pending |
-| RESP-01 | Phase 12 | Pending |
+| AUTH-01 | — | Pending |
+| AUTH-02 | — | Pending |
+| AUTH-03 | — | Pending |
+| AUTH-04 | — | Pending |
+| AUTH-05 | — | Pending |
+| AUTH-06 | — | Pending |
+| AUTH-07 | — | Pending |
+| RESP-01 | — | Pending |
+| RESP-02 | — | Pending |
+| RESP-03 | — | Pending |
 
 **Coverage:**
-- v1.3 requirements: 11 total
-- Mapped to phases: 11
-- Unmapped: 0
+- v1.4 requirements: 10 total
+- Mapped to phases: 0
+- Unmapped: 10 ⚠️
 
 ---
-*Requirements defined: 2026-04-04*
-*Last updated: 2026-04-04 after roadmap creation*
+*Requirements defined: 2026-04-07*
+*Last updated: 2026-04-07 after initial definition*
