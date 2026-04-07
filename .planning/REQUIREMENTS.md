@@ -45,22 +45,22 @@ Requirements for Auth Recovery & Smart Responses milestone. Each maps to roadmap
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| AUTH-04 | — | Pending |
-| AUTH-05 | — | Pending |
-| AUTH-06 | — | Pending |
-| AUTH-07 | — | Pending |
-| RESP-01 | — | Pending |
-| RESP-02 | — | Pending |
-| RESP-03 | — | Pending |
+| AUTH-01 | Phase 13 | Pending |
+| AUTH-02 | Phase 13 | Pending |
+| AUTH-03 | Phase 14 | Pending |
+| AUTH-04 | Phase 14 | Pending |
+| AUTH-05 | Phase 15 | Pending |
+| AUTH-06 | Phase 15 | Pending |
+| AUTH-07 | Phase 15 | Pending |
+| RESP-01 | Phase 16 | Pending |
+| RESP-02 | Phase 16 | Pending |
+| RESP-03 | Phase 16 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 10 total
-- Mapped to phases: 0
-- Unmapped: 10 ⚠️
+- Mapped to phases: 10
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-07*
-*Last updated: 2026-04-07 after initial definition*
+*Last updated: 2026-04-07 after roadmap creation*

@@ -4,7 +4,8 @@
 
 - ✅ **v1.0 MVP** - Phases 1-6 (shipped 2026-04-03)
 - ✅ **v1.1 Standalone Server** - Phases 7-9 (shipped 2026-04-03)
-- 🚧 **v1.3 Session Management** - Phases 10-12 (in progress)
+- ✅ **v1.3 Session Management** - Phases 10-12 (shipped 2026-04-04)
+- 🚧 **v1.4 Auth Recovery & Smart Responses** - Phases 13-16 (in progress)
 
 ## Phases
 
@@ -112,15 +113,8 @@ Plans:
 
 </details>
 
-### v1.3 Session Management (In Progress)
-
-**Milestone Goal:** Create new Claude Code sessions from the app with FZF-style fuzzy directory search and improve response handling in session-stop hooks.
-
-- [x] **Phase 10: Server Config & Protocol** - Server-side config, directory listing, and session creation handlers (completed 2026-04-04)
-- [x] **Phase 11: Session Creation UI** - Fullscreen dialog with fuzzy search, confirmation, and session launch (completed 2026-04-04)
-- [x] **Phase 12: Smart Response Handling** - Size-aware response logic replacing legacy truncation (completed 2026-04-04)
-
-## Phase Details
+<details>
+<summary>v1.3 Session Management (Phases 10-12) - SHIPPED 2026-04-04</summary>
 
 ### Phase 10: Server Config & Protocol
 **Goal**: Server can read project root configuration, scan directories, and create new Claude Code sessions on request from the app
@@ -134,15 +128,15 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [x] 10-01-PLAN.md — Config reading + directory listing handler (CONF-01, CONF-02)
-- [x] 10-02-PLAN.md — Session creation handler with kuerzel dedup (CONF-03)
+- [x] 10-01-PLAN.md -- Config reading + directory listing handler (CONF-01, CONF-02)
+- [x] 10-02-PLAN.md -- Session creation handler with kuerzel dedup (CONF-03)
 
 ### Phase 11: Session Creation UI
 **Goal**: Users can create a new Claude Code session from the app by selecting a project directory and confirming session parameters
 **Depends on**: Phase 10 (server protocol must exist)
 **Requirements**: SESS-01, SESS-02, SESS-03, SESS-04, SESS-05, SESS-06, SESS-07
 **Success Criteria** (what must be TRUE):
-  1. User can open the session creation dialog from a FAB (+) on the session list screen (SESS-02 superseded — drawer removed)
+  1. User can open the session creation dialog from a FAB (+) on the session list screen (SESS-02 superseded -- drawer removed)
   2. User can fuzzy-search project directories with instant filtering as they type (no network roundtrip per keystroke)
   3. User sees a confirmation dialog with editable kuerzel, the selected path, and a toggle for `--dangerously-skip-permissions`
   4. User can enter a custom path not in the directory list and proceed to confirmation
@@ -150,8 +144,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [x] 11-01-PLAN.md — Protocol DTOs, parser, domain models, WebSocket send methods (SESS-01, SESS-02, SESS-03, SESS-07)
-- [x] 11-02-PLAN.md — FuzzyMatch, CreateSessionViewModel, CreateSessionDialog, FAB entry point (SESS-01, SESS-03, SESS-04, SESS-05, SESS-06, SESS-07)
+- [x] 11-01-PLAN.md -- Protocol DTOs, parser, domain models, WebSocket send methods (SESS-01, SESS-02, SESS-03, SESS-07)
+- [x] 11-02-PLAN.md -- FuzzyMatch, CreateSessionViewModel, CreateSessionDialog, FAB entry point (SESS-01, SESS-03, SESS-04, SESS-05, SESS-06, SESS-07)
 
 ### Phase 12: Smart Response Handling
 **Goal**: Session-stop notifications include complete or intelligently sized responses instead of hard-truncated text
@@ -163,10 +157,65 @@ Plans:
   3. Responses exceeding 16 KB are truncated with a visible marker instead of silently cutting off at 2000 characters
 **Plans**: [To be planned]
 
+</details>
+
+### v1.4 Auth Recovery & Smart Responses (In Progress)
+
+**Milestone Goal:** Enable remote OAuth re-authentication from the app when Claude Code sessions hit auth errors, and eliminate duplicate `/last` responses via checksum-based deduplication.
+
+- [ ] **Phase 13: Auth Error Detection & Login Dispatch** - Server parses terminal output for auth failures and automatically dispatches /login
+- [ ] **Phase 14: OAuth URL Extraction & Forwarding** - Server extracts OAuth URL from terminal and sends it to app via WebSocket
+- [ ] **Phase 15: App-Side Auth Recovery UI** - User opens OAuth URL on phone, pastes auth code back, sees recovery status
+- [ ] **Phase 16: Last-Response Dedup** - Checksum-based deduplication for /last responses on the server
+
+## Phase Details
+
+### Phase 13: Auth Error Detection & Login Dispatch
+**Goal**: Server detects when Claude Code sessions lose authentication and automatically triggers the login flow without user intervention
+**Depends on**: Phase 12 (relay-server with terminal output parsing)
+**Requirements**: AUTH-01, AUTH-02
+**Success Criteria** (what must be TRUE):
+  1. When a Claude Code session outputs an auth error (401, session expired, token revoked), the server detects it within one polling cycle
+  2. Server automatically dispatches `/login` into the affected session's Zellij pane after detecting an auth failure
+  3. Server does not dispatch duplicate `/login` commands if the same session is already in a login recovery flow
+**Plans**: TBD
+
+### Phase 14: OAuth URL Extraction & Forwarding
+**Goal**: Server captures the OAuth authorization URL that appears after `/login` and delivers it to the app so the user can authenticate from their phone
+**Depends on**: Phase 13 (login must be dispatched first to produce the URL)
+**Requirements**: AUTH-03, AUTH-04
+**Success Criteria** (what must be TRUE):
+  1. Server extracts the OAuth authorization URL from terminal output after `/login` produces the authentication prompt
+  2. Server sends the OAuth URL to the app as an `AUTH_URL` WebSocket message type with the correct session identifier
+  3. App receives and can parse the `AUTH_URL` message (protocol layer ready for Phase 15 UI)
+**Plans**: TBD
+
+### Phase 15: App-Side Auth Recovery UI
+**Goal**: User can complete the entire OAuth re-authentication flow from their phone -- open the URL, get the code, paste it back, and see the session recover
+**Depends on**: Phase 14 (OAuth URL must be available in the app)
+**Requirements**: AUTH-05, AUTH-06, AUTH-07
+**Success Criteria** (what must be TRUE):
+  1. User can tap the OAuth URL in the app and it opens in their phone's browser
+  2. User can paste the authorization code into the app and it gets dispatched to the correct Claude Code terminal session
+  3. App shows a status indicator tracking the auth recovery lifecycle: detected -> login triggered -> waiting for code -> recovered
+  4. After successful recovery, the session returns to normal operating state in the app
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 16: Last-Response Dedup
+**Goal**: Users no longer receive duplicate `/last` responses when nothing has changed in a session -- the server tracks content and reports "No updates" instead
+**Depends on**: Nothing (independent of auth recovery)
+**Requirements**: RESP-01, RESP-02, RESP-03
+**Success Criteria** (what must be TRUE):
+  1. Server stores a checksum of the last sent `/last` response for each session
+  2. When the user requests `/last` and the content is unchanged, the server responds with a "No updates" message instead of resending the same content
+  3. When the `/last` content has actually changed, the full response is sent as before (checksum updated)
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 10 -> 11 -> 12
+Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -179,6 +228,10 @@ Phases execute in numeric order: 10 -> 11 -> 12
 | 7. Server Migration | v1.1 | 3/3 | Complete | 2026-04-03 |
 | 8. Interactive Controls & Reconnect | v1.1 | 2/2 | Complete | 2026-04-03 |
 | 9. Mac-Side Voice | v1.1 | 2/2 | Complete | 2026-04-03 |
-| 10. Server Config & Protocol | v1.3 | 2/2 | Complete    | 2026-04-04 |
-| 11. Session Creation UI | v1.3 | 2/2 | Complete    | 2026-04-04 |
-| 12. Smart Response Handling | v1.3 | 0/0 | Complete    | 2026-04-04 |
+| 10. Server Config & Protocol | v1.3 | 2/2 | Complete | 2026-04-04 |
+| 11. Session Creation UI | v1.3 | 2/2 | Complete | 2026-04-04 |
+| 12. Smart Response Handling | v1.3 | 0/0 | Complete | 2026-04-04 |
+| 13. Auth Error Detection & Login Dispatch | v1.4 | 0/0 | Not started | - |
+| 14. OAuth URL Extraction & Forwarding | v1.4 | 0/0 | Not started | - |
+| 15. App-Side Auth Recovery UI | v1.4 | 0/0 | Not started | - |
+| 16. Last-Response Dedup | v1.4 | 0/0 | Not started | - |
