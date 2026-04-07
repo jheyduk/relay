@@ -43,7 +43,19 @@ Remote session control with per-session separation — see all Claude Code sessi
 
 ### Active
 
-(None — planning next milestone)
+- [ ] Server-side detection of auth errors (401, session expired, token revoked) in Claude Code terminal output
+- [ ] Automatic `/login` dispatch into affected session on auth failure
+- [ ] OAuth URL extraction from terminal output and forwarding to the app via WebSocket
+- [ ] App-side Auth Recovery UI with browser-open and status feedback
+- [ ] Checksum-based dedup for `/last` responses — "No updates" when content unchanged
+
+## Current Milestone: v1.4 Auth Recovery & Smart Responses
+
+**Goal:** Enable remote OAuth re-authentication from the app and eliminate duplicate `/last` responses via checksum dedup.
+
+**Target features:**
+- Remote auth recovery: detect 401 → trigger login → forward OAuth URL → user confirms on phone
+- Smart last-response dedup: checksum per session, "No updates" on duplicate
 
 ## Current State
 
@@ -97,4 +109,4 @@ Remote session control with per-session separation — see all Claude Code sessi
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-04-04 after v1.3 milestone completion*
+*Last updated: 2026-04-07 after v1.4 milestone start*
