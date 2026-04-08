@@ -191,7 +191,10 @@ Plans:
   1. Server extracts the OAuth authorization URL from terminal output after `/login` produces the authentication prompt
   2. Server sends the OAuth URL to the app as an `AUTH_URL` WebSocket message type with the correct session identifier
   3. App receives and can parse the `AUTH_URL` message (protocol layer ready for Phase 15 UI)
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 14-01-PLAN.md -- OAuth URL scanning, auth_url/auth_timeout broadcast, app protocol extension
 
 ### Phase 15: App-Side Auth Recovery UI
 **Goal**: User can complete the entire OAuth re-authentication flow from their phone -- open the URL, get the code, paste it back, and see the session recover
@@ -235,6 +238,6 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 11. Session Creation UI | v1.3 | 2/2 | Complete | 2026-04-04 |
 | 12. Smart Response Handling | v1.3 | 0/0 | Complete | 2026-04-04 |
 | 13. Auth Error Detection & Login Dispatch | v1.4 | 1/1 | Complete    | 2026-04-07 |
-| 14. OAuth URL Extraction & Forwarding | v1.4 | 0/0 | Not started | - |
+| 14. OAuth URL Extraction & Forwarding | v1.4 | 0/1 | Not started | - |
 | 15. App-Side Auth Recovery UI | v1.4 | 0/0 | Not started | - |
 | 16. Last-Response Dedup | v1.4 | 0/0 | Not started | - |
