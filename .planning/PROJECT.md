@@ -41,25 +41,18 @@ Remote session control with per-session separation — see all Claude Code sessi
 - ✓ Custom path input for directories not under configured roots — v1.3
 - ✓ Smart response handling (replace legacy Telegram truncation) — v1.3
 
+- ✓ Server-side auth error detection and automatic `/login` dispatch with recovery state machine — v1.4
+- ✓ OAuth URL extraction from terminal and forwarding to app via WebSocket — v1.4
+- ✓ App-side Auth Recovery UI (open URL in browser, paste code, status feedback) — v1.4
+- ✓ Checksum-based dedup for `/last` responses — "No updates" when content unchanged — v1.4
+
 ### Active
 
-- [ ] Server-side detection of auth errors (401, session expired, token revoked) in Claude Code terminal output
-- [ ] Automatic `/login` dispatch into affected session on auth failure
-- [ ] OAuth URL extraction from terminal output and forwarding to the app via WebSocket
-- [ ] App-side Auth Recovery UI with browser-open and status feedback
-- [ ] Checksum-based dedup for `/last` responses — "No updates" when content unchanged
-
-## Current Milestone: v1.4 Auth Recovery & Smart Responses
-
-**Goal:** Enable remote OAuth re-authentication from the app and eliminate duplicate `/last` responses via checksum dedup.
-
-**Target features:**
-- Remote auth recovery: detect 401 → trigger login → forward OAuth URL → user confirms on phone
-- Smart last-response dedup: checksum per session, "No updates" on duplicate
+(None — planning next milestone)
 
 ## Current State
 
-**Shipped v1.3** — Session Management milestone complete
+**Shipped v1.4** — Auth Recovery & Smart Responses milestone complete
 
 ### Out of Scope
 
@@ -75,6 +68,7 @@ Remote session control with per-session separation — see all Claude Code sessi
 - **Shipped v1.1** — 3 phases (server migration, interactive controls, mac-side voice)
 - **Shipped v1.2** — Post-release polish: theme, attachments, status, bubbles, icon, adaptive polling, favorites
 - **Shipped v1.3** — Session creation from app (FZF fuzzy search, fullscreen dialog), server config, smart response handling
+- **Shipped v1.4** — Auth recovery (detect 401 → login → OAuth URL → phone browser → code paste-back), last-response checksum dedup
 - **Architecture**: KMP shared module (Ktor WebSocket, SQLDelight, Koin DI) + Android Compose UI + Node.js relay-server
 - **Transport**: Direct WebSocket to relay-server in `server/`
 - **Voice**: whisper.cpp medium model on Mac (~5s transcription, German default)
@@ -103,10 +97,13 @@ Remote session control with per-session separation — see all Claude Code sessi
 | zellij write-chars + write 13 | Direct pane input for commands | ✓ Working |
 | Adaptive status polling | 3s when active, 30s when idle | ✓ Good — low overhead, fast feedback |
 | Staged attachments | Pick file → preview → send with message | ✓ Good UX |
+| Auth scan on working→ready transition | Efficient — only scans when session stops, not every poll | ✓ Good |
+| Server-confirmed auth recovery | Wait for WORKING status instead of optimistic | ✓ Good — prevents false positives |
+| MD5 checksum for /last dedup | Fast, collision-irrelevant for this use case | ✓ Good |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-04-07 after v1.4 milestone start*
+*Last updated: 2026-04-08 after v1.4 milestone completion*

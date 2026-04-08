@@ -1,5 +1,19 @@
 # Milestones
 
+## v1.4 Auth Recovery & Smart Responses (Shipped: 2026-04-08)
+
+**Phases completed:** 4 phases, 5 plans, 10 tasks
+
+**Key accomplishments:**
+
+- Server-side auth error detection with regex pattern matching on working->ready transitions, automatic /login dispatch, recovery state machine with 30s cooldown and 5-min timeout, plus AUTH_REQUIRED app protocol support
+- Server-side OAuth URL extraction with regex scanning during login_sent state, auth_url/auth_timeout WebSocket broadcast, and 4-place app protocol extension
+- auth_code WebSocket action on server + sendAuthCode method through full Kotlin transport chain for OAuth code paste-back
+- AuthRecoveryCard composable with 5-phase lifecycle (required/open-url/enter-code/recovered/timeout), wired into ChatScreen as persistent bottom-bar overlay with Intent.ACTION_VIEW browser launch and code dispatch
+- MD5 checksum-based dedup in get_last handler — repeated /last returns "No updates" with no_change flag when content unchanged
+
+---
+
 ## v1.3 Session Management (Shipped: 2026-04-04)
 
 **Phases completed:** 3 phases, 4 plans, 10 tasks
