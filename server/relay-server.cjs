@@ -612,6 +612,9 @@ let statusPollTimer = null;
 let lastStatusMap = new Map(); // kuerzel -> status
 let anySessionWorking = false;
 
+// --- Last Response Dedup ---
+const lastResponseChecksums = new Map(); // kuerzel -> md5 hex string
+
 // --- Auth Recovery State ---
 const authRecoveryState = new Map(); // kuerzel -> { state: 'detected'|'login_sent'|'waiting_url'|'recovered', detectedAt: number }
 const AUTH_SCAN_COOLDOWN = 30000; // 30s per session
@@ -815,6 +818,7 @@ function stopStatusPolling() {
   authRecoveryState.clear();
   lastAuthScanMap.clear();
   lastUrlScanMap.clear();
+  lastResponseChecksums.clear();
 }
 
 let pollSuppressedUntil = 0;
@@ -1147,13 +1151,37 @@ wss.on('connection', (ws, req) => {
           const output = getLastResponses(reqKuerzel, count);
           process.stderr.write(`[relay-server] get_last @${reqKuerzel}: ${output ? output.length : 0} chars\n`);
           if (appSocket && appSocket.readyState === 1) {
-            appSocket.send(JSON.stringify({
-              type: 'last_response',
-              session: reqKuerzel,
-              message: output || '(no output)',
-              success: !!output,
-              error: output ? undefined : 'No output available',
-            }));
+            if (output) {
+              const checksum = crypto.createHash('md5').update(output).digest('hex');
+              const prevChecksum = lastResponseChecksums.get(reqKuerzel);
+              if (checksum === prevChecksum) {
+                // RESP-02, RESP-03: content unchanged — send no_change signal
+                appSocket.send(JSON.stringify({
+                  type: 'last_response',
+                  session: reqKuerzel,
+                  message: 'No updates',
+                  success: true,
+                  no_change: true,
+                }));
+              } else {
+                // Content changed — send full response and update checksum (RESP-01)
+                lastResponseChecksums.set(reqKuerzel, checksum);
+                appSocket.send(JSON.stringify({
+                  type: 'last_response',
+                  session: reqKuerzel,
+                  message: output,
+                  success: true,
+                }));
+              }
+            } else {
+              appSocket.send(JSON.stringify({
+                type: 'last_response',
+                session: reqKuerzel,
+                message: '(no output)',
+                success: false,
+                error: 'No output available',
+              }));
+            }
           }
         }
       }
