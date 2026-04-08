@@ -634,10 +634,8 @@ async function scanForAuthError(kuerzel) {
 
   lastAuthScanMap.set(kuerzel, Date.now());
 
-  const responses = getLastResponses(kuerzel, 1);
-  if (!responses || responses.length === 0) return;
-
-  const responseText = responses.map(r => r.text || r).join('\n');
+  const responseText = getLastResponses(kuerzel, 1);
+  if (!responseText) return;
   const match = AUTH_ERROR_PATTERN.exec(responseText);
   if (!match) return;
 
