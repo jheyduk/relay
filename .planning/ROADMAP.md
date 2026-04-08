@@ -242,5 +242,5 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 12. Smart Response Handling | v1.3 | 0/0 | Complete | 2026-04-04 |
 | 13. Auth Error Detection & Login Dispatch | v1.4 | 1/1 | Complete    | 2026-04-07 |
 | 14. OAuth URL Extraction & Forwarding | v1.4 | 1/1 | Complete    | 2026-04-08 |
-| 15. App-Side Auth Recovery UI | v1.4 | 2/2 | Complete   | 2026-04-08 |
+| 15. App-Side Auth Recovery UI | v1.4 | 2/2 | Complete    | 2026-04-08 |
 | 16. Last-Response Dedup | v1.4 | 0/0 | Not started | - |
