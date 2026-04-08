@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Auth Recovery & Smart Responses
 status: verifying
-stopped_at: Completed 16-01-PLAN.md
-last_updated: "2026-04-08T12:43:30.528Z"
+stopped_at: Completed quick-260408-ku7-01-PLAN.md
+last_updated: "2026-04-08T13:05:58.349Z"
 last_activity: 2026-04-08
 progress:
   total_phases: 4
@@ -52,6 +52,7 @@ No new decisions for v1.4 yet.
 - [Phase 15]: Reuse dispatchCommand for auth code delivery -- OAuth code is just text typed into terminal
 - [Phase 15]: Auth card as persistent bottom-bar overlay (not inline message) because auth types are DB-skipped
 - [Phase 16]: MD5 checksum for /last dedup — fast, sufficient for content comparison
+- [Phase quick-260408-ku7]: Server-confirmed auth recovery via SessionStatus.WORKING instead of optimistic RECOVERED
 
 ### Pending Todos
 
@@ -63,6 +64,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-08T12:41:52.310Z
-Stopped at: Completed 16-01-PLAN.md
+Last session: 2026-04-08T13:05:57.543Z
+Stopped at: Completed quick-260408-ku7-01-PLAN.md
 Resume file: None
