@@ -165,7 +165,7 @@ Plans:
 
 - [x] **Phase 13: Auth Error Detection & Login Dispatch** - Server parses terminal output for auth failures and automatically dispatches /login (completed 2026-04-07)
 - [x] **Phase 14: OAuth URL Extraction & Forwarding** - Server extracts OAuth URL from terminal and sends it to app via WebSocket (completed 2026-04-08)
-- [ ] **Phase 15: App-Side Auth Recovery UI** - User opens OAuth URL on phone, pastes auth code back, sees recovery status
+- [x] **Phase 15: App-Side Auth Recovery UI** - User opens OAuth URL on phone, pastes auth code back, sees recovery status (completed 2026-04-08)
 - [ ] **Phase 16: Last-Response Dedup** - Checksum-based deduplication for /last responses on the server
 
 ## Phase Details
@@ -209,7 +209,7 @@ Plans:
 
 Plans:
 - [x] 15-01-PLAN.md -- Server auth_code action handler + app sendAuthCode transport chain
-- [ ] 15-02-PLAN.md -- AuthRecoveryCard composable, ChatViewModel auth state, ChatScreen wiring
+- [x] 15-02-PLAN.md -- AuthRecoveryCard composable, ChatViewModel auth state, ChatScreen wiring
 
 ### Phase 16: Last-Response Dedup
 **Goal**: Users no longer receive duplicate `/last` responses when nothing has changed in a session -- the server tracks content and reports "No updates" instead
@@ -242,5 +242,5 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 12. Smart Response Handling | v1.3 | 0/0 | Complete | 2026-04-04 |
 | 13. Auth Error Detection & Login Dispatch | v1.4 | 1/1 | Complete    | 2026-04-07 |
 | 14. OAuth URL Extraction & Forwarding | v1.4 | 1/1 | Complete    | 2026-04-08 |
-| 15. App-Side Auth Recovery UI | v1.4 | 1/2 | In Progress|  |
+| 15. App-Side Auth Recovery UI | v1.4 | 2/2 | Complete   | 2026-04-08 |
 | 16. Last-Response Dedup | v1.4 | 0/0 | Not started | - |
