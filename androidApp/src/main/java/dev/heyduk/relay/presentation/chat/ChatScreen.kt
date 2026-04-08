@@ -233,6 +233,32 @@ fun ChatScreen(
         },
         bottomBar = {
             Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
+                // Auth recovery card (shown above input when auth flow is active)
+                val authPhase = uiState.authPhase
+                if (authPhase != null) {
+                    AuthRecoveryCard(
+                        session = kuerzel,
+                        authPhase = authPhase,
+                        authUrl = uiState.authUrl,
+                        onOpenUrl = {
+                            uiState.authUrl?.let { url ->
+                                val intent = android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse(url)
+                                )
+                                context.startActivity(intent)
+                            }
+                            viewModel.openAuthUrl()
+                        },
+                        onSendCode = { code -> viewModel.sendAuthCode(code) },
+                        onRetry = { viewModel.retryAuth() },
+                        isSending = uiState.isSendingAuthCode,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+
                 if (uiState.isTranscribing) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
