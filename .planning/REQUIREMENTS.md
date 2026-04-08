@@ -14,7 +14,7 @@ Requirements for Auth Recovery & Smart Responses milestone. Each maps to roadmap
 - [x] **AUTH-03**: Server extracts OAuth authorization URL from terminal output after login is triggered
 - [x] **AUTH-04**: Server forwards OAuth URL to app as `AUTH_URL` WebSocket message type
 - [ ] **AUTH-05**: User can open the OAuth URL in their phone browser directly from the app
-- [ ] **AUTH-06**: User can paste the authorization code in the app and it gets dispatched to the Claude Code terminal
+- [x] **AUTH-06**: User can paste the authorization code in the app and it gets dispatched to the Claude Code terminal
 - [ ] **AUTH-07**: App shows auth recovery status feedback (detected → login triggered → waiting for confirmation → recovered)
 
 ### Smart Responses
@@ -50,7 +50,7 @@ Requirements for Auth Recovery & Smart Responses milestone. Each maps to roadmap
 | AUTH-03 | Phase 14 | Complete |
 | AUTH-04 | Phase 14 | Complete |
 | AUTH-05 | Phase 15 | Pending |
-| AUTH-06 | Phase 15 | Pending |
+| AUTH-06 | Phase 15 | Complete |
 | AUTH-07 | Phase 15 | Pending |
 | RESP-01 | Phase 16 | Pending |
 | RESP-02 | Phase 16 | Pending |
