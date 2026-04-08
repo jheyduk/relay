@@ -1128,6 +1128,14 @@ wss.on('connection', (ws, req) => {
           }
           // session-start hook fires automatically when claude starts in the new tab
         });
+      } else if (msg.action === 'auth_code') {
+        // Auth recovery: dispatch an OAuth authorization code into the terminal
+        if (!msg.kuerzel || !msg.code) {
+          process.stderr.write('[relay-server] auth_code: missing kuerzel or code\n');
+          return;
+        }
+        process.stderr.write('[relay-server] auth_code: dispatching code to @' + msg.kuerzel + '\n');
+        dispatchCommand(msg.kuerzel, msg.code);
       } else if (msg.action === 'get_last') {
         const reqKuerzel = msg.kuerzel;
         const count = msg.count || 2;
