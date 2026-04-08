@@ -11,8 +11,8 @@ Requirements for Auth Recovery & Smart Responses milestone. Each maps to roadmap
 
 - [x] **AUTH-01**: Server detects auth failure patterns (401, session expired, token revoked) in Claude Code terminal output
 - [x] **AUTH-02**: Server automatically dispatches `/login` into affected session on auth failure detection
-- [ ] **AUTH-03**: Server extracts OAuth authorization URL from terminal output after login is triggered
-- [ ] **AUTH-04**: Server forwards OAuth URL to app as `AUTH_URL` WebSocket message type
+- [x] **AUTH-03**: Server extracts OAuth authorization URL from terminal output after login is triggered
+- [x] **AUTH-04**: Server forwards OAuth URL to app as `AUTH_URL` WebSocket message type
 - [ ] **AUTH-05**: User can open the OAuth URL in their phone browser directly from the app
 - [ ] **AUTH-06**: User can paste the authorization code in the app and it gets dispatched to the Claude Code terminal
 - [ ] **AUTH-07**: App shows auth recovery status feedback (detected → login triggered → waiting for confirmation → recovered)
@@ -47,8 +47,8 @@ Requirements for Auth Recovery & Smart Responses milestone. Each maps to roadmap
 |-------------|-------|--------|
 | AUTH-01 | Phase 13 | Complete |
 | AUTH-02 | Phase 13 | Complete |
-| AUTH-03 | Phase 14 | Pending |
-| AUTH-04 | Phase 14 | Pending |
+| AUTH-03 | Phase 14 | Complete |
+| AUTH-04 | Phase 14 | Complete |
 | AUTH-05 | Phase 15 | Pending |
 | AUTH-06 | Phase 15 | Pending |
 | AUTH-07 | Phase 15 | Pending |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Auth Recovery & Smart Responses
 status: verifying
-stopped_at: Completed 13-01-PLAN.md
-last_updated: "2026-04-07T12:31:07.033Z"
-last_activity: 2026-04-07
+stopped_at: Completed 14-01-PLAN.md
+last_updated: "2026-04-08T08:42:35.068Z"
+last_activity: 2026-04-08
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  completed_phases: 2
+  total_plans: 2
+  completed_plans: 2
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** Remote session control with per-session separation -- see all Claude Code sessions at a glance, interact with any of them, and never miss a permission request or completion notification.
-**Current focus:** Phase 13 — auth-error-detection-login-dispatch
+**Current focus:** Phase 14 — oauth-url-extraction-forwarding
 
 ## Current Position
 
-Phase: 14
-Plan: Not started
+Phase: 14 (oauth-url-extraction-forwarding) — EXECUTING
+Plan: 1 of 1
 Status: Phase complete — ready for verification
-Last activity: 2026-04-07
+Last activity: 2026-04-08
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -48,6 +48,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 No new decisions for v1.4 yet.
 
 - [Phase 13]: Auth scan on working->ready transitions only; 30s cooldown; 5-min recovery timeout; AUTH_REQUIRED as non-chat signaling message
+- [Phase 14]: 3s URL scan interval for responsive OAuth URL detection; url_sent state prevents duplicate broadcasts
 
 ### Pending Todos
 
@@ -59,6 +60,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-07T12:29:20.380Z
-Stopped at: Completed 13-01-PLAN.md
+Last session: 2026-04-08T08:42:35.066Z
+Stopped at: Completed 14-01-PLAN.md
 Resume file: None
