@@ -42,7 +42,10 @@ class ChatViewModel(
         val isRecording: Boolean = false,
         val isTranscribing: Boolean = false,
         val transcriptPreview: String? = null,
-        val pendingAttachment: PendingAttachment? = null
+        val pendingAttachment: PendingAttachment? = null,
+        val authPhase: AuthPhase? = null,
+        val authUrl: String? = null,
+        val isSendingAuthCode: Boolean = false
     )
 
     private data class LocalState(
@@ -51,7 +54,10 @@ class ChatViewModel(
         val isRecording: Boolean = false,
         val isTranscribing: Boolean = false,
         val transcriptPreview: String? = null,
-        val pendingAttachment: PendingAttachment? = null
+        val pendingAttachment: PendingAttachment? = null,
+        val authPhase: AuthPhase? = null,
+        val authUrl: String? = null,
+        val isSendingAuthCode: Boolean = false
     )
 
     private val _localState = MutableStateFlow(LocalState())
@@ -90,7 +96,10 @@ class ChatViewModel(
             isRecording = local.isRecording,
             isTranscribing = local.isTranscribing,
             transcriptPreview = local.transcriptPreview,
-            pendingAttachment = local.pendingAttachment
+            pendingAttachment = local.pendingAttachment,
+            authPhase = local.authPhase,
+            authUrl = local.authUrl,
+            isSendingAuthCode = local.isSendingAuthCode
         )
     }.stateIn(
         scope = viewModelScope,
@@ -112,6 +121,56 @@ class ChatViewModel(
                     }
                 }
         }
+    }
+
+    init {
+        // Observe auth-related relay updates for this session
+        viewModelScope.launch {
+            chatRepository.relayUpdates
+                .filter { it.session == kuerzel }
+                .collect { update ->
+                    when (update.type) {
+                        RelayMessageType.AUTH_REQUIRED -> {
+                            _localState.update { it.copy(authPhase = AuthPhase.AUTH_REQUIRED) }
+                        }
+                        RelayMessageType.AUTH_URL -> {
+                            _localState.update { it.copy(authPhase = AuthPhase.OPEN_URL, authUrl = update.authUrl) }
+                        }
+                        RelayMessageType.AUTH_TIMEOUT -> {
+                            _localState.update { it.copy(authPhase = AuthPhase.TIMED_OUT, authUrl = null) }
+                        }
+                        else -> { /* ignore */ }
+                    }
+                }
+        }
+    }
+
+    /** Transition to ENTER_CODE phase after user opens the auth URL in browser. */
+    fun openAuthUrl() {
+        _localState.update { it.copy(authPhase = AuthPhase.ENTER_CODE) }
+    }
+
+    /** Send the authorization code to the server and handle recovery lifecycle. */
+    fun sendAuthCode(code: String) {
+        if (code.isBlank()) return
+        viewModelScope.launch {
+            _localState.update { it.copy(isSendingAuthCode = true) }
+            try {
+                chatRepository.sendAuthCode(kuerzel, code)
+                // Optimistically transition to RECOVERED
+                _localState.update { it.copy(authPhase = AuthPhase.RECOVERED, isSendingAuthCode = false) }
+                // Auto-dismiss after 5 seconds
+                kotlinx.coroutines.delay(5000)
+                _localState.update { it.copy(authPhase = null, authUrl = null) }
+            } catch (e: Exception) {
+                _localState.update { it.copy(isSendingAuthCode = false, errorMessage = "Auth code send failed: ${e.message}") }
+            }
+        }
+    }
+
+    /** Reset to AUTH_REQUIRED for retry -- server will re-detect and re-trigger. */
+    fun retryAuth() {
+        _localState.update { it.copy(authPhase = AuthPhase.AUTH_REQUIRED, authUrl = null) }
     }
 
     /** Send a text message (and pending attachment if any) to the current session. */
