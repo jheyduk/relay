@@ -253,6 +253,7 @@ fun ChatScreen(
                         onSendCode = { code -> viewModel.sendAuthCode(code) },
                         onRetry = { viewModel.retryAuth() },
                         isSending = uiState.isSendingAuthCode,
+                        authErrorMessage = uiState.authErrorMessage,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp)

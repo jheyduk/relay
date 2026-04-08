@@ -45,7 +45,8 @@ class ChatViewModel(
         val pendingAttachment: PendingAttachment? = null,
         val authPhase: AuthPhase? = null,
         val authUrl: String? = null,
-        val isSendingAuthCode: Boolean = false
+        val isSendingAuthCode: Boolean = false,
+        val authErrorMessage: String? = null
     )
 
     private data class LocalState(
@@ -57,7 +58,8 @@ class ChatViewModel(
         val pendingAttachment: PendingAttachment? = null,
         val authPhase: AuthPhase? = null,
         val authUrl: String? = null,
-        val isSendingAuthCode: Boolean = false
+        val isSendingAuthCode: Boolean = false,
+        val authErrorMessage: String? = null
     )
 
     private val _localState = MutableStateFlow(LocalState())
@@ -69,6 +71,16 @@ class ChatViewModel(
         viewModelScope.launch {
             chatRepository.statusUpdates(kuerzel).collect { status ->
                 _sessionStatus.value = status
+                // Auth recovery confirmation: session going to WORKING means auth succeeded
+                val currentAuth = _localState.value.authPhase
+                if (currentAuth == AuthPhase.ENTER_CODE || currentAuth == AuthPhase.OPEN_URL) {
+                    if (status == SessionStatus.WORKING) {
+                        // Server confirmed auth succeeded — session is working again
+                        _localState.update { it.copy(authPhase = AuthPhase.RECOVERED, isSendingAuthCode = false) }
+                        kotlinx.coroutines.delay(5000)
+                        _localState.update { it.copy(authPhase = null, authUrl = null) }
+                    }
+                }
             }
         }
     }
@@ -99,7 +111,8 @@ class ChatViewModel(
             pendingAttachment = local.pendingAttachment,
             authPhase = local.authPhase,
             authUrl = local.authUrl,
-            isSendingAuthCode = local.isSendingAuthCode
+            isSendingAuthCode = local.isSendingAuthCode,
+            authErrorMessage = local.authErrorMessage
         )
     }.stateIn(
         scope = viewModelScope,
@@ -131,13 +144,18 @@ class ChatViewModel(
                 .collect { update ->
                     when (update.type) {
                         RelayMessageType.AUTH_REQUIRED -> {
-                            _localState.update { it.copy(authPhase = AuthPhase.AUTH_REQUIRED) }
+                            // If we were waiting for confirmation (ENTER_CODE), this means the code was wrong
+                            val wasWaiting = _localState.value.authPhase == AuthPhase.ENTER_CODE
+                            _localState.update { it.copy(
+                                authPhase = AuthPhase.AUTH_REQUIRED,
+                                authErrorMessage = if (wasWaiting) "Authentication failed. Please try again." else null
+                            ) }
                         }
                         RelayMessageType.AUTH_URL -> {
-                            _localState.update { it.copy(authPhase = AuthPhase.OPEN_URL, authUrl = update.authUrl) }
+                            _localState.update { it.copy(authPhase = AuthPhase.OPEN_URL, authUrl = update.authUrl, authErrorMessage = null) }
                         }
                         RelayMessageType.AUTH_TIMEOUT -> {
-                            _localState.update { it.copy(authPhase = AuthPhase.TIMED_OUT, authUrl = null) }
+                            _localState.update { it.copy(authPhase = AuthPhase.TIMED_OUT, authUrl = null, authErrorMessage = null) }
                         }
                         else -> { /* ignore */ }
                     }
@@ -157,11 +175,9 @@ class ChatViewModel(
             _localState.update { it.copy(isSendingAuthCode = true) }
             try {
                 chatRepository.sendAuthCode(kuerzel, code)
-                // Optimistically transition to RECOVERED
-                _localState.update { it.copy(authPhase = AuthPhase.RECOVERED, isSendingAuthCode = false) }
-                // Auto-dismiss after 5 seconds
-                kotlinx.coroutines.delay(5000)
-                _localState.update { it.copy(authPhase = null, authUrl = null) }
+                // Stay at ENTER_CODE — do NOT set RECOVERED optimistically.
+                // The _sessionStatus observer will detect working -> triggers RECOVERED.
+                _localState.update { it.copy(isSendingAuthCode = false) }
             } catch (e: Exception) {
                 _localState.update { it.copy(isSendingAuthCode = false, errorMessage = "Auth code send failed: ${e.message}") }
             }
@@ -218,7 +234,12 @@ class ChatViewModel(
                         .first()
                 }
                 if (update != null && update.sessionCreatedSuccess == true) {
-                    chatRepository.insertIncomingMessage(kuerzel, update.message)
+                    if (update.noChange) {
+                        // Show transient snackbar instead of inserting chat bubble
+                        _localState.update { it.copy(errorMessage = "No updates") }
+                    } else {
+                        chatRepository.insertIncomingMessage(kuerzel, update.message)
+                    }
                 } else if (update != null) {
                     _localState.update { it.copy(errorMessage = update.sessionCreatedError ?: "Failed to fetch") }
                 } else {

@@ -62,6 +62,7 @@ fun AuthRecoveryCard(
     onSendCode: (String) -> Unit,
     onRetry: () -> Unit,
     isSending: Boolean = false,
+    authErrorMessage: String? = null,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -108,6 +109,14 @@ fun AuthRecoveryCard(
             // Phase-specific content
             when (authPhase) {
                 AuthPhase.AUTH_REQUIRED -> {
+                    if (authErrorMessage != null) {
+                        Text(
+                            text = authErrorMessage,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = StatusRed
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
                     Text(
                         text = "Authentication expired. Login has been triggered automatically.",
                         style = MaterialTheme.typography.bodyMedium,
