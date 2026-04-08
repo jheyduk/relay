@@ -219,7 +219,10 @@ Plans:
   1. Server stores a checksum of the last sent `/last` response for each session
   2. When the user requests `/last` and the content is unchanged, the server responds with a "No updates" message instead of resending the same content
   3. When the `/last` content has actually changed, the full response is sent as before (checksum updated)
-**Plans**: 2 plans
+**Plans**: 1 plan
+
+Plans:
+- [ ] 16-01-PLAN.md -- Checksum dedup for get_last handler (RESP-01, RESP-02, RESP-03)
 
 ## Progress
 
