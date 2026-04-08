@@ -84,6 +84,10 @@ class ChatRepositoryImpl(
         )
     }
 
+    override suspend fun sendAuthCode(kuerzel: String, code: String) {
+        relayRepository.sendAuthCode(kuerzel, code)
+    }
+
     override suspend fun sendCommand(kuerzel: String, text: String) {
         relayRepository.sendCommand(kuerzel, text)
     }

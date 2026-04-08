@@ -45,6 +45,10 @@ class RelayRepositoryImpl(
         webSocketClient.sendCommand(kuerzel, message)
     }
 
+    override suspend fun sendAuthCode(kuerzel: String, code: String) {
+        webSocketClient.sendAuthCode(kuerzel, code)
+    }
+
     override suspend fun sendRawCommand(command: String) {
         webSocketClient.sendRawCommand(command)
     }

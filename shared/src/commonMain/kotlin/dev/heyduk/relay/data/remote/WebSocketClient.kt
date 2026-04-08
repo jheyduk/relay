@@ -136,6 +136,19 @@ class WebSocketClient(
     }
 
     /**
+     * Sends an OAuth authorization code to a session's terminal for auth recovery.
+     *
+     * @param kuerzel Session short name (e.g. "infra")
+     * @param code The authorization code to paste into the terminal
+     */
+    suspend fun sendAuthCode(kuerzel: String, code: String) {
+        val payload = json.encodeToString(
+            mapOf("action" to "auth_code", "kuerzel" to kuerzel, "code" to code)
+        )
+        send(payload)
+    }
+
+    /**
      * Sends a raw command string (e.g. "/ls") via the relay server.
      *
      * @param command The raw command to send

@@ -28,6 +28,9 @@ interface ChatRepository {
     /** Insert an incoming server message into DB (displayed as server-side bubble). */
     suspend fun insertIncomingMessage(kuerzel: String, text: String)
 
+    /** Send an OAuth authorization code to a session's terminal for auth recovery. */
+    suspend fun sendAuthCode(kuerzel: String, code: String)
+
     /** Send a command to the terminal without DB insert. */
     suspend fun sendCommand(kuerzel: String, text: String)
 

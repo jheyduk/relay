@@ -25,6 +25,9 @@ interface RelayRepository {
     /** Send a command to a specific session via the relay server. */
     suspend fun sendCommand(kuerzel: String, message: String)
 
+    /** Send an OAuth authorization code to a session's terminal. */
+    suspend fun sendAuthCode(kuerzel: String, code: String)
+
     /** Send a raw command (e.g. /ls, /last) via the relay server. */
     suspend fun sendRawCommand(command: String)
 
