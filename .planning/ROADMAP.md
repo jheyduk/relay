@@ -205,8 +205,11 @@ Plans:
   2. User can paste the authorization code into the app and it gets dispatched to the correct Claude Code terminal session
   3. App shows a status indicator tracking the auth recovery lifecycle: detected -> login triggered -> waiting for code -> recovered
   4. After successful recovery, the session returns to normal operating state in the app
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 2 plans
+
+Plans:
+- [ ] 15-01-PLAN.md -- Server auth_code action handler + app sendAuthCode transport chain
+- [ ] 15-02-PLAN.md -- AuthRecoveryCard composable, ChatViewModel auth state, ChatScreen wiring
 
 ### Phase 16: Last-Response Dedup
 **Goal**: Users no longer receive duplicate `/last` responses when nothing has changed in a session -- the server tracks content and reports "No updates" instead
@@ -216,7 +219,7 @@ Plans:
   1. Server stores a checksum of the last sent `/last` response for each session
   2. When the user requests `/last` and the content is unchanged, the server responds with a "No updates" message instead of resending the same content
   3. When the `/last` content has actually changed, the full response is sent as before (checksum updated)
-**Plans**: TBD
+**Plans**: 2 plans
 
 ## Progress
 
