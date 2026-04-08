@@ -19,9 +19,9 @@ Requirements for Auth Recovery & Smart Responses milestone. Each maps to roadmap
 
 ### Smart Responses
 
-- [ ] **RESP-01**: Server stores a checksum of the last sent `/last` response per session
-- [ ] **RESP-02**: Server compares new `/last` response against stored checksum before sending
-- [ ] **RESP-03**: User receives "No updates" message when `/last` content is unchanged
+- [x] **RESP-01**: Server stores a checksum of the last sent `/last` response per session
+- [x] **RESP-02**: Server compares new `/last` response against stored checksum before sending
+- [x] **RESP-03**: User receives "No updates" message when `/last` content is unchanged
 
 ## Future Requirements
 
@@ -52,9 +52,9 @@ Requirements for Auth Recovery & Smart Responses milestone. Each maps to roadmap
 | AUTH-05 | Phase 15 | Complete |
 | AUTH-06 | Phase 15 | Complete |
 | AUTH-07 | Phase 15 | Complete |
-| RESP-01 | Phase 16 | Pending |
-| RESP-02 | Phase 16 | Pending |
-| RESP-03 | Phase 16 | Pending |
+| RESP-01 | Phase 16 | Complete |
+| RESP-02 | Phase 16 | Complete |
+| RESP-03 | Phase 16 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 10 total

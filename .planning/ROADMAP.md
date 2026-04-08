@@ -166,7 +166,7 @@ Plans:
 - [x] **Phase 13: Auth Error Detection & Login Dispatch** - Server parses terminal output for auth failures and automatically dispatches /login (completed 2026-04-07)
 - [x] **Phase 14: OAuth URL Extraction & Forwarding** - Server extracts OAuth URL from terminal and sends it to app via WebSocket (completed 2026-04-08)
 - [x] **Phase 15: App-Side Auth Recovery UI** - User opens OAuth URL on phone, pastes auth code back, sees recovery status (completed 2026-04-08)
-- [ ] **Phase 16: Last-Response Dedup** - Checksum-based deduplication for /last responses on the server
+- [x] **Phase 16: Last-Response Dedup** - Checksum-based deduplication for /last responses on the server (completed 2026-04-08)
 
 ## Phase Details
 
@@ -222,7 +222,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 16-01-PLAN.md -- Checksum dedup for get_last handler (RESP-01, RESP-02, RESP-03)
+- [x] 16-01-PLAN.md -- Checksum dedup for get_last handler (RESP-01, RESP-02, RESP-03)
 
 ## Progress
 
@@ -246,4 +246,4 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16
 | 13. Auth Error Detection & Login Dispatch | v1.4 | 1/1 | Complete    | 2026-04-07 |
 | 14. OAuth URL Extraction & Forwarding | v1.4 | 1/1 | Complete    | 2026-04-08 |
 | 15. App-Side Auth Recovery UI | v1.4 | 2/2 | Complete    | 2026-04-08 |
-| 16. Last-Response Dedup | v1.4 | 0/0 | Not started | - |
+| 16. Last-Response Dedup | v1.4 | 1/1 | Complete   | 2026-04-08 |
