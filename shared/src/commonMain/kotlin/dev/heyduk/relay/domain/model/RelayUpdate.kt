@@ -27,5 +27,6 @@ data class RelayUpdate(
     val sessionCreatedKuerzel: String? = null,
     val sessionCreatedPath: String? = null,
     val sessionCreatedSuccess: Boolean? = null,
-    val sessionCreatedError: String? = null
+    val sessionCreatedError: String? = null,
+    val authUrl: String? = null
 )

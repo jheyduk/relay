@@ -91,7 +91,9 @@ class WebSocketService : Service() {
                         update.type == RelayMessageType.DIRECTORY_LIST ||
                         update.type == RelayMessageType.SESSION_CREATED ||
                         update.type == RelayMessageType.LAST_RESPONSE ||
-                        update.type == RelayMessageType.AUTH_REQUIRED) return@collect
+                        update.type == RelayMessageType.AUTH_REQUIRED ||
+                        update.type == RelayMessageType.AUTH_URL ||
+                        update.type == RelayMessageType.AUTH_TIMEOUT) return@collect
 
                     database.messagesQueries.insertOrIgnore(
                         update_id = update.updateId,

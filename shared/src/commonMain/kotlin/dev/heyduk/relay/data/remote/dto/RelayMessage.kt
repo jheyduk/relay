@@ -22,6 +22,7 @@ data class RelayMessage(
     val defaultFlags: String? = null,
     val success: Boolean? = null,
     val error: String? = null,
+    val url: String? = null,
     val kuerzel: String? = null,
     val path: String? = null
 )
@@ -51,7 +52,9 @@ enum class RelayMessageTypeDto {
     @SerialName("directory_list") DIRECTORY_LIST,
     @SerialName("session_created") SESSION_CREATED,
     @SerialName("last_response") LAST_RESPONSE,
-    @SerialName("auth_required") AUTH_REQUIRED
+    @SerialName("auth_required") AUTH_REQUIRED,
+    @SerialName("auth_url") AUTH_URL,
+    @SerialName("auth_timeout") AUTH_TIMEOUT
 }
 
 @Serializable

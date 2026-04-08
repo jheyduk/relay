@@ -51,7 +51,8 @@ object RelayMessageParser {
                 sessionCreatedKuerzel = relay.kuerzel,
                 sessionCreatedPath = relay.path,
                 sessionCreatedSuccess = relay.success,
-                sessionCreatedError = relay.error
+                sessionCreatedError = relay.error,
+                authUrl = relay.url
             )
         } catch (_: Exception) {
             null // Not a relay JSON message
@@ -72,6 +73,8 @@ fun RelayMessageTypeDto.toDomain(): RelayMessageType = when (this) {
     RelayMessageTypeDto.SESSION_CREATED -> RelayMessageType.SESSION_CREATED
     RelayMessageTypeDto.LAST_RESPONSE -> RelayMessageType.LAST_RESPONSE
     RelayMessageTypeDto.AUTH_REQUIRED -> RelayMessageType.AUTH_REQUIRED
+    RelayMessageTypeDto.AUTH_URL -> RelayMessageType.AUTH_URL
+    RelayMessageTypeDto.AUTH_TIMEOUT -> RelayMessageType.AUTH_TIMEOUT
 }
 
 fun SessionStatusDto.toDomain(): SessionStatus = when (this) {
