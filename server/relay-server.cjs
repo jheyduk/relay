@@ -619,6 +619,9 @@ const AUTH_RECOVERY_TIMEOUT = 300000; // 5 minutes
 const lastAuthScanMap = new Map(); // kuerzel -> timestamp of last scan
 
 const AUTH_ERROR_PATTERN = /(session has expired|oauth token (has expired|revoked)|not logged in|please run \/login|API Error: 401|authentication_error)/i;
+const OAUTH_URL_PATTERN = /(https:\/\/(?:console\.anthropic\.com|claude\.ai)\/oauth\S+)/i;
+const URL_SCAN_INTERVAL = 3000; // 3s between OAuth URL scans
+const lastUrlScanMap = new Map(); // kuerzel -> timestamp of last URL scan
 
 /**
  * Scan terminal output for auth errors after a session transitions from working to ready.
@@ -659,6 +662,41 @@ async function scanForAuthError(kuerzel) {
   const recovery = authRecoveryState.get(kuerzel);
   if (recovery) recovery.state = 'login_sent';
   process.stderr.write(`[relay-server] Dispatched /login to @${kuerzel}\n`);
+}
+
+/**
+ * Scan terminal output for OAuth URL after /login was dispatched.
+ * Only runs when recovery state is 'login_sent'. Sends auth_url to app on match.
+ */
+function scanForOAuthUrl(kuerzel) {
+  const recovery = authRecoveryState.get(kuerzel);
+  if (!recovery || recovery.state !== 'login_sent') return;
+
+  // Cooldown: max one URL scan per 3s per session
+  const lastScan = lastUrlScanMap.get(kuerzel) || 0;
+  if (Date.now() - lastScan < URL_SCAN_INTERVAL) return;
+
+  lastUrlScanMap.set(kuerzel, Date.now());
+
+  const responseText = getLastResponses(kuerzel, 1);
+  if (!responseText) return;
+
+  const match = OAUTH_URL_PATTERN.exec(responseText);
+  if (!match) return;
+
+  // OAuth URL found — update state and notify app
+  recovery.state = 'url_sent';
+  process.stderr.write(`[relay-server] OAuth URL extracted for @${kuerzel}: ${match[1]}\n`);
+
+  if (appSocket && appSocket.readyState === 1) {
+    appSocket.send(JSON.stringify({
+      type: 'auth_url',
+      session: kuerzel,
+      url: match[1],
+      timestamp: Date.now(),
+      __relay: true,
+    }));
+  }
 }
 
 const POLL_IDLE = 30000;  // 30s when all sessions are ready
@@ -708,7 +746,22 @@ function startStatusPolling() {
         for (const [kuerzel, recovery] of authRecoveryState) {
           if (Date.now() - recovery.detectedAt > AUTH_RECOVERY_TIMEOUT) {
             process.stderr.write(`[relay-server] Auth recovery timeout for @${kuerzel}, resetting\n`);
+            if (appSocket && appSocket.readyState === 1) {
+              appSocket.send(JSON.stringify({
+                type: 'auth_timeout',
+                session: kuerzel,
+                timestamp: Date.now(),
+                __relay: true,
+              }));
+            }
             authRecoveryState.delete(kuerzel);
+          }
+        }
+
+        // Scan for OAuth URL in sessions that are in login_sent state
+        for (const [kuerzel, recovery] of authRecoveryState) {
+          if (recovery.state === 'login_sent') {
+            scanForOAuthUrl(kuerzel);
           }
         }
 
@@ -761,6 +814,7 @@ function stopStatusPolling() {
   anySessionWorking = false;
   authRecoveryState.clear();
   lastAuthScanMap.clear();
+  lastUrlScanMap.clear();
 }
 
 let pollSuppressedUntil = 0;
