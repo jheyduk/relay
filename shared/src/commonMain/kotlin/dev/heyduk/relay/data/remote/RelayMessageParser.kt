@@ -52,7 +52,8 @@ object RelayMessageParser {
                 sessionCreatedPath = relay.path,
                 sessionCreatedSuccess = relay.success,
                 sessionCreatedError = relay.error,
-                authUrl = relay.url
+                authUrl = relay.url,
+                noChange = relay.noChange ?: false
             )
         } catch (_: Exception) {
             null // Not a relay JSON message

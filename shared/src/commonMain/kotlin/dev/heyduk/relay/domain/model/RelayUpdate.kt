@@ -28,5 +28,6 @@ data class RelayUpdate(
     val sessionCreatedPath: String? = null,
     val sessionCreatedSuccess: Boolean? = null,
     val sessionCreatedError: String? = null,
-    val authUrl: String? = null
+    val authUrl: String? = null,
+    val noChange: Boolean = false
 )

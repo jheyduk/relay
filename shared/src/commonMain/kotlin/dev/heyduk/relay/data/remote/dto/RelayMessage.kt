@@ -22,6 +22,7 @@ data class RelayMessage(
     val defaultFlags: String? = null,
     val success: Boolean? = null,
     val error: String? = null,
+    @SerialName("no_change") val noChange: Boolean? = null,
     val url: String? = null,
     val kuerzel: String? = null,
     val path: String? = null

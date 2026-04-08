@@ -5,6 +5,7 @@ import dev.heyduk.relay.domain.model.SessionStatus
 import dev.heyduk.relay.domain.model.DirectoryEntry
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -152,6 +153,39 @@ class RelayMessageParserTest {
         val dirs = result.directoryList
         assertNotNull(dirs)
         assertTrue(dirs.isEmpty())
+    }
+
+    @Test
+    fun lastResponseWithNoChangeFlagParsesCorrectly() {
+        val json = """
+            {
+                "type": "last_response",
+                "session": "test",
+                "message": "No updates",
+                "success": true,
+                "no_change": true
+            }
+        """.trimIndent()
+        val result = RelayMessageParser.parse(updateId = 20L, messageText = json, timestamp = 9999L)
+        assertNotNull(result)
+        assertEquals(RelayMessageType.LAST_RESPONSE, result.type)
+        assertTrue(result.noChange)
+    }
+
+    @Test
+    fun lastResponseWithoutNoChangeFlagDefaultsToFalse() {
+        val json = """
+            {
+                "type": "last_response",
+                "session": "test",
+                "message": "Some content here",
+                "success": true
+            }
+        """.trimIndent()
+        val result = RelayMessageParser.parse(updateId = 21L, messageText = json, timestamp = 9999L)
+        assertNotNull(result)
+        assertEquals(RelayMessageType.LAST_RESPONSE, result.type)
+        assertFalse(result.noChange)
     }
 
     @Test
