@@ -14,6 +14,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import dev.heyduk.relay.data.remote.ConnectionState
 import dev.heyduk.relay.data.remote.WebSocketClient
 import dev.heyduk.relay.data.repository.ChatRepositoryImpl
+import dev.heyduk.relay.data.repository.SessionRepository
 import dev.heyduk.relay.db.RelayDatabase
 import dev.heyduk.relay.domain.model.RelayMessageType
 import kotlinx.coroutines.CancellationException
@@ -50,6 +51,7 @@ class WebSocketService : Service() {
     private val notificationHelper: NotificationHelper by inject()
     private val nsdDiscovery: NsdDiscovery by inject()
     private val chatRepositoryImpl: ChatRepositoryImpl by inject()
+    private val sessionRepository: SessionRepository by inject()
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     @Volatile private var connectionStarted = false
@@ -86,6 +88,14 @@ class WebSocketService : Service() {
             // Collect updates and insert into the database
             launch {
                 webSocketClient.updates.collect { update ->
+                    // Handle session_list: update active sessions and auto-cleanup stale ones
+                    if (update.type == RelayMessageType.SESSION_LIST) {
+                        update.activeSessionNames?.let { names ->
+                            sessionRepository.updateActiveSessions(names)
+                        }
+                        return@collect
+                    }
+
                     // Skip DB persistence for non-chat message types
                     if (update.type == RelayMessageType.TRANSCRIPT ||
                         update.type == RelayMessageType.DIRECTORY_LIST ||

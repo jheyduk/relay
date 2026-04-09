@@ -46,3 +46,6 @@ FROM messages
 WHERE session != ''
 GROUP BY session
 ORDER BY last_seen DESC;
+
+deleteMessagesForSession:
+DELETE FROM messages WHERE session = ?;

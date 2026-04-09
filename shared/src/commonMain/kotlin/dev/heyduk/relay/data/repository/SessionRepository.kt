@@ -22,4 +22,7 @@ interface SessionRepository {
 
     /** Get the last response text for a specific session. */
     suspend fun getLastResponse(kuerzel: String): String?
+
+    /** Update active session set and auto-cleanup stale sessions from DB. */
+    suspend fun updateActiveSessions(activeNames: List<String>)
 }

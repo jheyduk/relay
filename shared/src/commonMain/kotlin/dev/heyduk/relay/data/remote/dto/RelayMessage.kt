@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 data class DirectoryEntryDto(val path: String, val name: String)
 
 @Serializable
+data class SessionListEntryDto(val name: String, val active: Boolean = true)
+
+@Serializable
 data class RelayMessage(
     val type: RelayMessageTypeDto,
     val session: String = "",
@@ -25,7 +28,8 @@ data class RelayMessage(
     @SerialName("no_change") val noChange: Boolean? = null,
     val url: String? = null,
     val kuerzel: String? = null,
-    val path: String? = null
+    val path: String? = null,
+    val sessions: List<SessionListEntryDto>? = null
 )
 
 @Serializable
@@ -55,7 +59,8 @@ enum class RelayMessageTypeDto {
     @SerialName("last_response") LAST_RESPONSE,
     @SerialName("auth_required") AUTH_REQUIRED,
     @SerialName("auth_url") AUTH_URL,
-    @SerialName("auth_timeout") AUTH_TIMEOUT
+    @SerialName("auth_timeout") AUTH_TIMEOUT,
+    @SerialName("session_list") SESSION_LIST
 }
 
 @Serializable
