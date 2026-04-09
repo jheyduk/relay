@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 
 /**
  * Session repository implementation that discovers sessions from the database.
@@ -79,12 +78,12 @@ class SessionRepositoryImpl(
             .filter { it !in activeSet }
 
         for (session in staleSessions) {
-            Timber.d("Auto-cleanup: deleting messages for inactive session '%s'", session)
+            println("Auto-cleanup: deleting messages for inactive session '$session'")
             database.messagesQueries.deleteMessagesForSession(session)
         }
 
         if (staleSessions.isNotEmpty()) {
-            Timber.i("Auto-cleanup: removed %d inactive session(s): %s", staleSessions.size, staleSessions)
+            println("Auto-cleanup: removed ${staleSessions.size} inactive session(s): $staleSessions")
         }
     }
 }
