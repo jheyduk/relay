@@ -48,7 +48,19 @@ class SessionRepositoryImpl(
             if (activeNames == null) {
                 allSessions // No session_list received yet -- show all as fallback
             } else {
-                allSessions.filter { it.kuerzel in activeNames }
+                // Start with DB sessions that are still active
+                val dbActive = allSessions.filter { it.kuerzel in activeNames }
+                val dbNames = dbActive.map { it.kuerzel }.toSet()
+                // Add active sessions that have no DB entries yet (newly created tabs)
+                val newSessions = activeNames.filter { it !in dbNames }.map { name ->
+                    Session(
+                        kuerzel = name,
+                        status = SessionStatus.READY,
+                        lastActivity = null,
+                        isActive = false
+                    )
+                }
+                dbActive + newSessions
             }
         }
 
