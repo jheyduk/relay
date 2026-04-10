@@ -185,25 +185,14 @@ class WebSocketService : Service() {
      * Tries mDNS discovery first (5 second timeout), falls back to configured WireGuard IP.
      */
     private suspend fun discoverServer(wireguardIp: String): String {
-        // Try mDNS discovery with a 5-second timeout
-        val mDnsResult = withTimeoutOrNull(5000) {
-            nsdDiscovery.discover().firstOrNull()
-        }
-
-        if (mDnsResult != null) {
-            val url = nsdDiscovery.resolveToUrl(mDnsResult)
-            Timber.i("Server found via mDNS: %s", url)
-            return url
-        }
-
-        // Fall back to WireGuard IP
+        // Use configured IP directly — mDNS discovery was unreliable
         if (wireguardIp.isNotBlank()) {
             val url = "ws://$wireguardIp:9784"
-            Timber.i("Using WireGuard fallback: %s", url)
+            Timber.i("Using configured server IP: %s", url)
             return url
         }
 
-        throw IllegalStateException("No server found — configure WireGuard IP or ensure local network")
+        throw IllegalStateException("No server IP configured — set Server IP in settings")
     }
 
     /**
