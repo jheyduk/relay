@@ -137,6 +137,16 @@ class ChatViewModel(
     }
 
     init {
+        // Auto-poll /last every 5 minutes (silent — no "No updates" snackbar)
+        viewModelScope.launch {
+            while (true) {
+                kotlinx.coroutines.delay(5 * 60 * 1000L)
+                fetchLast(silent = true)
+            }
+        }
+    }
+
+    init {
         // Observe auth-related relay updates for this session
         viewModelScope.launch {
             chatRepository.relayUpdates
@@ -223,8 +233,9 @@ class ChatViewModel(
         }
     }
 
-    /** Fetch the last 2 messages from the session via server get_last action. */
-    fun fetchLast() {
+    /** Fetch the last 2 messages from the session via server get_last action.
+     *  @param silent If true, suppress "No updates" snackbar (used by auto-poll). */
+    fun fetchLast(silent: Boolean = false) {
         viewModelScope.launch {
             try {
                 chatRepository.sendGetLast(kuerzel, 2)
@@ -235,18 +246,21 @@ class ChatViewModel(
                 }
                 if (update != null && update.sessionCreatedSuccess == true) {
                     if (update.noChange) {
-                        // Show transient snackbar instead of inserting chat bubble
-                        _localState.update { it.copy(errorMessage = "No updates") }
+                        if (!silent) {
+                            _localState.update { it.copy(errorMessage = "No updates") }
+                        }
                     } else {
                         chatRepository.insertIncomingMessage(kuerzel, update.message)
                     }
-                } else if (update != null) {
+                } else if (update != null && !silent) {
                     _localState.update { it.copy(errorMessage = update.sessionCreatedError ?: "Failed to fetch") }
-                } else {
+                } else if (update == null && !silent) {
                     _localState.update { it.copy(errorMessage = "Timeout fetching last messages") }
                 }
             } catch (e: Exception) {
-                _localState.update { it.copy(errorMessage = "Fetch failed: ${e.message}") }
+                if (!silent) {
+                    _localState.update { it.copy(errorMessage = "Fetch failed: ${e.message}") }
+                }
             }
         }
     }
