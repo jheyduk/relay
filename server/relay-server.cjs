@@ -1004,7 +1004,7 @@ wss.on('connection', (ws, req) => {
         // Suppress polling for 10s — hooks handle the working→ready transition
         suppressPollingFor(10000);
       } else if (msg.action === 'raw_command') {
-        if (msg.command === 'ls') {
+        if (msg.command === 'ls' || msg.command === '/ls') {
           // List sessions directly from Zellij tabs
           const zellijSession = getZellijSession();
           if (zellijSession) {
