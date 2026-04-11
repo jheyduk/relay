@@ -559,11 +559,13 @@ function listSessions(sessionId) {
         .filter(t => t.name && t.name.startsWith('@'))
         .map(t => ({ name: t.name.slice(1), active: t.active }));
       if (appSocket && appSocket.readyState === 1) {
-        appSocket.send(JSON.stringify({
+        const msg = JSON.stringify({
           type: 'session_list',
           sessions,
           timestamp: Date.now(),
-        }));
+        });
+        appSocket.send(msg);
+        process.stderr.write(`[relay-server] Sent session_list: ${sessions.length} session(s)\n`);
       }
     } catch (e) {
       process.stderr.write(`[relay-server] list-tabs parse error: ${e.message}\n`);
