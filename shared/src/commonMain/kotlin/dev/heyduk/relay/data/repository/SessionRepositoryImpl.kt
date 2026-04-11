@@ -80,22 +80,10 @@ class SessionRepositoryImpl(
     }
 
     override suspend fun updateActiveSessions(activeNames: List<String>) {
-        val activeSet = activeNames.toSet()
-        _activeSessionNames.value = activeSet
+        _activeSessionNames.value = activeNames.toSet()
+    }
 
-        // Auto-cleanup: delete messages for sessions not in the active list
-        val allDbSessions = database.messagesQueries.getDistinctSessions().executeAsList()
-        val staleSessions = allDbSessions
-            .map { it.session }
-            .filter { it !in activeSet }
-
-        for (session in staleSessions) {
-            println("Auto-cleanup: deleting messages for inactive session '$session'")
-            database.messagesQueries.deleteMessagesForSession(session)
-        }
-
-        if (staleSessions.isNotEmpty()) {
-            println("Auto-cleanup: removed ${staleSessions.size} inactive session(s): $staleSessions")
-        }
+    override suspend fun clearSession(kuerzel: String) {
+        database.messagesQueries.deleteMessagesForSession(kuerzel)
     }
 }

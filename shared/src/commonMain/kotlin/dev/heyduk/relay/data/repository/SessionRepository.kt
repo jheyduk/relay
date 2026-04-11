@@ -25,4 +25,7 @@ interface SessionRepository {
 
     /** Update active session set and auto-cleanup stale sessions from DB. */
     suspend fun updateActiveSessions(activeNames: List<String>)
+
+    /** Delete all messages for a session from the local DB. */
+    suspend fun clearSession(kuerzel: String)
 }

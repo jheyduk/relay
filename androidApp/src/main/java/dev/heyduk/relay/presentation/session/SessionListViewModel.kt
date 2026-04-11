@@ -182,6 +182,13 @@ class SessionListViewModel(
         }
     }
 
+    /** Delete all messages for a session from the local DB. */
+    fun clearSession(kuerzel: String) {
+        viewModelScope.launch {
+            sessionRepository.clearSession(kuerzel)
+        }
+    }
+
     /** Clear any currently displayed error message. */
     fun clearError() {
         _localState.update { it.copy(errorMessage = null) }
