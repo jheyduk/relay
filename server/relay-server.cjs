@@ -557,7 +557,7 @@ function listSessions(sessionId) {
       const tabs = JSON.parse(stdout);
       const sessions = tabs
         .filter(t => t.name && t.name.startsWith('@'))
-        .map(t => ({ name: t.name.slice(1), active: t.active }));
+        .map(t => ({ name: t.name.slice(1), active: true }));
       if (appSocket && appSocket.readyState === 1) {
         const msg = JSON.stringify({
           type: 'session_list',
